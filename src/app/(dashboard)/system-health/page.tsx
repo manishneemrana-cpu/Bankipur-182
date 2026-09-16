@@ -1,10 +1,12 @@
 import { getCurrentUser } from "@/lib/data/current-user";
 import { getSystemHealth } from "@/lib/data/system-health";
 import { WORKFLOW_TEMPLATES } from "@/lib/n8n/workflow-templates";
+import { activateIntegration } from "./actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { formatDateTime } from "@/lib/format";
 
 const SERVICE_LABEL: Record<string, string> = {
@@ -19,11 +21,17 @@ const SERVICE_LABEL: Record<string, string> = {
   email: "Email",
 };
 
-export default async function SystemHealthPage() {
+export default async function SystemHealthPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   const user = await getCurrentUser();
   if (!user.organizationId) return null;
 
   const health = await getSystemHealth(user.organizationId);
+  const canActivate = user.role === "OWNER" || user.role === "ADMIN";
 
   return (
     <div className="flex flex-col gap-6">
@@ -31,9 +39,11 @@ export default async function SystemHealthPage() {
         <h1 className="text-lg font-semibold">System Health</h1>
         <p className="text-muted-foreground text-sm">
           Honest status per integration — nothing is marked healthy without
-          a real, verified connection. Most integrations are intentionally
-          NOT_CONNECTED until real credentials are configured.
+          a real, verified connection. LIVE activation is OWNER/ADMIN only
+          and per integration; it records governance intent, it cannot by
+          itself manufacture a real connection where no credentials exist.
         </p>
+        {error && <p className="text-destructive mt-2 text-sm">{decodeURIComponent(error)}</p>}
       </div>
 
       <Card>
@@ -47,22 +57,50 @@ export default async function SystemHealthPage() {
                 <TableHead>Service</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Detail</TableHead>
+                <TableHead>Activated by</TableHead>
                 <TableHead>Last checked</TableHead>
+                {canActivate && <TableHead></TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {health.map((h) => (
-                <TableRow key={h.id}>
-                  <TableCell className="font-medium">{SERVICE_LABEL[h.service] ?? h.service}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={h.status} />
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{h.detail}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {formatDateTime(h.last_checked_at)}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {health.map((h) => {
+                const activator = h.profiles as unknown as { full_name: string | null } | null;
+                return (
+                  <TableRow key={h.id}>
+                    <TableCell className="font-medium">{SERVICE_LABEL[h.service] ?? h.service}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={h.status} />
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{h.detail}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {h.activated_at ? (
+                        <>
+                          {activator?.full_name ?? "—"}
+                          <br />
+                          {formatDateTime(h.activated_at)}
+                        </>
+                      ) : (
+                        <Badge variant="outline">not activated</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {formatDateTime(h.last_checked_at)}
+                    </TableCell>
+                    {canActivate && (
+                      <TableCell>
+                        {!h.activated_at && (
+                          <form action={activateIntegration}>
+                            <input type="hidden" name="healthId" value={h.id} />
+                            <Button type="submit" size="sm" variant="outline">
+                              Activate
+                            </Button>
+                          </form>
+                        )}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>
