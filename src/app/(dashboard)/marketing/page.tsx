@@ -1,11 +1,19 @@
 import { getCurrentUser } from "@/lib/data/current-user";
 import { getCampaigns, getSocialPosts } from "@/lib/data/dashboard";
+import { publishSocialPost } from "./actions";
+import { DECISION_MAKER_ROLES } from "@/lib/agents/state-machine";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StatusBadge } from "@/components/status-badge";
+import { Button } from "@/components/ui/button";
 import { formatInr, formatDateTime } from "@/lib/format";
 
-export default async function MarketingPage() {
+export default async function MarketingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   const user = await getCurrentUser();
   if (!user.organizationId) return null;
 
@@ -14,15 +22,20 @@ export default async function MarketingPage() {
     getSocialPosts(user.organizationId),
   ]);
 
+  const canPublish = DECISION_MAKER_ROLES.includes(user.role as (typeof DECISION_MAKER_ROLES)[number]);
+
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-lg font-semibold">Marketing</h1>
         <p className="text-muted-foreground text-sm">
           Social Media Manager, Content Creator, and Ad Creative worker
-          agents land here in Phase 3. Social posts stay DRAFT — no
-          automatic publishing until LIVE mode and explicit approval.
+          agents land here in Phase 3. Social posts stay DRAFT — publishing
+          requires LIVE mode, explicit approval, and a configured provider;
+          none exist in this build, so every publish attempt below is
+          expected to be blocked.
         </p>
+        {error && <p className="text-destructive mt-2 text-sm">{decodeURIComponent(error)}</p>}
       </div>
 
       <Card>
@@ -71,7 +84,7 @@ export default async function MarketingPage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           {posts.map((p) => (
-            <div key={p.id} className="border-border flex flex-col gap-1 rounded-md border p-3">
+            <div key={p.id} className="border-border flex flex-col gap-2 rounded-md border p-3">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">{p.platform}</span>
                 <StatusBadge status={p.status} />
@@ -82,6 +95,14 @@ export default async function MarketingPage() {
                   ? `Scheduled ${formatDateTime(p.scheduled_at)}`
                   : `Drafted ${formatDateTime(p.created_at)}`}
               </p>
+              {canPublish && p.status !== "published" && (
+                <form action={publishSocialPost}>
+                  <input type="hidden" name="postId" value={p.id} />
+                  <Button type="submit" size="sm" variant="outline">
+                    Publish
+                  </Button>
+                </form>
+              )}
             </div>
           ))}
         </CardContent>
