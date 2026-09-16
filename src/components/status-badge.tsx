@@ -26,6 +26,15 @@ const STATUS_VARIANTS: Record<string, Variant> = {
   open: "outline",
   in_progress: "warning",
   done: "success",
+  waiting_head_review: "outline",
+  head_approved: "success",
+  head_rejected: "destructive",
+  escalated_to_ceo: "warning",
+  approved: "success",
+  executing: "warning",
+  failed: "destructive",
+  rejected: "destructive",
+  disabled: "outline",
 };
 
 export function StatusBadge({ status }: { status: string }) {
