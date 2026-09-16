@@ -16,5 +16,5 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Approvals", href: "/approvals", phase: "live" },
   { label: "Audit Logs", href: "/audit-logs", phase: "live" },
   { label: "AI Cost Monitoring", href: "/ai-cost", phase: "upcoming", phaseLabel: "Phase 3+" },
-  { label: "System Health", href: "/system-health", phase: "upcoming", phaseLabel: "Phase 5+" },
+  { label: "System Health", href: "/system-health", phase: "live" },
 ];

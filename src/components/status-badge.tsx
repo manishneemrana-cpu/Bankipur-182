@@ -35,6 +35,9 @@ const STATUS_VARIANTS: Record<string, Variant> = {
   failed: "destructive",
   rejected: "destructive",
   disabled: "outline",
+  healthy: "success",
+  error: "destructive",
+  not_connected: "outline",
 };
 
 export function StatusBadge({ status }: { status: string }) {
