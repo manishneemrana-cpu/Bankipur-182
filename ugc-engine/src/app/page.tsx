@@ -31,7 +31,7 @@ export default function CreationDashboard() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [form, setForm] = useState<FormState>({
-    brandKitId: "",
+    brandKitId: "00000000-0000-0000-0000-000000000003",
     brandName: "",
     productName: "",
     description: "",
@@ -56,8 +56,8 @@ export default function CreationDashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-organization-id": "demo-org",
-          "x-user-id": "demo-user",
+          "x-organization-id": "00000000-0000-0000-0000-000000000001",
+          "x-user-id": "00000000-0000-0000-0000-000000000002",
           "x-user-role": "owner",
         },
         body: JSON.stringify({

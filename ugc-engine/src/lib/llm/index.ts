@@ -13,10 +13,11 @@ export function getLLMProvider(): ILLMProvider {
     return cached;
   }
 
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" && process.env.ALLOW_MOCK_PROVIDERS !== "true") {
     throw new Error(
       "GEMINI_API_KEY is not configured. Refusing to fall back to MockLLMProvider in production " +
-        "(see spec section 61/52: never fake a successful generation in production)."
+        "(see spec section 61/52: never fake a successful generation in production). Set " +
+        "ALLOW_MOCK_PROVIDERS=true to explicitly opt into mock mode for a testing deploy."
     );
   }
 

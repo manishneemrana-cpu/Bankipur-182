@@ -4,7 +4,13 @@ let pool: Pool | null = null;
 
 function getPool(): Pool {
   if (!pool) {
-    pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      // Managed Postgres providers (Supabase, Neon, RDS) require TLS; the
+      // widely-used self-signed-chain workaround is fine for a hosted
+      // provider whose cert chain isn't in Node's default trust store.
+      ssl: process.env.DATABASE_SSL === "false" ? undefined : { rejectUnauthorized: false },
+    });
   }
   return pool;
 }

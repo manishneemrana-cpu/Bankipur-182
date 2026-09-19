@@ -14,7 +14,11 @@ export default function ProjectProgressPage({ params }: { params: Promise<{ id: 
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const headers = { "x-organization-id": "demo-org", "x-user-id": "demo-user", "x-user-role": "owner" };
+    const headers = {
+      "x-organization-id": "00000000-0000-0000-0000-000000000001",
+      "x-user-id": "00000000-0000-0000-0000-000000000002",
+      "x-user-role": "owner",
+    };
     let cancelled = false;
 
     async function poll() {
