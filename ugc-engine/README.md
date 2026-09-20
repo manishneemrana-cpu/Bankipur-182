@@ -48,15 +48,53 @@ Next.js App Router (dashboard, API) ──dispatch──▶ BullMQ / Redis ─�
 
 ## Provider abstraction & mock mode
 
-Every external dependency (LLM, video, voice, storage) is selected at
-runtime based on environment variables. If a key is missing:
+Every external dependency (LLM, video, voice, image, speech-to-text,
+storage) is selected at runtime based on environment variables, through a
+registry (`getLLMProvider()`, `getVoiceProvider()`, etc.) that business
+logic calls instead of importing a concrete adapter. If nothing is
+configured:
 
 - In development, a deterministic **mock adapter** is used so the full
   pipeline runs end-to-end without spending money or requiring credentials.
   Mock outputs are always clearly labeled (`[MOCK]`, `mock-storage.local`, …).
-- In production (`NODE_ENV=production`), missing credentials for the LLM or
-  storage provider throw at startup rather than silently faking a
-  successful generation — see spec sections 52/61.
+- In production (`NODE_ENV=production`), a missing LLM or storage
+  credential throws at startup rather than silently faking a successful
+  generation — see spec sections 52/61 — unless `ALLOW_MOCK_PROVIDERS=true`
+  is explicitly set (for a testing deploy on infra with no keys yet).
+
+### Multiple options per capability
+
+Each capability supports more than one provider so you can start on free
+tiers and swap providers later without touching agent/worker code — every
+adapter for a capability implements the same interface (`ILLMProvider`,
+`IVoiceProviderAdapter`, `IImageProviderAdapter`, `ISpeechToTextProvider`,
+`IVideoProviderAdapter`, `IMusicProviderAdapter`, `IStorageProviderAdapter`).
+
+| Capability | Options (env var picks one via `DEFAULT_*_PROVIDER`, or auto-detect) | Recommended free start |
+|---|---|---|
+| **LLM** (script/strategy) | Gemini · OpenRouter · **NVIDIA NIM** · Groq · Together AI | **Groq** — fast, generous free tier |
+| **Speech-to-Text** | Groq Whisper · OpenAI Whisper | Groq (reuses `GROQ_API_KEY`) |
+| **Image generation** (thumbnails/reference) | **Pollinations.ai (no key)** · NVIDIA NIM · Hugging Face | Pollinations — needs nothing, always works |
+| **Voice (TTS)** | ElevenLabs · Hugging Face | ElevenLabs (best quality + word timing), ~10k chars/month free |
+| **Video generation** | Google Veo · Runway · Luma · Kling | Whichever you can get a key for first — all cost money per second |
+| **Music** | Mubert · Mock | Mubert free tier, or leave unset for Mock |
+| **Storage** | S3-compatible (AWS S3 / Cloudflare R2) · local (dev only) | Cloudflare R2 — 10GB free, no egress fee |
+
+`NVIDIA_API_KEY` is reused across three registries (LLM text generation,
+image generation, and — if you point `DEFAULT_LLM_PROVIDER=nvidia` — the
+main creative pipeline) since NVIDIA NIM hosts both chat and image models
+behind one key from https://build.nvidia.com.
+
+One caveat: the multimodal Quality-Control agent (`QualityControlEngine`)
+needs a vision-capable model to inspect generated video frames — only
+`GeminiLLMProvider` implements that path today. If your `DEFAULT_LLM_PROVIDER`
+is OpenRouter/NVIDIA/Groq/Together, QC evaluation is skipped gracefully
+(the worker catches the "not supported" error and accepts the scene without
+QC) rather than failing the whole pipeline — configure `GEMINI_API_KEY`
+alongside your main text provider if you want real QC enforcement.
+
+See `.env.example` for exact variable names, where to get every key, and
+inline links.
 
 ## Running locally
 

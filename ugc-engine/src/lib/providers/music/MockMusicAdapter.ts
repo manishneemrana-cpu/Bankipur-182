@@ -1,4 +1,5 @@
 import type { IMusicProviderAdapter, MusicSelectionParams, MusicTrack } from "./MusicProviderInterface";
+import { MubertAdapter } from "./MubertAdapter";
 
 /**
  * Stand-in for a licensed music library integration (e.g. Epidemic Sound,
@@ -24,6 +25,10 @@ export class MockMusicAdapter implements IMusicProviderAdapter {
   }
 }
 
+let cached: IMusicProviderAdapter | null = null;
+
 export function getMusicProvider(): IMusicProviderAdapter {
-  return new MockMusicAdapter();
+  if (cached) return cached;
+  cached = process.env.MUBERT_API_KEY ? new MubertAdapter(process.env.MUBERT_API_KEY) : new MockMusicAdapter();
+  return cached;
 }
