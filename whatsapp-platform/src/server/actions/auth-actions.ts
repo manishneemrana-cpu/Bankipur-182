@@ -47,9 +47,15 @@ export async function registerOrganization(input: unknown): Promise<ActionResult
     );
     const userId = userRes.rows[0]!.id;
 
+    // Starter is the default plan for a brand-new organization. `plans` has
+    // no RLS (it's a global platform table, not tenant-scoped — see
+    // docs/decisions.md), so this read works inside the same transaction.
+    const planRes = await client.query<{ id: string }>("SELECT id FROM plans WHERE name = 'Starter'");
+    const starterPlanId = planRes.rows[0]?.id ?? null;
+
     const orgRes = await client.query<{ id: string }>(
-      "INSERT INTO organizations (name, brand_name) VALUES ($1, $2) RETURNING id",
-      [organizationName, organizationName]
+      "INSERT INTO organizations (name, brand_name, plan_id) VALUES ($1, $2, $3) RETURNING id",
+      [organizationName, organizationName, starterPlanId]
     );
     const organizationId = orgRes.rows[0]!.id;
 
@@ -57,6 +63,13 @@ export async function registerOrganization(input: unknown): Promise<ActionResult
       "INSERT INTO organization_members (organization_id, user_id, role, joined_at) VALUES ($1, $2, 'OWNER', now())",
       [organizationId, userId]
     );
+
+    if (starterPlanId) {
+      await client.query(
+        "INSERT INTO subscriptions (organization_id, plan_id, status, current_period_start, current_period_end) VALUES ($1, $2, 'ACTIVE', now(), now() + interval '30 days')",
+        [organizationId, starterPlanId]
+      );
+    }
 
     return { userId };
   });
