@@ -6,6 +6,7 @@ import { requireOrgContext } from "@/server/auth";
 import { hasPermission } from "@/server/permissions";
 import { createApiKey } from "@/server/api-keys";
 import { withOrgTransaction } from "@/server/db";
+import { recordAuditLog } from "@/server/audit";
 
 export interface ActionResult {
   ok: boolean;
@@ -32,6 +33,11 @@ export async function createApiKeyAction(input: unknown): Promise<ActionResult> 
   }
 
   const created = await createApiKey(organizationId, context.userId, name, scopes);
+  await recordAuditLog(organizationId, context.userId, "api_key.created", {
+    targetType: "api_key",
+    targetId: created.id,
+    metadata: { name, scopes },
+  });
   revalidatePath("/dashboard/api");
   return { ok: true, rawKey: created.rawKey };
 }
@@ -54,6 +60,8 @@ export async function revokeApiKeyAction(input: unknown): Promise<ActionResult> 
       apiKeyId,
     ])
   );
+
+  await recordAuditLog(organizationId, context.userId, "api_key.revoked", { targetType: "api_key", targetId: apiKeyId });
 
   revalidatePath("/dashboard/api");
   return { ok: true };

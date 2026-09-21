@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireOrgContext } from "@/server/auth";
 import { hasPermission, type OrgRole } from "@/server/permissions";
 import { withOrgTransaction, withSystemClient } from "@/server/db";
+import { recordAuditLog } from "@/server/audit";
 
 export interface ActionResult {
   ok: boolean;
@@ -60,6 +61,12 @@ export async function addTeamMember(input: unknown): Promise<ActionResult> {
     throw err;
   }
 
+  await recordAuditLog(organizationId, context.userId, "team.member_added", {
+    targetType: "user",
+    targetId: targetUserId,
+    metadata: { email, role },
+  });
+
   revalidatePath("/dashboard/team");
   return { ok: true };
 }
@@ -104,6 +111,12 @@ export async function updateMemberRole(input: unknown): Promise<ActionResult> {
     ])
   );
 
+  await recordAuditLog(organizationId, context.userId, "team.role_changed", {
+    targetType: "user",
+    targetId: memberUserId,
+    metadata: { previousRole: currentRole ?? null, newRole: role },
+  });
+
   revalidatePath("/dashboard/team");
   return { ok: true };
 }
@@ -134,6 +147,11 @@ export async function removeMember(input: unknown): Promise<ActionResult> {
       memberUserId,
     ])
   );
+
+  await recordAuditLog(organizationId, context.userId, "team.member_removed", {
+    targetType: "user",
+    targetId: memberUserId,
+  });
 
   revalidatePath("/dashboard/team");
   return { ok: true };

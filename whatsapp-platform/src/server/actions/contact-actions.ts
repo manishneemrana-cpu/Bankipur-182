@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { requireOrgContext } from "@/server/auth";
 import { hasPermission } from "@/server/permissions";
 import { withOrgTransaction } from "@/server/db";
+import { deleteContactData } from "@/server/data-lifecycle";
+import { recordAuditLog } from "@/server/audit";
 
 export interface ActionResult {
   ok: boolean;
@@ -91,9 +93,13 @@ export async function deleteContact(input: unknown): Promise<ActionResult> {
     return { ok: false, error: "You don't have permission to manage contacts" };
   }
 
-  await withOrgTransaction(organizationId, context.userId, (client) =>
-    client.query("DELETE FROM contacts WHERE organization_id = $1 AND id = $2", [organizationId, contactId])
-  );
+  try {
+    await deleteContactData(organizationId, context.userId, contactId);
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Failed to delete contact" };
+  }
+
+  await recordAuditLog(organizationId, context.userId, "contact.deleted", { targetType: "contact", targetId: contactId });
 
   revalidatePath("/dashboard/contacts");
   return { ok: true };

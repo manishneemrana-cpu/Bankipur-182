@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireOrgContext } from "@/server/auth";
 import { hasPermission } from "@/server/permissions";
 import { createOutboundWebhook, toggleOutboundWebhook, deleteOutboundWebhook, OUTBOUND_EVENT_TYPES } from "@/server/outbound-webhooks";
+import { recordAuditLog } from "@/server/audit";
 
 export interface ActionResult {
   ok: boolean;
@@ -29,6 +30,11 @@ export async function createOutboundWebhookAction(input: unknown): Promise<Actio
   }
 
   const created = await createOutboundWebhook(organizationId, context.userId, url, eventTypes);
+  await recordAuditLog(organizationId, context.userId, "outbound_webhook.created", {
+    targetType: "outbound_webhook",
+    targetId: created.id,
+    metadata: { url, eventTypes },
+  });
   revalidatePath("/dashboard/integrations");
   return { ok: true, secret: created.secret };
 }
@@ -61,6 +67,10 @@ export async function deleteOutboundWebhookAction(input: unknown): Promise<Actio
   }
 
   await deleteOutboundWebhook(organizationId, context.userId, webhookId);
+  await recordAuditLog(organizationId, context.userId, "outbound_webhook.deleted", {
+    targetType: "outbound_webhook",
+    targetId: webhookId,
+  });
   revalidatePath("/dashboard/integrations");
   return { ok: true };
 }
