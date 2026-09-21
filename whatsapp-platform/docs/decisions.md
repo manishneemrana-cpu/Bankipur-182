@@ -153,6 +153,16 @@ that exercises that exact query — it does not fall out for free from the gener
 `tenant_isolation` policy, and it is not safe to assume by analogy that a similar-looking table
 already has it.** `webhooks.md` documents the specific instance for `whatsapp_phone_numbers`.
 
+Later instances of the same pattern, now covering platform-admin *reads* as well as pre-tenant
+*writes*: `api_keys` (migration 0005, write), `subscriptions` (0007, write, for signup's founding
+subscription), `audit_logs` (0008, read, for the admin cross-org audit view), and — caught only
+by a dedicated test, not by the admin webhooks page rendering without error —
+`outbound_webhooks` and `outbound_webhook_deliveries` (0009/0010, read: an admin-side join across
+both tables silently returned `NULL`/no rows instead of throwing, the most dangerous shape of
+this bug because nothing *looked* wrong). Every one of these was "a table that already has RLS,
+being read or written from a context with no organization_id set" — the fix is never optional
+and never obvious from the table alone.
+
 ## Deferred to later phases (not yet built)
 
 - Everything Meta/WhatsApp-specific (Cloud API client, Embedded Signup, webhooks, Compliance
