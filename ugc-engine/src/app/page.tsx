@@ -24,6 +24,11 @@ const INDUSTRIES = [
   "automotive", "professional_services", "local_business", "startup", "personal_brand",
 ];
 
+const LANGUAGES = [
+  "English", "Hindi", "Hinglish", "Bengali", "Marathi", "Gujarati", "Punjabi",
+  "Tamil", "Telugu", "Kannada", "Malayalam", "Odia", "Assamese",
+];
+
 export default function CreationDashboard() {
   const [mode, setMode] = useState<Mode>("simple");
   const [step, setStep] = useState<"input" | "processing" | "complete" | "error">("input");
@@ -177,7 +182,9 @@ export default function CreationDashboard() {
                   </select>
                 </Field>
                 <Field label="Language">
-                  <input value={form.language} onChange={(e) => update("language", e.target.value)} className="input" />
+                  <select value={form.language} onChange={(e) => update("language", e.target.value)} className="input">
+                    {LANGUAGES.map((l) => <option key={l} value={l}>{l}</option>)}
+                  </select>
                 </Field>
               </div>
 
