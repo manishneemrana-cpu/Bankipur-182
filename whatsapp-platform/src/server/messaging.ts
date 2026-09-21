@@ -6,6 +6,7 @@ import { isMockModeEnabled } from "@/server/mock/meta";
 
 export type MessagingErrorCode =
   | "CONVERSATION_NOT_FOUND"
+  | "CONTACT_NOT_FOUND"
   | "CONTACT_SUPPRESSED"
   | "WINDOW_CLOSED"
   | "TEMPLATE_NOT_FOUND"
@@ -175,6 +176,117 @@ export async function sendConversationTemplateMessage(input: SendTemplateInput):
         JSON.stringify({ templateName: template.name }),
         result.metaMessageId,
         input.templateId,
+      ]
+    );
+    return { messageId: inserted.rows[0]!.id };
+  });
+}
+
+async function findOrgConnectedPhoneNumber(
+  organizationId: string,
+  client: PoolClient
+): Promise<{ whatsappPhoneNumberId: string; phoneNumberId: string } | null> {
+  const result = await client.query<{ id: string; phone_number_id: string }>(
+    "SELECT id, phone_number_id FROM whatsapp_phone_numbers WHERE organization_id = $1 ORDER BY created_at DESC LIMIT 1",
+    [organizationId]
+  );
+  const row = result.rows[0];
+  return row ? { whatsappPhoneNumberId: row.id, phoneNumberId: row.phone_number_id } : null;
+}
+
+async function findOrCreateConversationForContact(
+  organizationId: string,
+  contactId: string,
+  whatsappPhoneNumberId: string,
+  client: PoolClient
+): Promise<string> {
+  const existing = await client.query<{ id: string }>(
+    `SELECT id FROM conversations
+     WHERE organization_id = $1 AND contact_id = $2 AND whatsapp_phone_number_id = $3
+     ORDER BY created_at DESC LIMIT 1`,
+    [organizationId, contactId, whatsappPhoneNumberId]
+  );
+  if (existing.rows[0]) return existing.rows[0].id;
+
+  const created = await client.query<{ id: string }>(
+    `INSERT INTO conversations (organization_id, contact_id, whatsapp_phone_number_id, status)
+     VALUES ($1, $2, $3, 'OPEN') RETURNING id`,
+    [organizationId, contactId, whatsappPhoneNumberId]
+  );
+  return created.rows[0]!.id;
+}
+
+export interface SendTemplateToContactInput {
+  organizationId: string;
+  userId: string;
+  contactId: string;
+  templateId: string;
+  campaignId?: string;
+  idempotencyKey: string;
+}
+
+/**
+ * Sends an approved template directly to a contact, creating a conversation
+ * if one doesn't exist yet. Used by campaigns, where there may be no prior
+ * inbound message and thus no existing conversation — unlike
+ * sendConversationTemplateMessage, which requires one.
+ */
+export async function sendTemplateToContact(input: SendTemplateToContactInput): Promise<{ messageId: string }> {
+  return withOrgTransaction(input.organizationId, input.userId, async (client) => {
+    const contactResult = await client.query<{ phone_e164: string; suppressed: boolean }>(
+      "SELECT phone_e164, suppressed FROM contacts WHERE organization_id = $1 AND id = $2",
+      [input.organizationId, input.contactId]
+    );
+    const contact = contactResult.rows[0];
+    if (!contact) throw new MessagingError("CONTACT_NOT_FOUND", "Contact not found");
+    if (contact.suppressed) {
+      throw new MessagingError("CONTACT_SUPPRESSED", "This contact has opted out or is suppressed");
+    }
+
+    const templateResult = await client.query<{ name: string; language: string; status: string }>(
+      "SELECT name, language, status FROM message_templates WHERE organization_id = $1 AND id = $2",
+      [input.organizationId, input.templateId]
+    );
+    const template = templateResult.rows[0];
+    if (!template) throw new MessagingError("TEMPLATE_NOT_FOUND", "Template not found");
+    if (template.status !== "APPROVED") {
+      throw new MessagingError(
+        "TEMPLATE_NOT_APPROVED",
+        `Template status is ${template.status}, not APPROVED — Meta has not approved this template for sending`
+      );
+    }
+
+    const phoneNumber = await findOrgConnectedPhoneNumber(input.organizationId, client);
+    if (!phoneNumber) {
+      throw new MessagingError("CREDENTIALS_NOT_CONFIGURED", "No WhatsApp number connected for this organization");
+    }
+    const conversationId = await findOrCreateConversationForContact(
+      input.organizationId,
+      input.contactId,
+      phoneNumber.whatsappPhoneNumberId,
+      client
+    );
+
+    const result = await sendTemplateMessage({
+      phoneNumberId: phoneNumber.phoneNumberId,
+      accessToken: getAccessToken(),
+      to: contact.phone_e164,
+      templateName: template.name,
+      languageCode: template.language,
+      idempotencyKey: input.idempotencyKey,
+    });
+
+    const inserted = await client.query<{ id: string }>(
+      `INSERT INTO messages (organization_id, conversation_id, direction, type, content, meta_message_id, status, template_id, campaign_id)
+       VALUES ($1, $2, 'OUTBOUND', 'template', $3, $4, 'sent', $5, $6)
+       RETURNING id`,
+      [
+        input.organizationId,
+        conversationId,
+        JSON.stringify({ templateName: template.name }),
+        result.metaMessageId,
+        input.templateId,
+        input.campaignId ?? null,
       ]
     );
     return { messageId: inserted.rows[0]!.id };
