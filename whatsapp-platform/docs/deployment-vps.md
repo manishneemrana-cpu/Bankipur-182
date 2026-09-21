@@ -1,7 +1,10 @@
-# Deploying to a Hostinger VPS (Phase 1 scope: get the app + database running)
+# Deploying to a Hostinger VPS
 
-This covers getting this Phase-1 scaffold live on your VPS at `www.manishpandey.in`. It does
-not yet cover Meta/WhatsApp setup (that's Phase 3+) or Razorpay billing (later phase).
+This covers getting the app + self-hosted database running on your VPS at
+`www.manishpandey.in`. It does not cover configuring a real Meta/WhatsApp connection (see
+`docs/meta-current-state.md` and `docs/embedded-signup.md` — verify Meta's current docs before
+touching any `META_*` variable) or a real Razorpay account (see `docs/billing.md` — only the
+mock payment provider exists today; leave `MOCK_PAYMENTS=true`).
 
 ## 1. On the VPS: install Docker
 
@@ -31,7 +34,10 @@ Edit `.env`:
 - Generate strong passwords for `POSTGRES_PASSWORD` and `APP_DB_PASSWORD` (these must be
   **different** values — see `docs/decisions.md` on why the app must not use the superuser).
 - Generate `SESSION_SECRET`: `openssl rand -base64 32`.
-- Leave `MOCK_META=true` — do not touch any `META_*` variable yet.
+- Generate `ENCRYPTION_KEY` (used for `whatsapp_credentials.encrypted_token` — see
+  `src/server/crypto.ts`).
+- Leave `MOCK_META=true` and `MOCK_PAYMENTS=true` — do not touch any `META_*` or `RAZORPAY_*`
+  variable until you actually have real credentials for them.
 
 ## 4. Start the database, run migrations, start the app
 
@@ -84,10 +90,29 @@ Should return `{"status":"ok","database":"ok","mockMeta":true,...}`.
 Nothing here is hard-coded to `manishpandey.in` beyond the `NEXT_PUBLIC_APP_URL` env var and
 the Caddyfile — switching domains or hosts later is: point DNS, update those two, redeploy.
 
+## Applying new migrations after a deploy
+
+Every deploy that includes new files under `migrations/` needs the same command re-run —
+`npm run migrate` is idempotent (it skips already-applied migrations, see the "skip"/"apply"
+output), so it's safe to run on every deploy, not just the first one:
+
+```bash
+docker compose run --rm app npm run migrate
+docker compose up -d --build app
+```
+
+## Verifying after a deploy
+
+`GET /api/health` (see `docs/security-and-data-lifecycle.md` for what it and the admin
+System Health page check) reports database connectivity and mock-mode flags. It is not a full
+diagnostic — check the admin dashboard's System Health page for organization/user counts and
+recent webhook activity too.
+
 ## Not yet covered here
 
 - Backups (`pg_dump` on a cron job, or a managed backup snapshot from Hostinger).
 - Zero-downtime deploys (current setup is a simple `docker compose up -d --build`, which has
   a brief restart gap).
 - The Meta webhook URL, Embedded Signup redirect URLs, and everything else Meta-specific —
-  see `docs/meta-setup.md` (not written yet — Phase 3).
+  see `docs/meta-current-state.md` and `docs/embedded-signup.md` for what's built and what
+  still needs verifying against Meta's current docs before going live.
