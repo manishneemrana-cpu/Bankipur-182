@@ -3,8 +3,9 @@ import { z } from "zod";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { errorResponse } from "@/app/api/projects/route";
 import { withTenant } from "@/lib/db/client";
+import { looseUuid } from "@/lib/validation/uuid";
 
-const schema = z.object({ projectId: z.string().uuid() });
+const schema = z.object({ projectId: looseUuid });
 
 /**
  * GET-style export bundle (spec section 55): final video + script + shot

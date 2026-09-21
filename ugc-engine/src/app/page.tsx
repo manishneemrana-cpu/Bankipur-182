@@ -68,7 +68,12 @@ export default function CreationDashboard() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create project");
+      if (!res.ok) {
+        const detail = Array.isArray(data.details)
+          ? data.details.map((d: { path: (string | number)[]; message: string }) => `${d.path.join(".")}: ${d.message}`).join("; ")
+          : undefined;
+        throw new Error(detail ? `${data.error}: ${detail}` : data.error || "Failed to create project");
+      }
 
       setProgressMessage(`Job ${data.jobId} queued — poll /api/jobs/${data.jobId} for live progress`);
       setStep("complete");

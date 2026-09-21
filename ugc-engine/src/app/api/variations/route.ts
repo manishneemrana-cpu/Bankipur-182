@@ -5,9 +5,10 @@ import { errorResponse } from "@/app/api/projects/route";
 import { getVideoProductionQueue } from "@/lib/queue/videoProductionQueue";
 import { ProjectRepository } from "@/lib/db/repositories";
 import type { CreativeFramework } from "@/types/agents";
+import { looseUuid } from "@/lib/validation/uuid";
 
 const schema = z.object({
-  projectId: z.string().uuid(),
+  projectId: looseUuid,
   productInput: z.record(z.string(), z.unknown()),
   angles: z.array(z.string()).min(1).max(6),
 });

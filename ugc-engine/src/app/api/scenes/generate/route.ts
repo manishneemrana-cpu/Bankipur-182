@@ -4,8 +4,9 @@ import { requireTenantContext } from "@/lib/auth/tenant";
 import { errorResponse } from "@/app/api/projects/route";
 import { getVideoProductionQueue } from "@/lib/queue/videoProductionQueue";
 import { ProjectRepository } from "@/lib/db/repositories";
+import { looseUuid } from "@/lib/validation/uuid";
 
-const schema = z.object({ projectId: z.string().uuid(), productInput: z.record(z.string(), z.unknown()) });
+const schema = z.object({ projectId: looseUuid, productInput: z.record(z.string(), z.unknown()) });
 
 /** POST /api/scenes/generate — dispatches full scene generation for an already-created project. */
 export async function POST(req: NextRequest) {

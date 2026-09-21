@@ -4,9 +4,10 @@ import { requireTenantContext } from "@/lib/auth/tenant";
 import { errorResponse } from "@/app/api/projects/route";
 import { getVideoProductionQueue } from "@/lib/queue/videoProductionQueue";
 import { ProjectRepository } from "@/lib/db/repositories";
+import { looseUuid } from "@/lib/validation/uuid";
 
 const schema = z.object({
-  projectId: z.string().uuid(),
+  projectId: looseUuid,
   sceneNumbers: z.array(z.number().int().positive()).min(1),
   productInput: z.record(z.string(), z.unknown()),
 });

@@ -3,10 +3,11 @@ import { z } from "zod";
 import { requireTenantContext, UnauthorizedError } from "@/lib/auth/tenant";
 import { ProductRepository, ProjectRepository } from "@/lib/db/repositories";
 import { getVideoProductionQueue } from "@/lib/queue/videoProductionQueue";
+import { looseUuid } from "@/lib/validation/uuid";
 import type { ProductInput } from "@/types/project";
 
 const productInputSchema = z.object({
-  brandKitId: z.string().uuid(),
+  brandKitId: looseUuid,
   brandName: z.string().min(1),
   productName: z.string().min(1),
   description: z.string().min(1),
@@ -25,7 +26,7 @@ const productInputSchema = z.object({
   referenceAssets: z.array(z.object({ type: z.string(), url: z.string() })).optional(),
   websiteUrl: z.string().optional(),
   mode: z.enum(["simple", "pro_studio", "autopilot"]).default("simple"),
-  creatorProfileId: z.string().uuid().optional(),
+  creatorProfileId: looseUuid.optional(),
   advancedCreative: z.record(z.string(), z.unknown()).optional(),
 });
 
@@ -68,7 +69,9 @@ export function errorResponse(error: unknown) {
     return NextResponse.json({ error: error.message }, { status: 401 });
   }
   if (error instanceof z.ZodError) {
+    console.error("Validation error:", JSON.stringify(error.issues));
     return NextResponse.json({ error: "Invalid input", details: error.issues }, { status: 400 });
   }
+  console.error("Unhandled API error:", error);
   return NextResponse.json({ error: error instanceof Error ? error.message : "Internal error" }, { status: 500 });
 }
