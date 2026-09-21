@@ -63,5 +63,10 @@ underlying plumbing is running.
 
 ## What's next
 
-Phase 2 (customer dashboard shell + admin dashboard shell + mock mode) is the next planned
-step, per the build order. I will not start it until you say "go."
+All 13 phases from the original build order are now built — dashboards, Meta/WhatsApp
+integration layer, messaging, CRM, campaigns, automation, billing, a public API, and security
+hardening. Everything still runs in mock mode (`MOCK_META=true`, `MOCK_PAYMENTS=true`) — no
+real WhatsApp message has ever been sent and no real payment has ever been processed. Before
+any of that changes, read `docs/go-live-checklist.md` — it's the punch list of what a human
+(Meta Business verification, App Review, a lawyer for the legal pages, real Razorpay
+credentials) has to do that no amount of code can do for you.
