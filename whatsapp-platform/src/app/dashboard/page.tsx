@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CheckCircle2, MessageCircle, Gauge, Signal } from "lucide-react";
 import { readSession } from "@/server/auth";
 import { getUserOrganizations } from "@/server/organization";
-import { getMockWhatsappConnection, isMockModeEnabled } from "@/server/mock/meta";
+import { getRealConnectionSummary } from "@/server/whatsapp-status";
 
 export default async function DashboardOverviewPage() {
   const session = await readSession();
@@ -12,7 +13,7 @@ export default async function DashboardOverviewPage() {
   const currentOrg = organizations[0];
   if (!currentOrg) redirect("/register");
 
-  const connection = getMockWhatsappConnection(currentOrg.organizationId);
+  const connection = await getRealConnectionSummary(currentOrg.organizationId, session.userId);
 
   return (
     <div className="flex flex-col gap-6">
@@ -24,18 +25,16 @@ export default async function DashboardOverviewPage() {
         </p>
       </div>
 
-      {isMockModeEnabled() ? (
-        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5 text-sm text-amber-900">
-          <Signal className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2} />
-          <span>
-            Mock mode is on — the WhatsApp status below is simulated demo data, not a real
-            connection. No real WhatsApp message can be sent while this is on.
-          </span>
-        </div>
-      ) : (
+      {!connection && (
         <div className="flex items-start gap-3 rounded-xl border border-ink-200 bg-white px-4 py-3.5 text-sm text-ink-600">
           <MessageCircle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2} />
-          <span>No WhatsApp number connected yet. Connecting one ships in a later phase.</span>
+          <span>
+            No WhatsApp number connected yet.{" "}
+            <Link href="/dashboard/whatsapp/connect" className="font-medium text-brand-700 hover:underline">
+              Connect one
+            </Link>
+            .
+          </span>
         </div>
       )}
 
