@@ -53,26 +53,6 @@ export function getMockWhatsappConnection(organizationId: string): MockWhatsappC
   };
 }
 
-export interface MockTemplate {
-  id: string;
-  name: string;
-  language: string;
-  category: "MARKETING" | "UTILITY" | "AUTHENTICATION";
-  status: "DRAFT" | "PENDING" | "APPROVED" | "REJECTED" | "PAUSED";
-}
-
-const MOCK_TEMPLATE_SEEDS: ReadonlyArray<Omit<MockTemplate, "id">> = [
-  { name: "site_visit_reminder", language: "en", category: "UTILITY", status: "APPROVED" },
-  { name: "new_launch_alert", language: "en", category: "MARKETING", status: "PENDING" },
-  { name: "payment_reminder", language: "en", category: "UTILITY", status: "APPROVED" },
-  { name: "brochure_share", language: "en", category: "MARKETING", status: "DRAFT" },
-];
-
-export function getMockTemplates(organizationId: string): MockTemplate[] {
-  if (!isMockModeEnabled()) return [];
-  return MOCK_TEMPLATE_SEEDS.map((t, i) => ({ id: `mock-template-${organizationId.slice(0, 8)}-${i}`, ...t }));
-}
-
 export interface MockMessage {
   id: string;
   direction: "INBOUND" | "OUTBOUND";

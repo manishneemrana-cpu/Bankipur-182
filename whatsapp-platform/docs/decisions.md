@@ -138,6 +138,21 @@ from reading the primary source directly. That document says so plainly and name
 facts need re-verification (and by when — one of them, the Embedded Signup v4 migration
 deadline, is time-sensitive) before Phase 5 depends on them.
 
+## Phase 4: a recurring RLS pattern worth naming explicitly
+
+Four separate times now (organization_members' self-lookup, organizations' member-read,
+webhook_events' pre-tenant insert, and now whatsapp_phone_numbers' webhook lookup), a real bug
+turned out to be: some operation legitimately needs to run *before* an `organization_id` is
+known (signup, login, or Meta calling our server directly with only a `phone_number_id`), and
+the table's RLS policy only knew about `app_org_id()` — so the operation silently saw/wrote
+nothing rather than erroring loudly.
+
+The pattern going forward: **any new "resolve the organization from an external key" or
+"pre-tenant" operation needs its own explicit RLS policy addition, checked against a real test
+that exercises that exact query — it does not fall out for free from the generic
+`tenant_isolation` policy, and it is not safe to assume by analogy that a similar-looking table
+already has it.** `webhooks.md` documents the specific instance for `whatsapp_phone_numbers`.
+
 ## Deferred to later phases (not yet built)
 
 - Everything Meta/WhatsApp-specific (Cloud API client, Embedded Signup, webhooks, Compliance
