@@ -116,7 +116,66 @@ See `COMPLIANCE.md` for the full non-legal-advice summary and the explicit discl
 
 ---
 
-## 7. Open items to re-verify before Phase 1 build starts
+## 8. Alternative/affordable providers — researched 2026-09-21 (founder-requested follow-up)
+
+Founder asked specifically about "voicebox," plus a broader sweep of affordable/alternative STT/TTS/LLM-realtime options against the "human-like, cheap, streaming-capable" bar. Findings below; **none displace the Plivo/Sarvam/Gemini/Pipecat default**, for the reasons stated per item, but two (Smallest.ai, Bhashini) are worth tracking as future swappable alternates.
+
+### 8.1 "Voicebox" — verdict: NOT a viable commercial option, for any of the products the name refers to
+There are at least three unrelated things called "Voicebox," and none is a usable hosted TTS/voice-AI API for this platform:
+- **Meta's Voicebox** (2023 research paper, "Text-Guided Multilingual Universal Speech Generation at Scale"): Meta explicitly **did not release the model or code**, citing voice-cloning/misuse risk, and published only a paper, audio samples, and a deepfake-detection classifier. **No commercial API exists from Meta.**
+- **`jamiepine/voicebox` / VoiceBox.sh**: an open-source, **local-only** voice-cloning/dictation app (wraps 7 different local TTS engines). No hosted API/pricing model relevant to a cloud calling platform; would require self-hosting + GPU and is aimed at individual desktop use, not a multi-tenant telephony pipeline.
+- **"Voicebox" per Stork.AI / SoftwareWorld review listings**: these describe an unrelated **voicemail-transcription/business-phone-system** product category, not a TTS/STT engine — a naming collision, not a lead.
+- **Conclusion**: drop "voicebox" from further evaluation; it does not refer to a usable STT/TTS API in any form.
+- Sources: [Meta Voicebox announcement](https://ai.meta.com/blog/voicebox-generative-ai-model-speech/), [Meta Voicebox research paper](https://ai.meta.com/research/publications/voicebox-text-guided-multilingual-universal-speech-generation-at-scale/), [Engadget on Voicebox non-release](https://www.engadget.com/metas-voicebox-ai-is-a-dall-e-for-text-to-speech-150021287.html), [jamiepine/voicebox (GitHub)](https://github.com/jamiepine/voicebox), [VoiceBox.sh explainer](https://daveswift.com/voicebox/), [Stork.AI Voicebox listing](https://www.stork.ai/en/voicebox)
+
+### 8.2 Smallest.ai (Indian TTS/STT/voice-agent startup) — promising, track as an alternate
+- **TTS pricing**: ~$0.0135 per 1,000 characters (~$13.50/M chars) — cheaper than Cartesia's low end and well below ElevenLabs, though not as cheap as Sarvam Bulbul's ~$3.60/M chars.
+- **Streaming**: confirmed WebSocket/SSE streaming support, positioned specifically for low-latency voice agents.
+- **Verdict**: genuinely affordable and India-based, but **not verified as cheaper than Sarvam Bulbul** for the Economy tier, and its Indian-language depth/production track record is less proven in this search than Sarvam's. Worth a hands-on quality/latency eval as a second Indian-language TTS alternate (in addition to Cartesia/ElevenLabs/Piper), not a primary-swap candidate yet.
+- Sources: [Smallest.ai Pricing](https://smallest.ai/pricing), [Smallest.ai fastest TTS APIs 2026](https://smallest.ai/blog/top-fastest-text-to-speech-apis-in-2026)
+
+### 8.3 Neuphonic — not cheaper, but note the latency figure
+- **Pricing**: subscription-tiered — Free (limited concurrency), Business $79/mo ($948/yr) for full features incl. voice cloning, Enterprise custom. Not a pure pay-per-character model, so it doesn't map cleanly onto this cost model's ₹/min structure at low volume.
+- **Latency**: sub-25ms time-to-first-audio via WebSocket — faster than Cartesia's Sonic Turbo (~40ms) on paper.
+- **Verdict**: interesting for a future latency-critical Premium option, but the flat monthly-subscription pricing (vs. usage-based) makes it a worse fit than Cartesia for this platform's per-minute-metered billing model at Phase 1 scale. Not adopted.
+- Sources: [Neuphonic official site](https://www.neuphonic.com/), [Neuphonic API Evangelist profile](https://github.com/api-evangelist/neuphonic), [Pipecat Neuphonic TTS service](https://docs.pipecat.ai/server/services/tts/neuphonic)
+
+### 8.4 Rime AI — not cheaper for this volume profile
+- **Pricing**: usage-based, Starter plan from $0.03/1,000 chars (Mist) or $0.05/1,000 chars (Coda) → **$30–$50/M chars**, in ElevenLabs' price range, not Sarvam/Smallest's.
+- **Streaming**: sub-100ms latency, 600+ voices, 50+ languages.
+- **Verdict**: a legitimate Premium-tier quality alternate (similar positioning to Cartesia/ElevenLabs) but not an affordability win — not adopted as primary or as a new Economy alternate.
+- Sources: [Rime Pricing](https://www.rime.ai/pricing), [Rime updated pricing](https://rime.ai/resources/new-pricing)
+
+### 8.5 Bhashini (Government of India digital public infrastructure) — promising for Economy/compliance-sensitive tenants, needs a hands-on integration check
+- **Two distinct offerings, do not conflate them**: (a) the **government platform** at bhashini.gov.in offers ASR/TTS/NMT across 22 scheduled Indian languages, **free for non-commercial use** with discounted commercial rates; (b) a **separate commercial entity, Bhashini.ai**, sells subscription tiers (e.g. ~₹250/month for 50,000 TTS characters/day) unrelated to the government's free-tier terms.
+- **Streaming**: not confirmed in this search — Bhashini's API design (ULCA-based, documented on GitBook) is oriented around request/response inference calls; real-time low-latency streaming for a live barge-in pipeline is **unconfirmed and must be tested directly** before relying on it.
+- **Verdict**: worth a Phase 1 technical spike given the free/very-low-cost government tier and India-language coverage, but **not adopted as primary or alternate yet** — streaming capability and production reliability are unverified, unlike Sarvam's confirmed Pipecat-integrated streaming.
+- Sources: [Bhashini government platform](https://bhashini.gov.in/ulca), [Bhashini APIs overview (GitBook)](https://bhashini.gitbook.io/bhashini-apis), [Bhashini.ai pricing](https://www.bhashini.ai/pricing), [Open-source voice AI India 2026 — Sarvam/AI4Bharat/Bhashini comparison](https://caller.digital/blog/open-source-voice-ai-india-sarvam-ai4bharat-bhasini-2026)
+
+### 8.6 OpenAI Realtime API (speech-to-speech, LLM+voice combined) — not adopted, architecture mismatch and cost
+- **Pricing**: token-based, not per-minute; GPT-Realtime-2.1 works out to roughly **$0.05/min** (audio output-dominated), GPT-Realtime-Mini roughly $0.016/min, a newer GPT-Live-1 front-end layer is a flat $0.05/min ($3/hr).
+- **Architecture mismatch**: this is a combined STT+LLM+TTS speech-to-speech model, not a swappable single-layer adapter — adopting it would mean bypassing the Telephony→STT→LLM→TTS adapter-per-layer design this platform's spec mandates, trading flexibility (and Indian-language/Hinglish quality, unproven for OpenAI Realtime) for one all-in-one vendor.
+- **Cost**: ~$0.05/min ≈ ₹4.4/min for the audio/voice layer alone is markedly more expensive than the Economy tier's entire current stack (~₹1.08/min for STT+TTS+LLM combined).
+- **Verdict**: not adopted. Worth revisiting only for a possible future "instant premium, zero-config" tier where the flexibility trade-off is acceptable, not for Economy or Premium as currently modeled.
+- Sources: [OpenAI Realtime API pricing breakdown](https://www.forasoft.com/blog/article/openai-realtime-api-pricing), [GPT Realtime Mini pricing 2026](https://www.eesel.ai/blog/gpt-realtime-mini-pricing)
+
+### 8.7 Azure Speech, AWS Polly/Transcribe, Google Cloud STT/TTS — viable but not cheaper than the current picks
+- **Azure**: STT ~$1/audio-hour (~₹1.47/min) standard; TTS Neural $16/M chars, Neural HD $22/M chars (down from $30 in Mar 2026). Free tier: 500K TTS chars + 5 STT hours/month, permanent.
+- **AWS**: Transcribe streaming $0.030/min (~₹2.64/min); Polly Standard $4/M chars, Neural $16/M chars, Generative $30/M chars.
+- **Google Cloud**: STT from $0.016/min (~₹1.41/min); TTS pricing tiered similarly to Azure/AWS (standard vs. neural/studio voices).
+- **Verdict**: all three are mature, reliable, global-scale options with genuine streaming support, but **none beats Sarvam's ₹0.50/min STT or ₹30/10,000-chars TTS on cost, and none has Sarvam's confirmed Hindi/Hinglish code-switching strength**. They remain credible alternates for English-heavy or non-Indian-market expansion (the adapter pattern already supports adding them without a core change) but are not proposed as new primaries or Economy alternates.
+- Sources: [AWS/Azure/Google STT-TTS pricing comparison](https://vocafuse.com/blog/best-speech-to-text-api-comparison-2025/), [Azure Speech pricing 2026](https://texttolab.com/blog/azure-text-to-speech-pricing), [TTS pricing comparison 2026 (11 providers)](https://offlinetts.com/blog/tts-pricing-comparison-2026/)
+
+### 8.8 Coqui/XTTS (self-hosted) and Vosk (self-hosted STT) — status check, both technically alive but neither displaces Piper/Sarvam
+- **Coqui/XTTS v2**: Coqui the company shut down in Jan 2024; the codebase is community-maintained (active fork: `idiap/coqui-ai-TTS`, published as `coqui-tts` on PyPI). **Licensing caveat**: the pretrained XTTS v2 model weights are under the Coqui Public Model License (CPML) — **non-commercial only** — so using the public weights in this commercial SaaS is not viable without either training/licensing a commercial model or restricting to voices with a compatible license. This is a harder license blocker than Piper's GPL-3.0 (which at least permits commercial use with copyleft obligations); not recommended as a self-hosted alternate given this constraint.
+- **Vosk**: actively maintained (updated Mar 2026), offline/self-hosted, CPU-only, streaming-capable, 20+ languages, small footprint (~50MB models) — a legitimate self-hosted STT fallback for cost-sensitive or data-residency-sensitive deployments, comparable in spirit to the Piper self-hosted TTS option. Recommend noting it alongside Piper as a documented (not primary) self-hosted Economy/data-residency fallback for STT, same caveat as Piper: real ops overhead, evaluate only once volume justifies it.
+- Sources: [Coqui/XTTS v2 CPML license guide 2026](https://www.promptquorum.com/power-local-llm/local-tts-voice-cloning-piper-coqui-xtts), [idiap/coqui-ai-TTS (GitHub)](https://github.com/idiap/coqui-ai-TTS), [Vosk vs Whisper Local 2026 guide](https://www.sinologic.net/en/2026-05/vosk-vs-whisper-local-the-ultimate-2026-guide-to-self-hosted-speech-recognition-stt.html), [Vosk official](https://alphacephei.com/vosk/)
+
+**Net verdict for §8**: the Plivo/Sarvam/Gemini/Pipecat default stack still wins on the "cheap + human-like + streaming + Indian-language-proven" combination. Smallest.ai and Bhashini are the two most worth a hands-on technical spike in Phase 1 as documented alternates (Smallest.ai for TTS cost/quality, Bhashini for a possible free/near-free Economy-tier STT/TTS path pending streaming confirmation) — both added to `STACK_PROPOSAL.md`'s notes column as "watch" items, not yet promoted to the primary/alternate table since neither has a Pipecat-confirmed streaming integration verified in this session the way Sarvam/Deepgram/Cartesia do.
+
+---
+
+## 9. Open items to re-verify before Phase 1 build starts
 
 1. Exact current Plivo India per-minute inbound/outbound voice rate (blocked by egress proxy during this session — needs console login or sales contact).
 2. Exact current Exotel India per-minute voice rate (Exotel does not publish; needs a sales quote).
@@ -125,3 +184,5 @@ See `COMPLIANCE.md` for the full non-legal-advice summary and the explicit discl
 5. Confirm whether Groq Llama 3.3 70B enterprise pricing is reachable/affordable for this project's volume, or whether 3.1-8B-Instant (or another vendor) should be the sole Groq-hosted alternate.
 6. Get written confirmation from Plivo/Exotel on their DLT-registration-assist and DND-scrubbing tooling specifically for AI/bot-originated outbound calls (not just human agent call centers).
 7. Legal review of Piper's GPL-3.0 relicensing (post Oct 2025) and per-voice-model license terms before using it as a self-hosted TTS in a commercial SaaS.
+8. Hands-on Phase 1 spike: confirm whether Bhashini's government-tier API supports real-time streaming ASR/TTS suitable for a live barge-in call (unconfirmed in §8.5) — if yes, it's a candidate free/near-free Economy STT/TTS alternate for Indian-language tenants.
+9. Hands-on Phase 1 eval: Smallest.ai TTS quality/latency/Hinglish-handling head-to-head against Sarvam Bulbul (§8.2) — decide whether it's worth adding as a documented alternate.

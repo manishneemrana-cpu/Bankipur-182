@@ -77,7 +77,18 @@ These are linear extrapolations of the per-minute model above; they do **not** i
 
 ## What Phase 1 must confirm before this model is trusted for pricing customers
 
-1. Actual Plivo/Exotel India per-minute quotes at the founder's expected volume (see VERIFICATION.md §7.1–7.2).
+1. Actual Plivo/Exotel India per-minute quotes at the founder's expected volume (see VERIFICATION.md §9.1–9.2).
 2. Whether Sarvam's Business tier (₹50,000/mo, 1,000 req/min) changes the effective per-minute STT/TTS cost at scale vs. the PAYG rate used here.
 3. Gemini's post-October-2026 successor model and its price.
 4. Real measured average call length, turns/min, and character/token counts from a pilot — the assumptions above are reasoned estimates, not measured data.
+5. Whether Bhashini's government tier (if it turns out to support real-time streaming — unconfirmed, VERIFICATION.md §8.5) or Smallest.ai's TTS (§8.2) beat Sarvam on a hands-on Phase 1 eval — if so, re-run this model with those figures.
+
+## 2026-09-21 follow-up: does the alternate-provider research change the Economy-tier ₹2.03/min figure?
+
+**No.** A broader sweep (Smallest.ai, Neuphonic, Rime, Bhashini, OpenAI Realtime, Azure/AWS/Google Cloud, Coqui/XTTS, Vosk — full findings in `VERIFICATION.md` §8) turned up nothing confirmed cheaper than the Sarvam STT (₹0.50/min) + Sarvam Bulbul TTS (₹0.42/min at this turn volume) + Gemini Flash-Lite (₹0.01/min) combination already in the Economy-tier line above:
+- Smallest.ai's TTS (~$13.50/M chars) is cheaper than Cartesia/ElevenLabs but still well above Bulbul's ~$3.60/M chars — would *increase*, not decrease, the TTS line if swapped in.
+- Bhashini's government tier could in principle beat Bulbul on price (free/near-free for Indian languages), but its real-time streaming support is unconfirmed — it cannot be plugged into this model until that is verified hands-on, so it is **not** used to revise the ₹2.03/min figure yet (tracked as an open item above).
+- OpenAI Realtime API's audio layer alone (~₹4.4/min) is more expensive than this entire Economy stack combined — the opposite of a cost win.
+- Vosk (self-hosted STT) trades Sarvam's ₹0.50/min for infra/ops cost instead — not modeled as cheaper without a concrete self-hosting cost estimate, which Phase 1 has not built.
+
+**The Economy-tier total therefore stands at ≈₹2.03/min**, unchanged from the prior estimate. Telephony remains the dominant, least-confirmed line (see the model's original framing above) — that, not the AI-stack choice, is still the main lever on reaching the founder's ₹1/min aspiration.
