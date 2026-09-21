@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
-import { MessageCircle, ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { MessageCircle, ArrowDownLeft, ArrowUpRight, Settings2 } from "lucide-react";
 import { readSession } from "@/server/auth";
 import { getUserOrganizations } from "@/server/organization";
 import { getMockRecentMessages, getMockWhatsappConnection, isMockModeEnabled } from "@/server/mock/meta";
+import { getMetaConnectionStatus } from "@/server/meta/status";
 
 export default async function WhatsappPage() {
   const session = await readSession();
@@ -14,6 +15,7 @@ export default async function WhatsappPage() {
 
   const connection = getMockWhatsappConnection(currentOrg.organizationId);
   const messages = getMockRecentMessages(currentOrg.organizationId);
+  const platformStatus = getMetaConnectionStatus();
 
   return (
     <div className="flex flex-col gap-6">
@@ -24,6 +26,25 @@ export default async function WhatsappPage() {
           Phase 5. What&apos;s shown below is{" "}
           {isMockModeEnabled() ? "simulated demo data" : "empty because nothing real is connected yet"}.
         </p>
+      </div>
+
+      <div className="flex items-start gap-3 rounded-xl border border-ink-200 bg-white px-4 py-3.5 text-sm">
+        <Settings2 className="mt-0.5 h-4 w-4 shrink-0 text-ink-400" strokeWidth={2} />
+        <div>
+          <p className="font-medium text-ink-800">Platform Meta configuration</p>
+          {platformStatus.mockMode ? (
+            <p className="text-ink-500">Mock mode — no Meta app credentials are needed yet.</p>
+          ) : platformStatus.configured ? (
+            <p className="text-brand-700">
+              Configured (Graph API {platformStatus.graphApiVersion}). No client has connected a
+              real number yet — that comes with Embedded Signup in Phase 5.
+            </p>
+          ) : (
+            <p className="text-amber-700">
+              Missing: {platformStatus.missingVars.join(", ")}. See docs/environment.md.
+            </p>
+          )}
+        </div>
       </div>
 
       {!connection ? (

@@ -119,6 +119,25 @@ Lesson applied going forward: a new RLS policy isn't trusted until something exe
 actual multi-table query shape the application code will run, not just single-table reads
 against a manually seeded row.
 
+## Phase 3: token model confirmed, and a real network restriction in this build environment
+
+The master brief flagged `META_SYSTEM_USER_ACCESS_TOKEN` as "only if current docs confirm this
+applies to our Tech Provider setup — otherwise document why it's unused." Phase 3 research
+(see `docs/meta-current-state.md`) found the answer: **a Tech Provider uses per-client
+"Business Integration System User" tokens obtained through Embedded Signup, not one shared
+system-user token.** That's exactly what `whatsapp_credentials` (one encrypted token per
+organization) already implements, so no schema change was needed — `META_SYSTEM_USER_ID` /
+`META_SYSTEM_USER_ACCESS_TOKEN` were removed from `.env.example` with an explanation, rather
+than left in as unused placeholders.
+
+Also worth being direct about: this build environment's network egress policy blocks
+`developers.facebook.com` (and several other domains) outright — every attempt to fetch Meta's
+own docs directly failed with `EGRESS_BLOCKED`. Phase 3's research in
+`docs/meta-current-state.md` is therefore built from web-search snippets of Meta's docs, not
+from reading the primary source directly. That document says so plainly and names exactly which
+facts need re-verification (and by when — one of them, the Embedded Signup v4 migration
+deadline, is time-sensitive) before Phase 5 depends on them.
+
 ## Deferred to later phases (not yet built)
 
 - Everything Meta/WhatsApp-specific (Cloud API client, Embedded Signup, webhooks, Compliance

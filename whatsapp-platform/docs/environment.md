@@ -13,8 +13,9 @@ Copy `.env.example` to `.env` and fill in real values. **Never commit `.env`.**
 | `REDIS_URL` | (unused in Phase 1) | Provisioned for the future job queue |
 | `SESSION_SECRET` | app | 32+ random bytes, base64. Generate: `openssl rand -base64 32` |
 | `ENCRYPTION_KEY` / `ENCRYPTION_KEY_VERSION` | (unused until Meta phase) | Will encrypt `whatsapp_credentials.encrypted_token` (AES-256-GCM) |
-| `MOCK_META` | (unused until Meta phase) | Must be `true` until real Meta credentials exist |
-| `META_*` | (unused until Meta phase) | Placeholders only — do not fill in without first reading `docs/meta-current-state.md` (not yet written; Phase 3) |
+| `MOCK_META` | app | Must stay `true` until Phase 5 (Embedded Signup) exists and real Meta credentials are ready |
+| `META_APP_ID` / `META_APP_SECRET` / `META_WEBHOOK_VERIFY_TOKEN` / `META_WEBHOOK_APP_SECRET` / `META_GRAPH_API_VERSION` | Meta client, required when `MOCK_META=false` | Read `docs/meta-current-state.md` first — do not fill in `META_GRAPH_API_VERSION` from a blog post; look up the current version yourself |
+| `META_BUSINESS_ID` / `META_EMBEDDED_SIGNUP_CONFIG_ID` | Phase 5 (Embedded Signup) | Not used by anything yet |
 | `RAZORPAY_*` | (unused until billing phase) | |
 | `SENTRY_DSN` / `NEXT_PUBLIC_POSTHOG_KEY` | (not wired up yet) | |
 
