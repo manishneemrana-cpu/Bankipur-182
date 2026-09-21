@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withSystemClient } from "@/server/db";
+import { withPlatformAdminTransaction, withSystemClient } from "@/server/db";
 import { verifyMetaSignature } from "@/server/webhooks/verify-signature";
 import { computeEventHash } from "@/server/webhooks/event-hash";
 import { processWhatsAppWebhook } from "@/server/webhooks/process";
@@ -59,7 +59,17 @@ export async function POST(request: NextRequest) {
   const phoneNumberId = payload.entry?.[0]?.changes?.[0]?.value?.metadata?.phone_number_id ?? null;
   const wabaId = payload.entry?.[0]?.id ?? null;
 
-  const insertResult = await withSystemClient((client) =>
+  // Uses a platform-admin transaction, not withSystemClient: this INSERT ...
+  // RETURNING requires Postgres to re-check the just-inserted row against the
+  // table's SELECT policy (webhook_events_read), which needs either a
+  // matching app.org_id or app.is_platform_admin — neither is set on a plain
+  // system-client connection. Without this, Postgres raises "new row
+  // violates row-level security policy" on the INSERT itself, even though
+  // the INSERT policy (WITH CHECK (true)) would otherwise allow it. Caught
+  // by an end-to-end browser + real webhook POST test, not by the earlier
+  // unit-level webhook processing tests, which called processWhatsAppWebhook
+  // directly and never exercised this INSERT.
+  const insertResult = await withPlatformAdminTransaction((client) =>
     client.query<{ id: string }>(
       `INSERT INTO webhook_events (event_hash, waba_id, phone_number_id, event_type, payload)
        VALUES ($1, $2, $3, $4, $5)
