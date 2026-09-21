@@ -164,5 +164,7 @@ already has it.** `webhooks.md` documents the specific instance for `whatsapp_ph
 - Encryption of `whatsapp_credentials.encrypted_token` (AES-256-GCM) — the column and
   `key_version` field exist, but the encrypt/decrypt code isn't written until the phase that
   actually stores a token.
-- Redis-backed job queue, AI/Calling provider interfaces, billing/Razorpay integration,
-  public API + API keys enforcement, outbound webhooks delivery, audit log writers.
+- Redis-backed job queue, public API + API keys enforcement, outbound webhooks delivery,
+  audit log writers.
+- A real Razorpay implementation of the payment provider interface (see `docs/billing.md` —
+  Phase 9 built the interface, plans/subscriptions/invoices, and a mock provider only).

@@ -10,6 +10,10 @@ const envSchema = z
       .string()
       .default("true")
       .transform((v) => v === "true"),
+    MOCK_PAYMENTS: z
+      .string()
+      .default("true")
+      .transform((v) => v === "true"),
     PLATFORM_BRAND_NAME: z.string().default("Magadh Property"),
     NEXT_PUBLIC_APP_URL: z.string().default("http://localhost:3000"),
     // Meta/WhatsApp — all optional here. Required only when MOCK_META=false (see below),
@@ -23,23 +27,42 @@ const envSchema = z
     META_WEBHOOK_APP_SECRET: z.string().optional(),
     META_GRAPH_API_VERSION: z.string().optional(),
     META_EMBEDDED_SIGNUP_CONFIG_ID: z.string().optional(),
+    // Razorpay — optional here, required only when MOCK_PAYMENTS=false (see below).
+    // Never hard-code prices or fees anywhere in application code; `plans` and
+    // `pricing_config` are the only source of truth, both admin-editable.
+    RAZORPAY_KEY_ID: z.string().optional(),
+    RAZORPAY_KEY_SECRET: z.string().optional(),
+    RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
   })
   .superRefine((env, ctx) => {
-    if (env.MOCK_META) return;
-    const required = [
-      "META_APP_ID",
-      "META_APP_SECRET",
-      "META_WEBHOOK_VERIFY_TOKEN",
-      "META_WEBHOOK_APP_SECRET",
-      "META_GRAPH_API_VERSION",
-    ] as const;
-    for (const key of required) {
-      if (!env[key]) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: [key],
-          message: `${key} is required when MOCK_META=false`,
-        });
+    if (!env.MOCK_META) {
+      const required = [
+        "META_APP_ID",
+        "META_APP_SECRET",
+        "META_WEBHOOK_VERIFY_TOKEN",
+        "META_WEBHOOK_APP_SECRET",
+        "META_GRAPH_API_VERSION",
+      ] as const;
+      for (const key of required) {
+        if (!env[key]) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [key],
+            message: `${key} is required when MOCK_META=false`,
+          });
+        }
+      }
+    }
+    if (!env.MOCK_PAYMENTS) {
+      const required = ["RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "RAZORPAY_WEBHOOK_SECRET"] as const;
+      for (const key of required) {
+        if (!env[key]) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [key],
+            message: `${key} is required when MOCK_PAYMENTS=false`,
+          });
+        }
       }
     }
   });

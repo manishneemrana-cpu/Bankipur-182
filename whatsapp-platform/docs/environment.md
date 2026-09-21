@@ -16,7 +16,8 @@ Copy `.env.example` to `.env` and fill in real values. **Never commit `.env`.**
 | `MOCK_META` | app | Must stay `true` until Phase 5 (Embedded Signup) exists and real Meta credentials are ready |
 | `META_APP_ID` / `META_APP_SECRET` / `META_WEBHOOK_VERIFY_TOKEN` / `META_WEBHOOK_APP_SECRET` / `META_GRAPH_API_VERSION` | Meta client, required when `MOCK_META=false` | Read `docs/meta-current-state.md` first — do not fill in `META_GRAPH_API_VERSION` from a blog post; look up the current version yourself |
 | `META_BUSINESS_ID` / `META_EMBEDDED_SIGNUP_CONFIG_ID` | Phase 5 (Embedded Signup) | Not used by anything yet |
-| `RAZORPAY_*` | (unused until billing phase) | |
+| `MOCK_PAYMENTS` | app | Must stay `true` until a real Razorpay account is configured — same pattern as `MOCK_META` |
+| `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` / `RAZORPAY_WEBHOOK_SECRET` | Payment provider, required when `MOCK_PAYMENTS=false` | Nothing calls Razorpay yet — Phase 9 only defines the provider interface (`src/server/payments/provider.ts`) |
 | `SENTRY_DSN` / `NEXT_PUBLIC_POSTHOG_KEY` | (not wired up yet) | |
 
 No server-side secret is ever prefixed `NEXT_PUBLIC_`. If you see one that is, that's a bug —

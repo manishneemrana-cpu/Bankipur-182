@@ -6,7 +6,9 @@ export default function AdminBillingPage() {
     <AdminStub
       title="Billing"
       icon={CreditCard}
-      description="Plan/pricing management and Razorpay subscriptions ship in Phase 9."
+      description={
+        "Plan and pricing management now live at Admin → Plans. A cross-organization invoice/revenue view (this page) isn't built yet — each organization's own invoices are on its dashboard's Billing page."
+      }
     />
   );
 }
