@@ -2,6 +2,7 @@ import "server-only";
 import type { PoolClient } from "pg";
 import { withOrgTransaction, withPlatformAdminTransaction } from "@/server/db";
 import { runIncomingMessageAutomations } from "@/server/automation";
+import { deliverOutboundEvent } from "@/server/outbound-webhooks";
 import type { WhatsAppInboundMessage, WhatsAppStatusUpdate, WhatsAppWebhookPayload } from "./types";
 
 /**
@@ -117,6 +118,16 @@ async function processInboundMessage(
     phoneNumberId,
     messageBody: message.type === "text" ? (message.text?.body ?? "") : "",
     isNewContact: automationContext.contact.isNew,
+  });
+
+  // Same reasoning: an unreachable customer webhook must never affect the
+  // inbound message that was already safely recorded above.
+  await deliverOutboundEvent(organizationId, "message.received", {
+    conversationId: automationContext.conversationId,
+    contactId: automationContext.contact.contactId,
+    from: message.from,
+    type: message.type ?? "text",
+    body: message.type === "text" ? (message.text?.body ?? null) : null,
   });
 }
 

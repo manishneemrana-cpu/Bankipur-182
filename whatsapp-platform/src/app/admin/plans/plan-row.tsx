@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { updatePlanAction, togglePlanAction } from "@/server/actions/admin-plan-actions";
 import type { Plan } from "@/server/billing";
 
 export function PlanRow({ plan }: { plan: Plan }) {
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [priceMonthly, setPriceMonthly] = useState(String(plan.priceMonthly));
   const [currency, setCurrency] = useState(plan.currency);
@@ -21,13 +23,14 @@ export function PlanRow({ plan }: { plan: Plan }) {
         }
         setError(null);
         setEditing(false);
+        router.refresh();
       });
     });
   }
 
   function toggle() {
     startTransition(() => {
-      void togglePlanAction({ planId: plan.id });
+      void togglePlanAction({ planId: plan.id }).then(() => router.refresh());
     });
   }
 

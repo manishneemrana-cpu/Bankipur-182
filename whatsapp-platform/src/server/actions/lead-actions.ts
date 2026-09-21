@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireOrgContext } from "@/server/auth";
 import { hasPermission } from "@/server/permissions";
 import { withOrgTransaction } from "@/server/db";
+import { deliverOutboundEvent } from "@/server/outbound-webhooks";
 
 export interface ActionResult {
   ok: boolean;
@@ -41,13 +42,20 @@ export async function createLead(input: unknown): Promise<ActionResult> {
     return { ok: false, error: "You don't have permission to manage leads" };
   }
 
-  await withOrgTransaction(organizationId, context.userId, (client) =>
-    client.query(
+  const created = await withOrgTransaction(organizationId, context.userId, (client) =>
+    client.query<{ id: string }>(
       `INSERT INTO leads (organization_id, name, phone, property, budget, source)
-       VALUES ($1, $2, $3, $4, $5, 'manual')`,
+       VALUES ($1, $2, $3, $4, $5, 'manual') RETURNING id`,
       [organizationId, name, phone || null, property || null, budget ?? null]
     )
   );
+
+  await deliverOutboundEvent(organizationId, "lead.created", {
+    leadId: created.rows[0]!.id,
+    name,
+    phone: phone || null,
+    source: "manual",
+  });
 
   revalidatePath("/dashboard/leads");
   return { ok: true };

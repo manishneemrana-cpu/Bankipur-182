@@ -46,7 +46,9 @@ export default async function ApiPage() {
         <h1 className="text-xl font-semibold text-ink-900">API</h1>
         <p className="mt-1 max-w-2xl text-sm text-ink-500">
           Used by the n8n integration (<code className="rounded bg-ink-100 px-1">POST /api/integrations/n8n/webhook</code>
-          , Authorization: Bearer &lt;key&gt;). The full public REST API ships in Phase 10.
+          ) and the public REST API under <code className="rounded bg-ink-100 px-1">/api/v1/...</code> — both take{" "}
+          <code className="rounded bg-ink-100 px-1">Authorization: Bearer &lt;key&gt;</code>. See{" "}
+          <code className="rounded bg-ink-100 px-1">docs/api.md</code> for the full reference.
         </p>
       </div>
 
