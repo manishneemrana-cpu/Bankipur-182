@@ -1,0 +1,16 @@
+export const DASHBOARD_NAV = [
+  { href: "/dashboard", label: "Overview" },
+  { href: "/dashboard/inbox", label: "Inbox" },
+  { href: "/dashboard/contacts", label: "Contacts" },
+  { href: "/dashboard/leads", label: "Leads" },
+  { href: "/dashboard/campaigns", label: "Campaigns" },
+  { href: "/dashboard/templates", label: "Templates" },
+  { href: "/dashboard/automation", label: "Automation" },
+  { href: "/dashboard/whatsapp", label: "WhatsApp" },
+  { href: "/dashboard/team", label: "Team" },
+  { href: "/dashboard/analytics", label: "Analytics" },
+  { href: "/dashboard/billing", label: "Billing" },
+  { href: "/dashboard/integrations", label: "Integrations" },
+  { href: "/dashboard/api", label: "API" },
+  { href: "/dashboard/settings", label: "Settings" },
+] as const;

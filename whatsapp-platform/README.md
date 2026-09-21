@@ -22,6 +22,13 @@ npm run build
 npm test                 # requires a running Postgres — see docs/database.md
 ```
 
+Note: `next.config.ts` sets `output: "standalone"` (needed for the Docker/VPS deploy in
+`docs/deployment-vps.md`). Once you've run `npm run build`, `npm run start` will NOT work
+correctly against that output — Next prints a warning and serves the app without its static
+assets or session cookies resolving. Use `npm run dev` for local development instead, or run
+`node .next/standalone/server.js` (after copying `public/` and `.next/static` into
+`.next/standalone/`, exactly like the Dockerfile does) to test a production build locally.
+
 ## Deploying
 
 See `docs/deployment-vps.md` for a self-hosted Hostinger VPS deployment with Docker.

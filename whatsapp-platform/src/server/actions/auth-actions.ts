@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { redirect } from "next/navigation";
 import { withSystemClient, withPlatformAdminTransaction } from "@/server/db";
 import { createSessionCookie, clearSessionCookie, hashPassword, verifyPassword } from "@/server/auth";
 
@@ -94,4 +95,9 @@ export async function login(input: unknown): Promise<ActionResult> {
 
 export async function logout(): Promise<void> {
   await clearSessionCookie();
+}
+
+export async function logoutAndRedirect(): Promise<void> {
+  await clearSessionCookie();
+  redirect("/login");
 }

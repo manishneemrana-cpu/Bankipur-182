@@ -3,7 +3,7 @@ import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { getEnv } from "./env";
-import { withSystemClient } from "./db";
+import { withSystemClient, withUserTransaction } from "./db";
 import type { OrgRole } from "./permissions";
 
 const SESSION_COOKIE = "wap_session";
@@ -81,29 +81,49 @@ export async function requireOrgContext(organizationId: string): Promise<Current
     throw new Error("UNAUTHENTICATED");
   }
 
-  return withSystemClient(async (client) => {
+  const user = await withSystemClient(async (client) => {
     const userResult = await client.query<{ is_platform_admin: boolean }>(
       "SELECT is_platform_admin FROM users WHERE id = $1",
       [session.userId]
     );
-    const user = userResult.rows[0];
-    if (!user) throw new Error("UNAUTHENTICATED");
+    return userResult.rows[0];
+  });
+  if (!user) throw new Error("UNAUTHENTICATED");
 
+  // organization_members has RLS: a plain unscoped query would see nothing,
+  // so this looks itself up by app.user_id (see migrations/0002_membership_self_lookup.sql).
+  const member = await withUserTransaction(session.userId, async (client) => {
     const memberResult = await client.query<{ role: OrgRole; permissions: string[] }>(
       "SELECT role, permissions FROM organization_members WHERE user_id = $1 AND organization_id = $2",
       [session.userId, organizationId]
     );
-    const member = memberResult.rows[0];
-    if (!member && !user.is_platform_admin) {
-      throw new Error("FORBIDDEN");
-    }
-
-    return {
-      userId: session.userId,
-      organizationId,
-      role: member?.role ?? "VIEWER",
-      permissionOverrides: member?.permissions ?? [],
-      isPlatformAdmin: user.is_platform_admin,
-    };
+    return memberResult.rows[0];
   });
+  if (!member && !user.is_platform_admin) {
+    throw new Error("FORBIDDEN");
+  }
+
+  return {
+    userId: session.userId,
+    organizationId,
+    role: member?.role ?? "VIEWER",
+    permissionOverrides: member?.permissions ?? [],
+    isPlatformAdmin: user.is_platform_admin,
+  };
+}
+
+/** Returns the signed-in platform admin's userId, or null if not signed in / not an admin. */
+export async function requirePlatformAdminUserId(): Promise<string | null> {
+  const session = await readSession();
+  if (!session) return null;
+
+  const isAdmin = await withSystemClient(async (client) => {
+    const result = await client.query<{ is_platform_admin: boolean }>(
+      "SELECT is_platform_admin FROM users WHERE id = $1",
+      [session.userId]
+    );
+    return result.rows[0]?.is_platform_admin ?? false;
+  });
+
+  return isAdmin ? session.userId : null;
 }

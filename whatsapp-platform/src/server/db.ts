@@ -12,20 +12,62 @@ function getPool(): Pool {
 }
 
 /**
- * Runs `fn` inside a transaction with Postgres RLS scoped to `organizationId`.
- * organizationId must already be resolved server-side from the authenticated
- * session — never accept it as a raw parameter from request input.
+ * Runs `fn` inside a transaction with Postgres RLS scoped to `organizationId`
+ * (and, when provided, `userId` — needed for policies like
+ * `organization_members`'s that also match on the caller's own user id).
+ * Both must already be resolved server-side from the authenticated session —
+ * never accept either as a raw parameter from request input.
  */
 export async function withOrgTransaction<T>(
   organizationId: string,
   fn: (client: PoolClient) => Promise<T>
+): Promise<T>;
+export async function withOrgTransaction<T>(
+  organizationId: string,
+  userId: string,
+  fn: (client: PoolClient) => Promise<T>
+): Promise<T>;
+export async function withOrgTransaction<T>(
+  organizationId: string,
+  userIdOrFn: string | ((client: PoolClient) => Promise<T>),
+  maybeFn?: (client: PoolClient) => Promise<T>
 ): Promise<T> {
+  const userId = typeof userIdOrFn === "string" ? userIdOrFn : undefined;
+  const fn = typeof userIdOrFn === "function" ? userIdOrFn : maybeFn!;
+
   const client = await getPool().connect();
   try {
     await client.query("BEGIN");
     // set_config with is_local=true scopes this to the current transaction only,
     // so it can never leak across pooled connections between requests.
     await client.query("SELECT set_config('app.org_id', $1, true)", [organizationId]);
+    if (userId) {
+      await client.query("SELECT set_config('app.user_id', $1, true)", [userId]);
+    }
+    const result = await fn(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Scoped to the caller's own user id only (no organization yet) — for the
+ * one legitimate class of pre-tenant lookup that still needs RLS-aware
+ * filtering: "which organizations do I belong to?" (login, org switcher).
+ */
+export async function withUserTransaction<T>(
+  userId: string,
+  fn: (client: PoolClient) => Promise<T>
+): Promise<T> {
+  const client = await getPool().connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("SELECT set_config('app.user_id', $1, true)", [userId]);
     const result = await fn(client);
     await client.query("COMMIT");
     return result;

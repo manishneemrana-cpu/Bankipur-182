@@ -92,6 +92,33 @@ globally unique, and partitioning by insertion time would let a retried webhook 
 land in a different partition and defeat that uniqueness constraint. Revisit only if webhook
 volume actually requires it, with a proper time-bucketed dedup design at that point.
 
+## Phase 2: RLS gaps found by an actual browser-driven smoke test, not just unit tests
+
+The Phase 1 tenant-isolation tests exercised each table's RLS policy in isolation and all
+passed, but they didn't catch two real bugs that only showed up when Phase 2 built a real
+signed-in dashboard and it was tested by actually registering and loading pages in a browser
+(not just `npm run build` succeeding):
+
+1. **`organization_members` couldn't be looked up by a user who didn't know their
+   organization_id yet** (needed for login and "which orgs am I in"). Fixed in
+   `migrations/0002_membership_self_lookup.sql` by adding an `app_user_id()` session setting
+   and letting a user read their own membership rows by `user_id`, while keeping writes
+   restricted to an already-established `organization_id` context (so a user still can't
+   grant themselves membership in an arbitrary organization).
+2. **The join from `organization_members` to `organizations`** (exactly what
+   `getUserOrganizations()` runs) silently dropped every row, because `organizations`' RLS
+   policy only allowed `id = app_org_id()` (not yet set, in this lookup) or a platform admin.
+   A freshly-registered user's own dashboard redirected them straight back to `/register`, as
+   if they belonged to no organization — even though their membership row existed and the
+   signup transaction had committed successfully. Fixed in
+   `migrations/0003_organizations_member_read.sql` by letting a user `SELECT` any organization
+   they have a membership row in, while keeping `INSERT`/`UPDATE`/`DELETE` exactly as
+   restrictive as before.
+
+Lesson applied going forward: a new RLS policy isn't trusted until something exercises the
+actual multi-table query shape the application code will run, not just single-table reads
+against a manually seeded row.
+
 ## Deferred to later phases (not yet built)
 
 - Everything Meta/WhatsApp-specific (Cloud API client, Embedded Signup, webhooks, Compliance
