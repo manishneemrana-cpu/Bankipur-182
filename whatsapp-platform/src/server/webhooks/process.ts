@@ -1,6 +1,7 @@
 import "server-only";
 import type { PoolClient } from "pg";
 import { withOrgTransaction, withPlatformAdminTransaction } from "@/server/db";
+import { runIncomingMessageAutomations } from "@/server/automation";
 import type { WhatsAppInboundMessage, WhatsAppStatusUpdate, WhatsAppWebhookPayload } from "./types";
 
 /**
@@ -29,16 +30,18 @@ async function upsertContact(
   phoneE164: string,
   name: string | undefined,
   client: PoolClient
-): Promise<string> {
-  const result = await client.query<{ id: string }>(
+): Promise<{ contactId: string; isNew: boolean; suppressed: boolean }> {
+  const result = await client.query<{ id: string; suppressed: boolean; xmax: string }>(
     `INSERT INTO contacts (organization_id, phone_e164, name, source)
      VALUES ($1, $2, $3, 'whatsapp_inbound')
      ON CONFLICT (organization_id, phone_e164)
      DO UPDATE SET name = COALESCE(contacts.name, EXCLUDED.name)
-     RETURNING id`,
+     RETURNING id, suppressed, xmax`,
     [organizationId, phoneE164, name ?? null]
   );
-  return result.rows[0]!.id;
+  const row = result.rows[0]!;
+  // xmax = '0' only for a freshly inserted row (Postgres sets it on update via the DO UPDATE path).
+  return { contactId: row.id, isNew: row.xmax === "0", suppressed: row.suppressed };
 }
 
 async function findOrCreateOpenConversation(
@@ -71,16 +74,17 @@ async function findOrCreateOpenConversation(
 async function processInboundMessage(
   organizationId: string,
   whatsappPhoneNumberId: string,
+  phoneNumberId: string,
   message: WhatsAppInboundMessage,
   contactName: string | undefined
 ): Promise<void> {
   if (!message.from) return;
 
-  await withOrgTransaction(organizationId, async (client) => {
-    const contactId = await upsertContact(organizationId, message.from!, contactName, client);
+  const automationContext = await withOrgTransaction(organizationId, async (client) => {
+    const contact = await upsertContact(organizationId, message.from!, contactName, client);
     const conversationId = await findOrCreateOpenConversation(
       organizationId,
-      contactId,
+      contact.contactId,
       whatsappPhoneNumberId,
       client
     );
@@ -97,6 +101,22 @@ async function processInboundMessage(
         message.timestamp ? new Date(Number(message.timestamp) * 1000) : new Date(),
       ]
     );
+
+    return { conversationId, contact };
+  });
+
+  // Runs in its own transaction, after the inbound message is safely
+  // recorded — an automation failure must never roll back the message itself.
+  await runIncomingMessageAutomations({
+    organizationId,
+    conversationId: automationContext.conversationId,
+    contactId: automationContext.contact.contactId,
+    contactPhone: message.from,
+    contactSuppressed: automationContext.contact.suppressed,
+    whatsappPhoneNumberId,
+    phoneNumberId,
+    messageBody: message.type === "text" ? (message.text?.body ?? "") : "",
+    isNewContact: automationContext.contact.isNew,
   });
 }
 
@@ -147,7 +167,7 @@ export async function processWhatsAppWebhook(payload: WhatsAppWebhookPayload): P
 
       const contactName = change.value?.contacts?.[0]?.profile?.name;
       for (const message of change.value?.messages ?? []) {
-        await processInboundMessage(organizationId, whatsappPhoneNumberId, message, contactName);
+        await processInboundMessage(organizationId, whatsappPhoneNumberId, phoneNumberId, message, contactName);
       }
       for (const status of change.value?.statuses ?? []) {
         await processStatusUpdate(organizationId, status);
