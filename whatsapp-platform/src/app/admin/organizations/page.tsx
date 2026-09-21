@@ -34,42 +34,54 @@ async function listOrganizations(): Promise<OrgRow[]> {
   });
 }
 
+const STATUS_STYLES: Record<string, string> = {
+  active: "bg-brand-100 text-brand-800",
+  suspended: "bg-amber-100 text-amber-800",
+  closed: "bg-ink-100 text-ink-600",
+};
+
 export default async function AdminOrganizationsPage() {
   const organizations = await listOrganizations();
 
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold">Organizations</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <h1 className="text-xl font-semibold text-ink-900">Organizations</h1>
+        <p className="mt-1 max-w-2xl text-sm text-ink-500">
           Suspending an organization, and viewing its onboarding/WhatsApp connection status,
           ship once those features exist (later phases).
         </p>
       </div>
 
       {organizations.length === 0 ? (
-        <p className="text-sm text-slate-600">No organizations yet.</p>
+        <p className="text-sm text-ink-500">No organizations yet.</p>
       ) : (
-        <table className="w-full overflow-hidden rounded-lg border border-slate-200 bg-white text-sm">
-          <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-400">
-            <tr>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Members</th>
-              <th className="px-4 py-2">Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {organizations.map((o) => (
-              <tr key={o.id} className="border-t border-slate-100">
-                <td className="px-4 py-2 font-medium">{o.name}</td>
-                <td className="px-4 py-2 text-slate-600">{o.status}</td>
-                <td className="px-4 py-2 text-slate-600">{o.memberCount}</td>
-                <td className="px-4 py-2 text-slate-600">{new Date(o.createdAt).toLocaleDateString()}</td>
+        <div className="card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-ink-50 text-left text-xs uppercase tracking-wide text-ink-400">
+              <tr>
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Members</th>
+                <th className="px-4 py-3">Created</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {organizations.map((o) => (
+                <tr key={o.id} className="border-t border-ink-100">
+                  <td className="px-4 py-3 font-medium text-ink-900">{o.name}</td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[o.status] ?? "bg-ink-100 text-ink-600"}`}>
+                      {o.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-ink-500">{o.memberCount}</td>
+                  <td className="px-4 py-3 text-ink-500">{new Date(o.createdAt).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

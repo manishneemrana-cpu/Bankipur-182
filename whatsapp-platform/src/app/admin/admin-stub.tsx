@@ -1,6 +1,6 @@
 import { Construction, type LucideIcon } from "lucide-react";
 
-export function PhaseStub({
+export function AdminStub({
   title,
   description,
   icon: Icon = Construction,

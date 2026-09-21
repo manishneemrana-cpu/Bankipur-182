@@ -8,17 +8,18 @@ export function AdminNavLinks() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-col gap-1">
+    <nav className="flex flex-col gap-0.5">
       {ADMIN_NAV.map((item) => {
         const isActive = item.href === "/admin" ? pathname === item.href : pathname?.startsWith(item.href);
         return (
           <Link
             key={item.href}
             href={item.href}
-            className={`rounded-md px-3 py-2 text-sm ${
-              isActive ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-100"
+            className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              isActive ? "bg-white/10 text-white" : "text-ink-300 hover:bg-white/5 hover:text-white"
             }`}
           >
+            <item.icon className="h-4 w-4 shrink-0" strokeWidth={2} />
             {item.label}
           </Link>
         );

@@ -21,7 +21,8 @@
     "jose": "5.9.6",
     "bcryptjs": "2.4.3",
     "dotenv": "16.4.5",
-    "server-only": "0.0.1"
+    "server-only": "0.0.1",
+    "lucide-react": "1.47.0"
   },
   "devDependencies": {
     "@types/node": "22.15.0",
