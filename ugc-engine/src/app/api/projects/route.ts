@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireTenantContext, UnauthorizedError } from "@/lib/auth/tenant";
 import { ProductRepository, ProjectRepository } from "@/lib/db/repositories";
 import { getVideoProductionQueue } from "@/lib/queue/videoProductionQueue";
+import { assertRedisConfigured, RedisNotConfiguredError } from "@/lib/queue/connection";
 import { looseUuid } from "@/lib/validation/uuid";
 import type { ProductInput } from "@/types/project";
 
@@ -36,6 +37,8 @@ export async function POST(req: NextRequest) {
     const tenant = requireTenantContext(req);
     const body = productInputSchema.parse(await req.json());
 
+    assertRedisConfigured();
+
     const input: ProductInput = { ...body, organizationId: tenant.organizationId } as ProductInput;
 
     const productId = await ProductRepository.create(tenant.organizationId, body.brandKitId, input);
@@ -67,6 +70,9 @@ export async function POST(req: NextRequest) {
 export function errorResponse(error: unknown) {
   if (error instanceof UnauthorizedError) {
     return NextResponse.json({ error: error.message }, { status: 401 });
+  }
+  if (error instanceof RedisNotConfiguredError) {
+    return NextResponse.json({ error: error.message }, { status: 503 });
   }
   if (error instanceof z.ZodError) {
     console.error("Validation error:", JSON.stringify(error.issues));

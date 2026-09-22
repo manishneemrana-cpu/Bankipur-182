@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { errorResponse } from "@/app/api/projects/route";
 import { getVideoProductionQueue } from "@/lib/queue/videoProductionQueue";
+import { assertRedisConfigured } from "@/lib/queue/connection";
 import { ProjectRepository } from "@/lib/db/repositories";
 import type { CreativeFramework } from "@/types/agents";
 import { looseUuid } from "@/lib/validation/uuid";
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
   try {
     const tenant = requireTenantContext(req);
     const { projectId, productInput, angles } = schema.parse(await req.json());
+    assertRedisConfigured();
 
     const sourceProject = await ProjectRepository.get(tenant.organizationId, projectId);
     if (!sourceProject) return NextResponse.json({ error: "Source project not found" }, { status: 404 });

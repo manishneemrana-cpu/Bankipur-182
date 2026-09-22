@@ -238,7 +238,7 @@ function sleep(ms: number): Promise<void> {
 export const videoProductionWorker = new Worker<VideoProductionJobData, VideoProductionJobResult>(
   VIDEO_PRODUCTION_QUEUE_NAME,
   processVideoProductionJob,
-  { connection: getRedisConnection(), concurrency: 2 }
+  { connection: getRedisConnection({ forWorker: true }), concurrency: 2 }
 );
 
 videoProductionWorker.on("failed", (job, err) => {

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { errorResponse } from "@/app/api/projects/route";
 import { getVideoProductionQueue } from "@/lib/queue/videoProductionQueue";
+import { assertRedisConfigured } from "@/lib/queue/connection";
 import { ProjectRepository } from "@/lib/db/repositories";
 import { looseUuid } from "@/lib/validation/uuid";
 
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
   try {
     const tenant = requireTenantContext(req);
     const { projectId, sceneNumbers, productInput } = schema.parse(await req.json());
+    assertRedisConfigured();
 
     const project = await ProjectRepository.get(tenant.organizationId, projectId);
     if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
