@@ -17,6 +17,17 @@ export async function GET(req: NextRequest) {
   const apiKey = process.env.NVIDIA_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "NVIDIA_API_KEY not set" }, { status: 400 });
 
+  const testModel = req.nextUrl.searchParams.get("test");
+  if (testModel) {
+    const res = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: testModel, messages: [{ role: "user", content: "Say OK." }], max_tokens: 5 }),
+    });
+    const body = await res.text();
+    return NextResponse.json({ status: res.status, body });
+  }
+
   const res = await fetch("https://integrate.api.nvidia.com/v1/models", {
     headers: { Authorization: `Bearer ${apiKey}` },
   });
