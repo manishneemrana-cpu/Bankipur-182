@@ -23,12 +23,13 @@ const OPENAI_COMPATIBLE_CONFIG: Record<Exclude<LLMProviderKey, "gemini">, { base
     baseUrl: "https://integrate.api.nvidia.com/v1",
     envKey: "NVIDIA_API_KEY",
     modelEnvKey: "NVIDIA_MODEL",
-    // meta/llama-3.1-70b-instruct and meta/llama-3.3-70b-instruct are both retired.
-    // nvidia/llama-3.1-nemotron-70b-instruct is listed in /v1/models but 404s as
-    // "Function not found for account" — large NIM models often need separate
-    // per-account entitlement even when listed. Using a small, broadly-available
-    // instruct model instead. Override via NVIDIA_MODEL if this one changes too.
-    defaultModel: "mistralai/mistral-7b-instruct-v0.3",
+    // Most models listed in /v1/models 404 as "Function not found for account" on
+    // this API key (nemotron-70b, mistral-7b-instruct-v0.3, gemma-3-12b-it,
+    // granite-3.0-8b-instruct, mistral-nemo-12b-instruct all do) — this key only
+    // has entitlement for a subset. meta/llama-3.2-11b-vision-instruct is
+    // confirmed live via a real chat completion call. Override via NVIDIA_MODEL
+    // if this account's entitlements change.
+    defaultModel: "meta/llama-3.2-11b-vision-instruct",
   },
   groq: {
     baseUrl: "https://api.groq.com/openai/v1",
