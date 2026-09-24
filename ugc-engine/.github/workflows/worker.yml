@@ -1,0 +1,45 @@
+name: UGC Video Worker
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "*/10 * * * *"
+
+concurrency:
+  group: ugc-worker
+  cancel-in-progress: false
+
+jobs:
+  run-worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    defaults:
+      run:
+        working-directory: ugc-engine
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: ugc-engine/package-lock.json
+
+      - run: npm install
+
+      - name: Drain the video production queue for up to 6 minutes
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          DEFAULT_LLM_PROVIDER: nvidia
+          DEFAULT_IMAGE_PROVIDER: nvidia
+          ALLOW_MOCK_PROVIDERS: "true"
+          STORAGE_PROVIDER: ${{ secrets.S3_BUCKET != '' && 's3' || '' }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          S3_REGION: ${{ secrets.S3_REGION }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_PUBLIC_BASE_URL: ${{ secrets.S3_PUBLIC_BASE_URL }}
+        run: timeout --signal=SIGINT 360 npm run worker || true

@@ -1,3 +1,5 @@
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import type { IStorageProviderAdapter, UploadResult } from "./StorageProviderInterface";
 
 export interface S3AdapterConfig {
@@ -6,36 +8,54 @@ export interface S3AdapterConfig {
   accessKeyId: string;
   secretAccessKey: string;
   endpoint?: string; // set for Cloudflare R2
+  publicBaseUrl?: string; // e.g. an R2 public bucket URL or CDN in front of it
 }
 
 /**
- * S3-compatible adapter (works for AWS S3 or Cloudflare R2 via `endpoint`).
- * Uses presigned URLs via the AWS SDK v3 at the call site's discretion;
- * the actual @aws-sdk/client-s3 + @aws-sdk/s3-request-presigner packages
- * are intentionally left as a peer dependency to avoid bloating installs
- * for teams that only need LocalStorageAdapter in development.
+ * S3-compatible adapter — works against AWS S3 or Cloudflare R2 (pass
+ * `endpoint` + `region: "auto"` for R2). Used for any deploy that needs
+ * generated assets to survive past the process that rendered them
+ * (a serverless request, an ephemeral CI runner, a restarted worker).
  */
 export class S3StorageAdapter implements IStorageProviderAdapter {
   public providerName = "s3-compatible";
+  private client: S3Client;
 
-  constructor(private config: S3AdapterConfig) {}
+  constructor(private config: S3AdapterConfig) {
+    if (!config.bucket || !config.accessKeyId || !config.secretAccessKey) {
+      throw new Error(
+        "S3StorageAdapter requires S3_BUCKET, S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY to be set."
+      );
+    }
+    this.client = new S3Client({
+      region: config.region,
+      endpoint: config.endpoint,
+      forcePathStyle: Boolean(config.endpoint),
+      credentials: { accessKeyId: config.accessKeyId, secretAccessKey: config.secretAccessKey },
+    });
+  }
 
-  public async upload(_key: string, _data: Buffer, _contentType: string): Promise<UploadResult> {
-    throw new Error(
-      "S3StorageAdapter.upload requires @aws-sdk/client-s3 to be installed and configured. " +
-        "Install it and implement PutObjectCommand here before enabling STORAGE_PROVIDER=s3 in production."
+  public async upload(key: string, data: Buffer, contentType: string): Promise<UploadResult> {
+    await this.client.send(
+      new PutObjectCommand({ Bucket: this.config.bucket, Key: key, Body: data, ContentType: contentType })
     );
+    const url = this.config.publicBaseUrl
+      ? `${this.config.publicBaseUrl.replace(/\/$/, "")}/${key}`
+      : await this.getSignedReadUrl(key);
+    return { url, key, sizeBytes: data.byteLength };
   }
 
-  public async getSignedUploadUrl(_key: string, _contentType: string): Promise<string> {
-    throw new Error("S3StorageAdapter.getSignedUploadUrl requires @aws-sdk/s3-request-presigner.");
+  public async getSignedUploadUrl(key: string, contentType: string): Promise<string> {
+    const command = new PutObjectCommand({ Bucket: this.config.bucket, Key: key, ContentType: contentType });
+    return getSignedUrl(this.client, command, { expiresIn: 3600 });
   }
 
-  public async getSignedReadUrl(_key: string): Promise<string> {
-    throw new Error("S3StorageAdapter.getSignedReadUrl requires @aws-sdk/s3-request-presigner.");
+  public async getSignedReadUrl(key: string): Promise<string> {
+    const command = new GetObjectCommand({ Bucket: this.config.bucket, Key: key });
+    return getSignedUrl(this.client, command, { expiresIn: 3600 * 24 * 7 });
   }
 
-  public async delete(_key: string): Promise<void> {
-    throw new Error("S3StorageAdapter.delete requires @aws-sdk/client-s3.");
+  public async delete(key: string): Promise<void> {
+    await this.client.send(new DeleteObjectCommand({ Bucket: this.config.bucket, Key: key }));
   }
 }

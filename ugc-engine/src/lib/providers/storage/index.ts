@@ -15,6 +15,7 @@ export function getStorageProvider(): IStorageProviderAdapter {
       accessKeyId: process.env.S3_ACCESS_KEY_ID || "",
       secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || "",
       endpoint: process.env.S3_ENDPOINT,
+      publicBaseUrl: process.env.S3_PUBLIC_BASE_URL,
     });
   } else if (process.env.ALLOW_MOCK_PROVIDERS === "true") {
     // Explicit opt-in for a testing deploy on a read-only/serverless filesystem
