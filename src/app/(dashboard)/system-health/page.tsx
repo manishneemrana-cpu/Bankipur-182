@@ -1,7 +1,7 @@
 import { getCurrentUser } from "@/lib/data/current-user";
 import { getSystemHealth } from "@/lib/data/system-health";
 import { WORKFLOW_TEMPLATES } from "@/lib/n8n/workflow-templates";
-import { activateIntegration } from "./actions";
+import { activateIntegration, checkSitesNSignConnection } from "./actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StatusBadge } from "@/components/status-badge";
@@ -88,14 +88,24 @@ export default async function SystemHealthPage({
                     </TableCell>
                     {canActivate && (
                       <TableCell>
-                        {!h.activated_at && (
-                          <form action={activateIntegration}>
-                            <input type="hidden" name="healthId" value={h.id} />
-                            <Button type="submit" size="sm" variant="outline">
-                              Activate
-                            </Button>
-                          </form>
-                        )}
+                        <div className="flex gap-2">
+                          {h.service === "sitesnsign_connector" && (
+                            <form action={checkSitesNSignConnection}>
+                              <input type="hidden" name="healthId" value={h.id} />
+                              <Button type="submit" size="sm" variant="outline">
+                                Check Connection
+                              </Button>
+                            </form>
+                          )}
+                          {!h.activated_at && (
+                            <form action={activateIntegration}>
+                              <input type="hidden" name="healthId" value={h.id} />
+                              <Button type="submit" size="sm" variant="outline">
+                                Activate
+                              </Button>
+                            </form>
+                          )}
+                        </div>
                       </TableCell>
                     )}
                   </TableRow>
