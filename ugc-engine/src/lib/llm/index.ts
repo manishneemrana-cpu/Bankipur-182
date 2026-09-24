@@ -23,9 +23,10 @@ const OPENAI_COMPATIBLE_CONFIG: Record<Exclude<LLMProviderKey, "gemini">, { base
     baseUrl: "https://integrate.api.nvidia.com/v1",
     envKey: "NVIDIA_API_KEY",
     modelEnvKey: "NVIDIA_MODEL",
-    // llama-3.1-70b-instruct reached NVIDIA NIM end-of-life 2026-08-26; 3.3 is its
-    // direct successor on the same catalog. Override via NVIDIA_MODEL if this ages out too.
-    defaultModel: "meta/llama-3.3-70b-instruct",
+    // meta/llama-3.1-70b-instruct and meta/llama-3.3-70b-instruct both hit NVIDIA NIM
+    // end-of-life (2026-08-26); confirmed live against this catalog via /v1/models on
+    // 2026-09-24. Override via NVIDIA_MODEL if this one ages out too.
+    defaultModel: "nvidia/llama-3.1-nemotron-70b-instruct",
   },
   groq: {
     baseUrl: "https://api.groq.com/openai/v1",
