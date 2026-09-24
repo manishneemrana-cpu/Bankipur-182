@@ -25,17 +25,29 @@ ${cinematography ? `User-specified cinematography overrides: ${JSON.stringify(ci
 For each scene return camera settings, character action, product interaction, an audio cue, a short caption text, and a transition into the next scene.
 Return JSON: { "scenes": [{ "sceneNumber": n, "camera": {"shotType": "Extreme Close-Up"|"Close-Up"|"Medium Shot"|"Wide Shot", "movement": "Handheld subtle shake"|"Static tripod"|"Slow pan right"|"Push in", "lens": "24mm wide angle lens"|"35mm lens"|"50mm portrait lens", "lighting": "Natural window daylight"|"Warm indoor ring light"|"Golden hour sunlight"}, "characterAction": string, "productInteraction": string, "audioCue": string, "captionText": string, "transition": "cut"|"crossfade"|"whip-pan"|"match-cut" }] }`;
 
-    const { scenes: directions } = await this.llm.generateJSON<{
-      scenes: Array<{
-        sceneNumber: number;
-        camera: CameraSettings;
-        characterAction: string;
-        productInteraction: string;
-        audioCue: string;
-        captionText: string;
-        transition: StoryboardScene["transition"];
-      }>;
-    }>({ prompt, temperature: 0.6 });
+    type DirectionEntry = {
+      sceneNumber: number;
+      camera: CameraSettings;
+      characterAction: string;
+      productInteraction: string;
+      audioCue: string;
+      captionText: string;
+      transition: StoryboardScene["transition"];
+    };
+
+    const parsed = await this.llm.generateJSON<{ scenes: DirectionEntry[] } | DirectionEntry[]>({
+      prompt,
+      temperature: 0.6,
+    });
+    // Smaller/less instruction-tuned models sometimes ignore the requested
+    // wrapper object and return a bare array — accept either shape rather
+    // than crash on `.find` of undefined.
+    const directions = Array.isArray(parsed) ? parsed : parsed?.scenes;
+    if (!directions?.length) {
+      throw new Error(
+        `StoryboardDirectorAgent: LLM response had no 'scenes' array (got: ${JSON.stringify(parsed).slice(0, 300)})`
+      );
+    }
 
     return script.map((scene) => {
       const direction = directions.find((d) => d.sceneNumber === scene.sceneNumber) ?? directions[0];
