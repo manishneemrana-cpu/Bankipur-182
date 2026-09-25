@@ -4,6 +4,15 @@ import type { CameraSettings, ContinuityBible, ScriptScene, StoryboardScene } fr
 import { UGCVideoPromptEngine } from "@/lib/prompt/UGCVideoPromptEngine";
 import { getIndustryFramework } from "@/lib/industry/IndustryFrameworks";
 
+// Used whenever a smaller/less-instructable LLM omits a field entirely
+// instead of picking one of the requested enum values.
+const DEFAULT_CAMERA: CameraSettings = {
+  shotType: "Medium Shot",
+  movement: "Static tripod",
+  lens: "35mm lens",
+  lighting: "Natural window daylight",
+};
+
 /**
  * Agent 6 (Storyboard Director) + Agent 7 (Prompt Engineer) combined
  * pipeline step: converts the script into camera-ready scenes, then
@@ -50,7 +59,18 @@ Return JSON: { "scenes": [{ "sceneNumber": n, "camera": {"shotType": "Extreme Cl
     }
 
     return script.map((scene) => {
-      const direction = directions.find((d) => d.sceneNumber === scene.sceneNumber) ?? directions[0];
+      const found = directions.find((d) => d.sceneNumber === scene.sceneNumber) ?? directions[0];
+      // Defensively fill in anything the LLM left out rather than crash deep
+      // inside prompt-building on an undefined field.
+      const direction: DirectionEntry = {
+        sceneNumber: found.sceneNumber,
+        camera: found.camera ?? DEFAULT_CAMERA,
+        characterAction: found.characterAction ?? scene.visualAction,
+        productInteraction: found.productInteraction ?? "",
+        audioCue: found.audioCue ?? "",
+        captionText: found.captionText ?? scene.spokenDialogue,
+        transition: found.transition ?? "cut",
+      };
 
       const { prompt: modelPrompt, negativePrompt } = UGCVideoPromptEngine.buildModelPrompt(
         {
