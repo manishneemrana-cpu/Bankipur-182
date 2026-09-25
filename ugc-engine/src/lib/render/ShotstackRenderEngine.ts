@@ -13,6 +13,8 @@ export interface ShotstackRenderConfig {
   captionsSrtUrl?: string;
   targetAspectRatio: AspectRatio;
   overrides?: EnvOverrides;
+  /** Scenes are still images (e.g. PollinationsPanAdapter), not real motion footage — animate with a Ken Burns pan/zoom instead of playing as video. */
+  imageMode?: boolean;
 }
 
 const OUTPUT_SIZE: Record<AspectRatio, { width: number; height: number }> = {
@@ -52,14 +54,27 @@ export class ShotstackRenderEngine {
     const totalDuration = config.scenes.reduce((sum, s) => sum + s.durationSeconds, 0);
     const size = OUTPUT_SIZE[config.targetAspectRatio];
 
+    // Alternate the pan direction per scene so a multi-scene still-image edit
+    // doesn't feel like the exact same zoom repeated — a cheap but real
+    // difference a viewer will actually notice.
+    const KEN_BURNS_EFFECTS = ["zoomIn", "zoomOut", "slideLeft", "slideRight"];
+
     let cursor = 0;
-    const videoClips = config.scenes.map((scene) => {
-      const clip = {
-        asset: { type: "video", src: scene.videoUrl },
-        start: cursor,
-        length: scene.durationSeconds,
-        fit: "crop",
-      };
+    const videoClips = config.scenes.map((scene, index) => {
+      const clip = config.imageMode
+        ? {
+            asset: { type: "image", src: scene.videoUrl },
+            start: cursor,
+            length: scene.durationSeconds,
+            fit: "cover",
+            effect: KEN_BURNS_EFFECTS[index % KEN_BURNS_EFFECTS.length],
+          }
+        : {
+            asset: { type: "video", src: scene.videoUrl },
+            start: cursor,
+            length: scene.durationSeconds,
+            fit: "crop",
+          };
       cursor += scene.durationSeconds;
       return clip;
     });

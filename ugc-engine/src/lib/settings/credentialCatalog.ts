@@ -68,14 +68,16 @@ export const CREDENTIAL_CATALOG: CredentialGroup[] = [
   },
   {
     group: "Video generation",
-    description: "All of these are paid, per-second billed AI video models. Pick whichever you can get a key for.",
+    description:
+      "\"pollinations-pan\" is free and needs no key — it animates AI-generated still frames with a pan/zoom instead of real " +
+      "motion footage. Every other option is a real AI video model, but all are paid/per-second billed.",
     fields: [
       {
         key: "DEFAULT_VIDEO_PROVIDER",
         label: "Provider to use",
         type: "select",
-        options: ["google-veo-2", "runway-gen4", "luma-dream-machine", "kling-1.5"],
-        whereToGet: "Which video model actually generates each scene.",
+        options: ["pollinations-pan", "google-veo-2", "runway-gen4", "luma-dream-machine", "kling-1.5"],
+        whereToGet: "Leave as \"pollinations-pan\" for a free result with no signup, or pick a paid model below.",
       },
       { key: "GOOGLE_VEO_API_KEY", label: "Google Veo API key", type: "secret", whereToGet: "Google AI Studio / Vertex AI console — Veo access." },
       { key: "RUNWAY_API_KEY", label: "Runway API key", type: "secret", whereToGet: "dev.runwayml.com — Developer Portal → API Keys." },

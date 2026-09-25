@@ -3,11 +3,15 @@ import { GoogleVeoAdapter } from "./GoogleVeoAdapter";
 import { RunwayAdapter } from "./RunwayAdapter";
 import { LumaAdapter } from "./LumaAdapter";
 import { KlingAdapter } from "./KlingAdapter";
+import { PollinationsPanAdapter } from "./PollinationsPanAdapter";
 import { MockVideoAdapter } from "./MockVideoAdapter";
 import { getImageProvider } from "@/lib/providers/image";
 import { resolveEnv, type EnvOverrides } from "@/lib/settings/resolveEnv";
 
-export type VideoProviderKey = "google-veo-2" | "runway-gen4" | "luma-dream-machine" | "kling-1.5";
+export type VideoProviderKey = "google-veo-2" | "runway-gen4" | "luma-dream-machine" | "kling-1.5" | "pollinations-pan";
+
+/** Providers whose "scenes" are still images, not real motion footage — ShotstackRenderEngine animates them with a pan/zoom instead of concatenating as video. */
+export const IMAGE_BASED_VIDEO_PROVIDERS = new Set<VideoProviderKey>(["pollinations-pan"]);
 
 /**
  * Central lookup so the worker/queue layer never imports a concrete
@@ -30,12 +34,17 @@ export class VideoProviderRegistry {
         return new LumaAdapter(env("LUMA_API_KEY"), env("LUMA_MODEL"));
       case "kling-1.5":
         return new KlingAdapter(env("KLING_API_KEY"));
+      case "pollinations-pan":
+        return new PollinationsPanAdapter();
       default:
         throw new Error(`Unknown video provider: ${key}`);
     }
   }
 
   static getDefault(overrides: EnvOverrides = {}): IVideoProviderAdapter {
-    return this.get(resolveEnv(overrides, "DEFAULT_VIDEO_PROVIDER") || "google-veo-2", overrides);
+    // pollinations-pan (free, no key) rather than google-veo-2 as the bare
+    // default — an unconfigured deployment should still produce a real,
+    // watchable result instead of silently falling through to MockVideoAdapter.
+    return this.get(resolveEnv(overrides, "DEFAULT_VIDEO_PROVIDER") || "pollinations-pan", overrides);
   }
 }

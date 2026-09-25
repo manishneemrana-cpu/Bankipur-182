@@ -4,7 +4,7 @@ import { VoiceDirectorAgent } from "@/lib/agents/VoiceDirectorAgent";
 import { AudioVisualEditorAgent } from "@/lib/agents/AudioVisualEditorAgent";
 import { QualityControllerAgent } from "@/lib/agents/QualityControllerAgent";
 
-import { VideoProviderRegistry } from "@/lib/providers/video/VideoProviderRegistry";
+import { VideoProviderRegistry, IMAGE_BASED_VIDEO_PROVIDERS, type VideoProviderKey } from "@/lib/providers/video/VideoProviderRegistry";
 import { getVoiceProvider } from "@/lib/providers/voice";
 import { getMusicProvider } from "@/lib/providers/music/MockMusicAdapter";
 import { getStorageProvider } from "@/lib/providers/storage";
@@ -165,6 +165,7 @@ export async function processVideoProductionJob(
           captionsSrtUrl: srtUpload.url,
           targetAspectRatio: productInput.aspectRatio,
           overrides,
+          imageMode: IMAGE_BASED_VIDEO_PROVIDERS.has(videoProvider.providerName as VideoProviderKey),
         });
       } else {
         const outputPath = `/tmp/ugc-engine/${projectId}/master.mp4`;
