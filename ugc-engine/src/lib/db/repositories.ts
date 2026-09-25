@@ -18,7 +18,32 @@ export interface ProjectRow {
   updated_at: string;
 }
 
+export interface ProductWithBrandRow {
+  id: string;
+  brand_kit_id: string;
+  brand_name: string;
+  name: string;
+  description: string;
+  category: string | null;
+  industry: string;
+  key_benefits: string[];
+  target_audience: string;
+  price_offer: string | null;
+  cta_text: string;
+  reference_assets: Array<{ type: string; url: string }>;
+}
+
 export const ProductRepository = {
+  async getWithBrand(organizationId: string, productId: string): Promise<ProductWithBrandRow | null> {
+    return withTenant(organizationId, async (client) => {
+      const { rows } = await client.query<ProductWithBrandRow>(
+        `SELECT p.*, b.name AS brand_name FROM products p JOIN brand_kits b ON b.id = p.brand_kit_id WHERE p.id = $1`,
+        [productId]
+      );
+      return rows[0] ?? null;
+    });
+  },
+
   async create(organizationId: string, brandKitId: string, input: ProductInput): Promise<string> {
     return withTenant(organizationId, async (client) => {
       const { rows } = await client.query<{ id: string }>(

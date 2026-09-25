@@ -18,7 +18,7 @@ import { buildCacheKey } from "@/lib/cache/CacheKey";
 
 import { JobRepository, ProjectRepository, SceneRepository, StrategyRepository, RenderRepository, UsageRepository } from "@/lib/db/repositories";
 import { getCredentialOverrides, resolveEnv } from "@/lib/settings/resolveEnv";
-import type { StoryboardScene } from "@/types/agents";
+import type { CreativeStrategyOutput, StoryboardScene } from "@/types/agents";
 import type { VideoProductionJobData, VideoProductionJobResult } from "@/types/jobs";
 
 const MAX_QC_RETRIES = 3;
@@ -68,22 +68,35 @@ export async function processVideoProductionJob(
     await ProjectRepository.updateStatus(organizationId, projectId, "processing");
 
     // --- Agents 1-7: strategy, script, storyboard, continuity, prompts ---
+    // A prior attempt at this same project may have already produced a strategy
+    // before its serverless invocation hit the platform's execution time limit
+    // (a full run's total external-API time can exceed a single invocation's
+    // budget) — reuse it instead of re-running the whole LLM pipeline and
+    // paying for it twice.
     await onProgress("CREATIVE_STRATEGY", 5);
-    const strategy = await orchestrator.executePipeline(productInput, async (step) => {
-      await onProgress(step, 10);
-      await JobRepository.updateProgress(organizationId, jobRowId, step as never, 10);
-    });
+    const existingStrategy = await reconstructStrategyFromDb(organizationId, projectId);
+    const strategy =
+      existingStrategy ??
+      (await orchestrator.executePipeline(productInput, async (step) => {
+        await onProgress(step, 10);
+        await JobRepository.updateProgress(organizationId, jobRowId, step as never, 10);
+      }));
 
-    await StrategyRepository.save(organizationId, projectId, strategy);
-    await SceneRepository.upsertFromStoryboard(organizationId, projectId, strategy.storyboard);
+    if (!existingStrategy) {
+      await StrategyRepository.save(organizationId, projectId, strategy);
+      await SceneRepository.upsertFromStoryboard(organizationId, projectId, strategy.storyboard);
+    }
 
     // --- Scene generation loop with per-scene QC retry (targeted regen only touches requested scenes) ---
     await onProgress("GENERATING_SCENES", 30);
     await JobRepository.updateProgress(organizationId, jobRowId, "GENERATING_SCENES", 30);
 
-    const scenesToGenerate = targetSceneNumbers?.length
-      ? strategy.storyboard.filter((s) => targetSceneNumbers.includes(s.sceneNumber))
-      : strategy.storyboard;
+    const alreadyLockedSceneNumbers = new Set(
+      (await SceneRepository.listLockedVideoUrls(organizationId, projectId)).map((s) => s.sceneNumber)
+    );
+    const scenesToGenerate = (
+      targetSceneNumbers?.length ? strategy.storyboard.filter((s) => targetSceneNumbers.includes(s.sceneNumber)) : strategy.storyboard
+    ).filter((s) => !alreadyLockedSceneNumbers.has(s.sceneNumber));
 
     for (const scene of scenesToGenerate) {
       const { videoUrl, cost } = await generateSceneWithQcRetry(scene, strategy.continuityBible, productInput, videoProvider, qcAgent);
@@ -270,4 +283,58 @@ async function generateSceneWithQcRetry(
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Rebuilds just enough of a CreativeStrategyOutput from previously-saved DB
+ * rows to resume a job whose earlier invocation got cut off after the
+ * strategy/storyboard step. Only script, continuityBible and storyboard are
+ * ever read back out downstream (voiceover text, scene durations/prompts,
+ * edit direction) — the rest is left empty rather than re-fetched, since
+ * nothing after this point uses it.
+ */
+async function reconstructStrategyFromDb(organizationId: string, projectId: string): Promise<CreativeStrategyOutput | null> {
+  const strategyRow = await StrategyRepository.getLatest(organizationId, projectId);
+  if (!strategyRow) return null;
+
+  const sceneRows = await SceneRepository.listAll(organizationId, projectId);
+  if (!sceneRows.length) return null;
+
+  const storyboard: StoryboardScene[] = sceneRows.map((row) => {
+    const camera = row.camera_settings as StoryboardScene["camera"];
+    const characterSettings = row.character_settings as { characterAction: string; productInteraction: string };
+    return {
+      sceneNumber: row.scene_number as number,
+      duration: row.duration_seconds as number,
+      purpose: row.purpose as StoryboardScene["purpose"],
+      dialogue: row.dialogue as string,
+      visualDescription: row.visual_description as string,
+      camera,
+      characterAction: characterSettings.characterAction,
+      productInteraction: characterSettings.productInteraction,
+      // Not persisted per-scene (see SceneRepository.upsertFromStoryboard) — harmless
+      // defaults, since nothing downstream of a resumed run reads these fields.
+      audioCue: "",
+      captionText: row.dialogue as string,
+      transition: "cut",
+      modelPrompt: row.raw_prompt as string,
+      negativePrompt: row.negative_prompt as string,
+    };
+  });
+
+  return {
+    brandIdentity: {},
+    audiencePsychology: strategyRow.audience_psychology as CreativeStrategyOutput["audiencePsychology"],
+    creativeConcept: {
+      angle: strategyRow.creative_angle as string,
+      framework: strategyRow.creative_framework as CreativeStrategyOutput["creativeConcept"]["framework"],
+      visualStyle: "",
+      advertisingObjective: "",
+    },
+    hooks: strategyRow.hooks as CreativeStrategyOutput["hooks"],
+    selectedHook: strategyRow.selected_hook as CreativeStrategyOutput["selectedHook"],
+    script: strategyRow.script_json as CreativeStrategyOutput["script"],
+    continuityBible: strategyRow.continuity_bible as CreativeStrategyOutput["continuityBible"],
+    storyboard,
+  };
 }
