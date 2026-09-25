@@ -221,6 +221,11 @@ async function generateSceneWithQcRetry(
 ): Promise<{ videoUrl: string; cost: number }> {
   let prompt = scene.modelPrompt;
   let totalCost = 0;
+  // Tracks the real cause of the most recent failed attempt so the error thrown
+  // after all retries are exhausted says what actually went wrong (generation
+  // failure, a stuck/failed provider job, or a genuine QC rejection) instead of
+  // always blaming "QC" even when QC never ran.
+  let lastFailureReason = "unknown error";
 
   for (let attempt = 1; attempt <= MAX_QC_RETRIES; attempt++) {
     const generation = await videoProvider.generateScene({
@@ -232,6 +237,7 @@ async function generateSceneWithQcRetry(
     totalCost += generation.costUsd;
 
     if (generation.status === "failed" || !generation.providerJobId) {
+      lastFailureReason = `video generation failed: ${generation.errorMessage ?? "no error detail returned"}`;
       continue; // try again on the next loop iteration
     }
 
@@ -241,12 +247,16 @@ async function generateSceneWithQcRetry(
       status = await videoProvider.checkStatus(generation.providerJobId);
     }
 
-    if (status.status !== "succeeded" || !status.videoUrl) continue;
+    if (status.status !== "succeeded" || !status.videoUrl) {
+      lastFailureReason = `video generation did not succeed (status: ${status.status}): ${status.errorMessage ?? "no error detail returned"}`;
+      continue;
+    }
 
     try {
       const videoBuffer = Buffer.from(await (await fetch(status.videoUrl)).arrayBuffer());
       const qcResult = await qcAgent.evaluate(videoBuffer, scene, continuity);
       if (qcResult.passed) return { videoUrl: status.videoUrl, cost: totalCost };
+      lastFailureReason = `quality control rejected the scene: ${qcResult.failureReasons.join("; ")}`;
       prompt = UGCVideoPromptEngine.applyQcFeedback(prompt, qcResult.failureReasons);
     } catch {
       // Mock providers return non-fetchable URLs in local dev; accept the asset without QC
@@ -255,7 +265,7 @@ async function generateSceneWithQcRetry(
     }
   }
 
-  throw new Error(`Scene ${scene.sceneNumber} failed QC after ${MAX_QC_RETRIES} attempts.`);
+  throw new Error(`Scene ${scene.sceneNumber} failed after ${MAX_QC_RETRIES} attempts: ${lastFailureReason}`);
 }
 
 function sleep(ms: number): Promise<void> {

@@ -27,22 +27,38 @@ export class PollinationsPanAdapter implements IVideoProviderAdapter {
     // A stable per-prompt seed so retries/polling return the same frame instead
     // of a new random image each time the URL is fetched.
     const seed = params.seed ?? hashToSeed(params.prompt);
-    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(params.prompt)}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
 
-    try {
-      // GET, not HEAD — Pollinations generates the image on request and HEAD
-      // isn't guaranteed supported; the response status is available as soon
-      // as headers arrive, before the body is read, so this doesn't cost an
-      // extra download.
-      const check = await fetch(url);
-      if (!check.ok) throw new Error(`Pollinations error (${check.status})`);
-    } catch (error) {
-      return { providerJobId: "", status: "failed", errorMessage: error instanceof Error ? error.message : String(error), costUsd: 0 };
+    // Pollinations intermittently 500s on longer, punctuation-heavy scene
+    // prompts (confirmed by direct testing: the same long prompt fails
+    // repeatedly while short ones like "a cat" always succeed with identical
+    // width/height/seed params) — a transient/model-side issue, not a bad
+    // request. Retry the same prompt a couple of times first (in case it's
+    // transient), then fall back to a shortened, punctuation-stripped version
+    // of the prompt rather than failing the whole scene outright.
+    const candidates = [params.prompt, params.prompt, simplifyPrompt(params.prompt)];
+
+    let lastError = "unknown error";
+    for (const candidate of candidates) {
+      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(candidate)}?width=${width}&height=${height}&seed=${seed}&nologo=true`;
+      try {
+        // GET, not HEAD — Pollinations generates the image on request and HEAD
+        // isn't guaranteed supported; the response status is available as soon
+        // as headers arrive, before the body is read, so this doesn't cost an
+        // extra download.
+        const check = await fetch(url);
+        if (check.ok) {
+          // Generation is synchronous (the URL itself is the image), so this is
+          // already "done" — no polling loop needed.
+          return { providerJobId: url, status: "succeeded", videoUrl: url, costUsd: 0 };
+        }
+        lastError = `Pollinations error (${check.status})`;
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : String(error);
+      }
+      await sleep(500);
     }
 
-    // Generation is synchronous (the URL itself is the image), so this is
-    // already "done" — no polling loop needed.
-    return { providerJobId: url, status: "succeeded", videoUrl: url, costUsd: 0 };
+    return { providerJobId: "", status: "failed", errorMessage: lastError, costUsd: 0 };
   }
 
   public async checkStatus(providerJobId: string): Promise<VideoJobResponse> {
@@ -60,4 +76,18 @@ function hashToSeed(text: string): number {
     hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
   }
   return hash;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Strips punctuation and truncates to a short word count — a plain,
+// short subject line is what reliably succeeds against Pollinations.
+function simplifyPrompt(prompt: string): string {
+  const words = prompt
+    .replace(/[^\w\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+  return words.slice(0, 12).join(" ") || "product photo";
 }
