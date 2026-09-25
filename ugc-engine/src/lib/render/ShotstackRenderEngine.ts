@@ -24,7 +24,11 @@ const OUTPUT_SIZE: Record<AspectRatio, { width: number; height: number }> = {
 };
 
 const POLL_INTERVAL_MS = 5000;
-const POLL_TIMEOUT_MS = 240_000;
+// Kept well under a serverless function's own execution cap (300s) so a
+// render that's still queued/rendering fails fast with a clear error
+// instead of the whole function being killed by the platform mid-poll —
+// which, unlike this timeout, leaves no error message at all.
+const POLL_TIMEOUT_MS = 150_000;
 
 /**
  * Cloud video assembly via Shotstack (https://shotstack.io) — an alternative
@@ -111,6 +115,7 @@ export class ShotstackRenderEngine {
       method: "POST",
       headers: { "x-api-key": this.apiKey(overrides), "Content-Type": "application/json" },
       body: JSON.stringify(edit),
+      signal: AbortSignal.timeout(20_000),
     });
     if (!submitRes.ok) {
       throw new Error(`Shotstack render submission failed (${submitRes.status}): ${await submitRes.text()}`);
@@ -122,9 +127,15 @@ export class ShotstackRenderEngine {
     const deadline = Date.now() + POLL_TIMEOUT_MS;
     while (Date.now() < deadline) {
       await sleep(POLL_INTERVAL_MS);
-      const statusRes = await fetch(`${this.baseUrl(overrides)}/render/${renderId}`, {
-        headers: { "x-api-key": this.apiKey(overrides) },
-      });
+      let statusRes: Response;
+      try {
+        statusRes = await fetch(`${this.baseUrl(overrides)}/render/${renderId}`, {
+          headers: { "x-api-key": this.apiKey(overrides) },
+          signal: AbortSignal.timeout(20_000),
+        });
+      } catch {
+        continue; // transient network hiccup — next poll iteration will retry
+      }
       if (!statusRes.ok) continue;
       const statusBody = await statusRes.json();
       const status = statusBody?.response?.status;

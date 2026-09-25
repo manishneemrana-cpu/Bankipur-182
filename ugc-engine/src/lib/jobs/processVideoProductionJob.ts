@@ -266,7 +266,7 @@ async function generateSceneWithQcRetry(
     }
 
     try {
-      const videoBuffer = Buffer.from(await (await fetch(status.videoUrl)).arrayBuffer());
+      const videoBuffer = Buffer.from(await (await fetch(status.videoUrl, { signal: AbortSignal.timeout(25_000) })).arrayBuffer());
       const qcResult = await qcAgent.evaluate(videoBuffer, scene, continuity);
       if (qcResult.passed) return { videoUrl: status.videoUrl, cost: totalCost };
       lastFailureReason = `quality control rejected the scene: ${qcResult.failureReasons.join("; ")}`;

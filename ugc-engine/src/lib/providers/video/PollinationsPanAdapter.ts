@@ -45,7 +45,11 @@ export class PollinationsPanAdapter implements IVideoProviderAdapter {
         // isn't guaranteed supported; the response status is available as soon
         // as headers arrive, before the body is read, so this doesn't cost an
         // extra download.
-        const check = await fetch(url);
+        // A hard timeout is required here: Pollinations can hang indefinitely
+        // generating an image for some prompts (confirmed live — a serverless
+        // invocation was killed by the platform's own execution cap after this
+        // fetch never resolved), which without a bound stalls the entire job.
+        const check = await fetch(url, { signal: AbortSignal.timeout(25_000) });
         if (check.ok) {
           // Generation is synchronous (the URL itself is the image), so this is
           // already "done" — no polling loop needed.
