@@ -36,7 +36,9 @@ const POLL_TIMEOUT_MS = 240_000;
 export class ShotstackRenderEngine {
   private static baseUrl(overrides: EnvOverrides): string {
     const env = resolveEnv(overrides, "SHOTSTACK_ENV") || "stage"; // "stage" = free sandbox (watermarked); "v1" = production
-    return `https://api.shotstack.io/${env}`;
+    // Confirmed against the actual Shotstack dashboard's own curl example: the
+    // "edit" product prefix is required — api.shotstack.io/v1/... 404s.
+    return `https://api.shotstack.io/edit/${env}`;
   }
 
   private static apiKey(overrides: EnvOverrides): string {
