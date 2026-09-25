@@ -39,6 +39,11 @@ export class OpenAICompatibleLLMProvider implements ILLMProvider {
         model: this.model,
         messages,
         temperature: params.temperature ?? 0.8,
+        // Without an explicit cap, smaller models default to a short completion
+        // length and truncate mid-JSON on longer outputs (full scene scripts,
+        // storyboards) — this surfaced as "did not return parseable JSON" for
+        // responses that were actually just cut off.
+        max_tokens: 4096,
         response_format: { type: "json_object" },
       }),
     });
@@ -48,7 +53,14 @@ export class OpenAICompatibleLLMProvider implements ILLMProvider {
     }
 
     const data = await response.json();
-    const content: string = data.choices?.[0]?.message?.content ?? "";
+    const choice = data.choices?.[0];
+    const content: string = choice?.message?.content ?? "";
+    if (choice?.finish_reason === "length") {
+      throw new Error(
+        `${this.providerName} response was truncated (hit max_tokens=4096) before completing valid JSON. ` +
+          "Reduce the prompt's expected output size or raise max_tokens."
+      );
+    }
     return parseJsonLoosely<T>(content, this.providerName);
   }
 
