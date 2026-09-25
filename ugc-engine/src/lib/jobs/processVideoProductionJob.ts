@@ -12,6 +12,7 @@ import { getStorageProvider } from "@/lib/providers/storage";
 import { UGCVideoPromptEngine } from "@/lib/prompt/UGCVideoPromptEngine";
 import { AudioCaptionEngine } from "@/lib/audio/AudioCaptionEngine";
 import { FFmpegRenderEngine } from "@/lib/render/FFmpegRenderEngine";
+import { ShotstackRenderEngine } from "@/lib/render/ShotstackRenderEngine";
 import { CostEngine } from "@/lib/cost/CostEngine";
 import { buildCacheKey } from "@/lib/cache/CacheKey";
 
@@ -103,7 +104,9 @@ export async function processVideoProductionJob(
     }
 
     const lockedScenes = await SceneRepository.listLockedVideoUrls(organizationId, projectId);
-    const sceneVideoUrls = lockedScenes.sort((a, b) => a.sceneNumber - b.sceneNumber).map((s) => s.videoAssetUrl);
+    const sortedLockedScenes = lockedScenes.sort((a, b) => a.sceneNumber - b.sceneNumber);
+    const sceneVideoUrls = sortedLockedScenes.map((s) => s.videoAssetUrl);
+    const sceneDurationByNumber = new Map(strategy.storyboard.map((s) => [s.sceneNumber, s.duration]));
 
     // --- Voice synthesis ---
     await onProgress("VOICE_SYNTHESIS", 70);
@@ -126,6 +129,8 @@ export async function processVideoProductionJob(
     await JobRepository.updateProgress(organizationId, jobRowId, "CAPTION_GENERATION", 78);
     const vtt = AudioCaptionEngine.generateDynamicVTT(voiceResult.wordTimestamps);
     const vttUpload = await storage.upload(`projects/${projectId}/captions.vtt`, Buffer.from(vtt, "utf-8"), "text/vtt");
+    const srt = AudioCaptionEngine.generateSRT(voiceResult.wordTimestamps);
+    const srtUpload = await storage.upload(`projects/${projectId}/captions.srt`, Buffer.from(srt, "utf-8"), "application/x-subrip");
 
     // --- Music / editing direction ---
     await onProgress("AUDIO_MIX", 82);
@@ -142,21 +147,36 @@ export async function processVideoProductionJob(
     await onProgress("FINAL_RENDERING", 90);
     await JobRepository.updateProgress(organizationId, jobRowId, "FINAL_RENDERING", 90);
 
-    const outputPath = `/tmp/ugc-engine/${projectId}/master.mp4`;
     let masterVideoUrl = "";
     try {
-      const renderedPath = await FFmpegRenderEngine.executeRender({
-        sceneVideoPaths: sceneVideoUrls,
-        voiceoverAudioPath: voiceResult.audioUrl,
-        backgroundMusicPath: musicTrack.trackUrl,
-        subtitlesPath: vttUpload.url,
-        outputPath,
-        targetAspectRatio: productInput.aspectRatio,
-      });
-      masterVideoUrl = renderedPath;
+      if (process.env.SHOTSTACK_API_KEY) {
+        // Preferred path in any serverless deployment: no ffmpeg binary or local
+        // disk needed — Shotstack fetches every asset by URL and renders remotely.
+        masterVideoUrl = await ShotstackRenderEngine.executeRender({
+          scenes: sortedLockedScenes.map((s) => ({
+            videoUrl: s.videoAssetUrl,
+            durationSeconds: sceneDurationByNumber.get(s.sceneNumber) ?? 5,
+          })),
+          voiceoverAudioUrl: voiceResult.audioUrl,
+          backgroundMusicUrl: musicTrack.trackUrl,
+          captionsSrtUrl: srtUpload.url,
+          targetAspectRatio: productInput.aspectRatio,
+        });
+      } else {
+        const outputPath = `/tmp/ugc-engine/${projectId}/master.mp4`;
+        masterVideoUrl = await FFmpegRenderEngine.executeRender({
+          sceneVideoPaths: sceneVideoUrls,
+          voiceoverAudioPath: voiceResult.audioUrl,
+          backgroundMusicPath: musicTrack.trackUrl,
+          subtitlesPath: vttUpload.url,
+          outputPath,
+          targetAspectRatio: productInput.aspectRatio,
+        });
+      }
     } catch (renderError) {
-      // FFmpeg binary or scene assets may be unavailable in this environment (mock providers
-      // return non-fetchable URLs). Never fake a successful render — surface it as the job result.
+      // FFmpeg binary, Shotstack credentials, or scene assets may be unavailable/unfetchable
+      // (mock providers return non-fetchable URLs). Never fake a successful render — surface
+      // it as the job result.
       masterVideoUrl = `unavailable://render-failed: ${(renderError as Error).message}`;
     }
 

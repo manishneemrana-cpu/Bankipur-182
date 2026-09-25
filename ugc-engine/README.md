@@ -79,6 +79,7 @@ adapter for a capability implements the same interface (`ILLMProvider`,
 | **Video generation** | Google Veo · Runway · Luma · Kling | Whichever you can get a key for first — all cost money per second |
 | **Music** | Mubert · Mock | Mubert free tier, or leave unset for Mock |
 | **Storage** | S3-compatible (AWS S3 / Cloudflare R2) · local (dev only) | Cloudflare R2 — 10GB free, no egress fee |
+| **Final video assembly** | **Shotstack** (cloud, no ffmpeg needed) · FFmpeg (local binary, needs a real server/VPS) | Shotstack "stage" key — free, watermarked, works on Vercel |
 
 `NVIDIA_API_KEY` is reused across three registries (LLM text generation,
 image generation, and — if you point `DEFAULT_LLM_PROVIDER=nvidia` — the
