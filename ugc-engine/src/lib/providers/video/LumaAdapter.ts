@@ -21,7 +21,10 @@ export class LumaAdapter implements IVideoProviderAdapter {
     try {
       const response = await fetch("https://api.lumalabs.ai/dream-machine/v1/generations", {
         method: "POST",
-        headers: { Authorization: `Bearer ${this.apiKey}`, "Content-Type": "application/json" },
+        // Confirmed against the live API: a "Bearer " scheme prefix gets a clean
+        // {"detail":"Not authenticated"} — Luma wants the raw key as the
+        // Authorization header value with no scheme word at all.
+        headers: { Authorization: this.apiKey, "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: params.prompt,
           model: this.model,
@@ -42,7 +45,7 @@ export class LumaAdapter implements IVideoProviderAdapter {
   public async checkStatus(providerJobId: string): Promise<VideoJobResponse> {
     if (!this.apiKey) return this.fallback.checkStatus(providerJobId);
     const response = await fetch(`https://api.lumalabs.ai/dream-machine/v1/generations/${providerJobId}`, {
-      headers: { Authorization: `Bearer ${this.apiKey}` },
+      headers: { Authorization: this.apiKey as string },
     });
     const data = await response.json();
     if (data.state === "completed") return { providerJobId, status: "succeeded", videoUrl: data.assets?.video, costUsd: 0 };
@@ -54,7 +57,7 @@ export class LumaAdapter implements IVideoProviderAdapter {
     if (!this.apiKey) return this.fallback.cancelJob(providerJobId);
     const response = await fetch(`https://api.lumalabs.ai/dream-machine/v1/generations/${providerJobId}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${this.apiKey}` },
+      headers: { Authorization: this.apiKey as string },
     });
     return response.ok;
   }
