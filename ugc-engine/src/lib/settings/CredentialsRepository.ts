@@ -12,7 +12,8 @@ export const CredentialsRepository = {
   async getAll(organizationId: string): Promise<Record<string, string>> {
     return withTenant(organizationId, async (client) => {
       const { rows } = await client.query<{ credential_key: string; value: string }>(
-        `SELECT credential_key, pgp_sym_decrypt(value_encrypted, $2) AS value FROM api_credentials WHERE organization_id = $1`,
+        // Supabase installs pgcrypto into the "extensions" schema, not "public" — schema-qualify or this 404s.
+        `SELECT credential_key, extensions.pgp_sym_decrypt(value_encrypted, $2) AS value FROM api_credentials WHERE organization_id = $1`,
         [organizationId, encryptionKey()]
       );
       return Object.fromEntries(rows.map((r) => [r.credential_key, r.value]));
@@ -47,9 +48,9 @@ export const CredentialsRepository = {
         }
         await client.query(
           `INSERT INTO api_credentials (organization_id, credential_key, value_encrypted)
-           VALUES ($1, $2, pgp_sym_encrypt($3, $4))
+           VALUES ($1, $2, extensions.pgp_sym_encrypt($3, $4))
            ON CONFLICT (organization_id, credential_key)
-           DO UPDATE SET value_encrypted = pgp_sym_encrypt($3, $4), updated_at = now()`,
+           DO UPDATE SET value_encrypted = extensions.pgp_sym_encrypt($3, $4), updated_at = now()`,
           [organizationId, key, value, encryptionKey()]
         );
       }
