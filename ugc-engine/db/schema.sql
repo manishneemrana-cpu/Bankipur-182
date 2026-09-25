@@ -122,8 +122,10 @@ CREATE TABLE creative_strategies (
   audience_psychology JSONB NOT NULL,
   hooks JSONB NOT NULL,          -- all generated hook candidates + scores
   selected_hook JSONB NOT NULL,  -- {type, script, visualDirection, viralityScore}
-  creative_angle VARCHAR(100) NOT NULL,
-  creative_framework VARCHAR(100) NOT NULL,
+  -- TEXT, not VARCHAR(100): a smaller/less-instructable LLM will sometimes
+  -- return a full descriptive sentence here instead of a short label.
+  creative_angle TEXT NOT NULL,
+  creative_framework TEXT NOT NULL,
   target_persona JSONB NOT NULL,
   script_json JSONB NOT NULL,          -- full scene-by-scene narrative
   continuity_bible JSONB NOT NULL,     -- character, environment, product rules
@@ -159,7 +161,7 @@ CREATE TABLE scenes (
   project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
   scene_number INT NOT NULL,
   duration_seconds INT NOT NULL,
-  purpose VARCHAR(50) NOT NULL, -- 'Hook', 'Problem', 'Solution', 'Demo', 'Proof', 'CTA', ...
+  purpose TEXT NOT NULL, -- 'Hook', 'Problem', 'Solution', 'Demo', 'Proof', 'CTA', ... (TEXT: a smaller LLM sometimes writes a full phrase instead of the short label)
   dialogue TEXT,
   visual_description TEXT NOT NULL,
   raw_prompt TEXT NOT NULL,
