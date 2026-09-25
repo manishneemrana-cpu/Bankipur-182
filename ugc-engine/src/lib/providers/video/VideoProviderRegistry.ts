@@ -4,6 +4,7 @@ import { RunwayAdapter } from "./RunwayAdapter";
 import { LumaAdapter } from "./LumaAdapter";
 import { KlingAdapter } from "./KlingAdapter";
 import { MockVideoAdapter } from "./MockVideoAdapter";
+import { getImageProvider } from "@/lib/providers/image";
 import { resolveEnv, type EnvOverrides } from "@/lib/settings/resolveEnv";
 
 export type VideoProviderKey = "google-veo-2" | "runway-gen4" | "luma-dream-machine" | "kling-1.5";
@@ -22,9 +23,11 @@ export class VideoProviderRegistry {
         return apiKey ? new GoogleVeoAdapter(apiKey) : new MockVideoAdapter("google-veo-2", 0.1);
       }
       case "runway-gen4":
-        return new RunwayAdapter(env("RUNWAY_API_KEY"));
+        // Runway is image-to-video only; pass an image provider so a scene with
+        // no reference image still gets a synthesized starting frame.
+        return new RunwayAdapter(env("RUNWAY_API_KEY"), getImageProvider(overrides));
       case "luma-dream-machine":
-        return new LumaAdapter(env("LUMA_API_KEY"));
+        return new LumaAdapter(env("LUMA_API_KEY"), env("LUMA_MODEL"));
       case "kling-1.5":
         return new KlingAdapter(env("KLING_API_KEY"));
       default:

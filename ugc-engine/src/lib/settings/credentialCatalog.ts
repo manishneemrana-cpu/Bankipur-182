@@ -80,6 +80,7 @@ export const CREDENTIAL_CATALOG: CredentialGroup[] = [
       { key: "GOOGLE_VEO_API_KEY", label: "Google Veo API key", type: "secret", whereToGet: "Google AI Studio / Vertex AI console — Veo access." },
       { key: "RUNWAY_API_KEY", label: "Runway API key", type: "secret", whereToGet: "dev.runwayml.com — Developer Portal → API Keys." },
       { key: "LUMA_API_KEY", label: "Luma Dream Machine API key", type: "secret", whereToGet: "lumalabs.ai/dream-machine/api — API Keys." },
+      { key: "LUMA_MODEL", label: "Luma model (optional)", type: "text", placeholder: "ray-2", whereToGet: "Leave blank for the default (ray-2)." },
       { key: "KLING_API_KEY", label: "Kling API key", type: "secret", whereToGet: "klingai.com developer platform — API Keys." },
     ],
   },

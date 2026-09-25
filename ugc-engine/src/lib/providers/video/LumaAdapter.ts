@@ -6,10 +6,14 @@ export class LumaAdapter implements IVideoProviderAdapter {
   public providerName = "luma-dream-machine";
   public costPerSecondUsd = 0.08;
   private apiKey?: string;
+  // Luma's model lineup moves (ray-1 -> ray-2 -> ray-flash-2, etc.); override via
+  // LUMA_MODEL if this default is retired the way NVIDIA's models were.
+  private model: string;
   private fallback = new MockVideoAdapter("luma-dream-machine", this.costPerSecondUsd);
 
-  constructor(apiKey?: string) {
+  constructor(apiKey?: string, model?: string) {
     this.apiKey = apiKey;
+    this.model = model || "ray-2";
   }
 
   public async generateScene(params: VideoGenerationParams): Promise<VideoJobResponse> {
@@ -20,13 +24,14 @@ export class LumaAdapter implements IVideoProviderAdapter {
         headers: { Authorization: `Bearer ${this.apiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: params.prompt,
+          model: this.model,
           aspect_ratio: params.aspectRatio,
           keyframes: params.referenceImageUrls?.length
             ? { frame0: { type: "image", url: params.referenceImageUrls[0] } }
             : undefined,
         }),
       });
-      if (!response.ok) throw new Error(`Luma API error: ${response.statusText}`);
+      if (!response.ok) throw new Error(`Luma API error (${response.status}): ${await response.text()}`);
       const data = await response.json();
       return { providerJobId: data.id, status: "processing", costUsd: params.durationSeconds * this.costPerSecondUsd };
     } catch (error: unknown) {
