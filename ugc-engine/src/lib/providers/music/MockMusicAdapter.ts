@@ -1,5 +1,6 @@
 import type { IMusicProviderAdapter, MusicSelectionParams, MusicTrack } from "./MusicProviderInterface";
 import { MubertAdapter } from "./MubertAdapter";
+import { resolveEnv, type EnvOverrides } from "@/lib/settings/resolveEnv";
 
 /**
  * Stand-in for a licensed music library integration (e.g. Epidemic Sound,
@@ -25,10 +26,7 @@ export class MockMusicAdapter implements IMusicProviderAdapter {
   }
 }
 
-let cached: IMusicProviderAdapter | null = null;
-
-export function getMusicProvider(): IMusicProviderAdapter {
-  if (cached) return cached;
-  cached = process.env.MUBERT_API_KEY ? new MubertAdapter(process.env.MUBERT_API_KEY) : new MockMusicAdapter();
-  return cached;
+export function getMusicProvider(overrides: EnvOverrides = {}): IMusicProviderAdapter {
+  const key = resolveEnv(overrides, "MUBERT_API_KEY");
+  return key ? new MubertAdapter(key) : new MockMusicAdapter();
 }

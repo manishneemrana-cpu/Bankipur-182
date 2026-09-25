@@ -1,20 +1,17 @@
 import type { ISpeechToTextProvider } from "./SpeechToTextInterface";
 import { WhisperCompatibleAdapter } from "./WhisperCompatibleAdapter";
-
-let cached: ISpeechToTextProvider | null = null;
+import { resolveEnv, type EnvOverrides } from "@/lib/settings/resolveEnv";
 
 /** Returns null (not a throw) when unconfigured — STT is an optional enhancement, never required for the core pipeline. */
-export function getSpeechToTextProvider(): ISpeechToTextProvider | null {
-  if (cached) return cached;
+export function getSpeechToTextProvider(overrides: EnvOverrides = {}): ISpeechToTextProvider | null {
+  const env = (key: string) => resolveEnv(overrides, key);
 
-  if (process.env.GROQ_API_KEY) {
-    cached = new WhisperCompatibleAdapter("groq-whisper", "https://api.groq.com/openai/v1", process.env.GROQ_API_KEY, "whisper-large-v3");
-    return cached;
+  if (env("GROQ_API_KEY")) {
+    return new WhisperCompatibleAdapter("groq-whisper", "https://api.groq.com/openai/v1", env("GROQ_API_KEY") as string, "whisper-large-v3");
   }
 
-  if (process.env.OPENAI_API_KEY) {
-    cached = new WhisperCompatibleAdapter("openai-whisper", "https://api.openai.com/v1", process.env.OPENAI_API_KEY, "whisper-1");
-    return cached;
+  if (env("OPENAI_API_KEY")) {
+    return new WhisperCompatibleAdapter("openai-whisper", "https://api.openai.com/v1", env("OPENAI_API_KEY") as string, "whisper-1");
   }
 
   return null;

@@ -1,4 +1,5 @@
 import type { AspectRatio } from "@/types/project";
+import { resolveEnv, type EnvOverrides } from "@/lib/settings/resolveEnv";
 
 export interface ShotstackScene {
   videoUrl: string;
@@ -11,6 +12,7 @@ export interface ShotstackRenderConfig {
   backgroundMusicUrl?: string;
   captionsSrtUrl?: string;
   targetAspectRatio: AspectRatio;
+  overrides?: EnvOverrides;
 }
 
 const OUTPUT_SIZE: Record<AspectRatio, { width: number; height: number }> = {
@@ -32,18 +34,19 @@ const POLL_TIMEOUT_MS = 240_000;
  * MockStorageAdapter's fake `mock-storage.local` URLs).
  */
 export class ShotstackRenderEngine {
-  private static baseUrl(): string {
-    const env = process.env.SHOTSTACK_ENV || "stage"; // "stage" = free sandbox (watermarked); "v1" = production
+  private static baseUrl(overrides: EnvOverrides): string {
+    const env = resolveEnv(overrides, "SHOTSTACK_ENV") || "stage"; // "stage" = free sandbox (watermarked); "v1" = production
     return `https://api.shotstack.io/${env}`;
   }
 
-  private static apiKey(): string {
-    const key = process.env.SHOTSTACK_API_KEY;
+  private static apiKey(overrides: EnvOverrides): string {
+    const key = resolveEnv(overrides, "SHOTSTACK_API_KEY");
     if (!key) throw new Error("SHOTSTACK_API_KEY is not set.");
     return key;
   }
 
   public static async executeRender(config: ShotstackRenderConfig): Promise<string> {
+    const overrides = config.overrides ?? {};
     const totalDuration = config.scenes.reduce((sum, s) => sum + s.durationSeconds, 0);
     const size = OUTPUT_SIZE[config.targetAspectRatio];
 
@@ -87,9 +90,9 @@ export class ShotstackRenderEngine {
       output: { format: "mp4", size },
     };
 
-    const submitRes = await fetch(`${this.baseUrl()}/render`, {
+    const submitRes = await fetch(`${this.baseUrl(overrides)}/render`, {
       method: "POST",
-      headers: { "x-api-key": this.apiKey(), "Content-Type": "application/json" },
+      headers: { "x-api-key": this.apiKey(overrides), "Content-Type": "application/json" },
       body: JSON.stringify(edit),
     });
     if (!submitRes.ok) {
@@ -102,8 +105,8 @@ export class ShotstackRenderEngine {
     const deadline = Date.now() + POLL_TIMEOUT_MS;
     while (Date.now() < deadline) {
       await sleep(POLL_INTERVAL_MS);
-      const statusRes = await fetch(`${this.baseUrl()}/render/${renderId}`, {
-        headers: { "x-api-key": this.apiKey() },
+      const statusRes = await fetch(`${this.baseUrl(overrides)}/render/${renderId}`, {
+        headers: { "x-api-key": this.apiKey(overrides) },
       });
       if (!statusRes.ok) continue;
       const statusBody = await statusRes.json();

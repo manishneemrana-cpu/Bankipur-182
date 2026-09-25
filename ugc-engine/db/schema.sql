@@ -2,6 +2,7 @@
 -- PostgreSQL schema with Row-Level Security for multi-tenancy + white-label support.
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- =========================================================================
 -- 1. ORGANIZATIONS (multi-tenancy root, also the white-label unit)
@@ -199,6 +200,20 @@ CREATE TABLE renders (
 );
 
 -- =========================================================================
+-- 10b. API CREDENTIALS (per-organization provider keys, settable from the
+-- in-app Settings dashboard instead of Vercel env vars — pgp-encrypted at
+-- rest with APP_ENCRYPTION_KEY so a DB dump never leaks plaintext secrets)
+-- =========================================================================
+CREATE TABLE api_credentials (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  credential_key VARCHAR(100) NOT NULL,
+  value_encrypted BYTEA NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(organization_id, credential_key)
+);
+
+-- =========================================================================
 -- 11. USAGE & BILLING
 -- =========================================================================
 CREATE TABLE usage_events (
@@ -271,6 +286,7 @@ ALTER TABLE renders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE usage_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE industry_templates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE api_credentials ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY tenant_isolation_users ON users
   USING (organization_id = current_setting('app.current_organization_id')::uuid);
@@ -296,3 +312,5 @@ CREATE POLICY tenant_isolation_audit ON audit_logs
   USING (organization_id = current_setting('app.current_organization_id')::uuid);
 CREATE POLICY tenant_isolation_industry_templates ON industry_templates
   USING (organization_id IS NULL OR organization_id = current_setting('app.current_organization_id')::uuid);
+CREATE POLICY tenant_isolation_api_credentials ON api_credentials
+  USING (organization_id = current_setting('app.current_organization_id')::uuid);

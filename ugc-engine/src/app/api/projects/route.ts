@@ -31,6 +31,17 @@ const productInputSchema = z.object({
   advancedCreative: z.record(z.string(), z.unknown()).optional(),
 });
 
+/** GET /api/projects — list this org's recent projects for the dashboard. */
+export async function GET(req: NextRequest) {
+  try {
+    const tenant = requireTenantContext(req);
+    const projects = await ProjectRepository.listRecent(tenant.organizationId);
+    return NextResponse.json({ projects });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
 /** POST /api/projects — spec section 39/44: create a project and dispatch async production. */
 export async function POST(req: NextRequest) {
   try {

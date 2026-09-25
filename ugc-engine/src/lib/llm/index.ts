@@ -2,6 +2,7 @@ import type { ILLMProvider } from "./LLMProvider";
 import { GeminiLLMProvider } from "./GeminiLLMProvider";
 import { MockLLMProvider } from "./MockLLMProvider";
 import { OpenAICompatibleLLMProvider } from "./OpenAICompatibleLLMProvider";
+import { resolveEnv, type EnvOverrides } from "@/lib/settings/resolveEnv";
 
 export type LLMProviderKey = "gemini" | "openrouter" | "nvidia" | "groq" | "together";
 
@@ -45,24 +46,20 @@ const OPENAI_COMPATIBLE_CONFIG: Record<Exclude<LLMProviderKey, "gemini">, { base
   },
 };
 
-let cached: ILLMProvider | null = null;
-
 /**
  * Selection order: explicit DEFAULT_LLM_PROVIDER wins; otherwise the first
  * provider with a configured API key is used; otherwise Gemini if its key
  * is set; otherwise MockLLMProvider (dev only, or ALLOW_MOCK_PROVIDERS=true).
+ * `overrides` are per-organization keys from the Settings dashboard, which
+ * win over the equivalent Vercel/`.env` value.
  */
-export function getLLMProvider(): ILLMProvider {
-  if (cached) return cached;
+export function getLLMProvider(overrides: EnvOverrides = {}): ILLMProvider {
+  const env = (key: string) => resolveEnv(overrides, key);
+  const requested = env("DEFAULT_LLM_PROVIDER") as LLMProviderKey | undefined;
 
-  const requested = process.env.DEFAULT_LLM_PROVIDER as LLMProviderKey | undefined;
-
-  if (requested === "gemini" || (!requested && process.env.GEMINI_API_KEY)) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (apiKey) {
-      cached = new GeminiLLMProvider(apiKey);
-      return cached;
-    }
+  if (requested === "gemini" || (!requested && env("GEMINI_API_KEY"))) {
+    const apiKey = env("GEMINI_API_KEY");
+    if (apiKey) return new GeminiLLMProvider(apiKey);
   }
 
   const candidates: LLMProviderKey[] = requested
@@ -72,14 +69,13 @@ export function getLLMProvider(): ILLMProvider {
   for (const key of candidates) {
     if (key === "gemini") continue;
     const config = OPENAI_COMPATIBLE_CONFIG[key];
-    const apiKey = process.env[config.envKey];
+    const apiKey = env(config.envKey);
     if (apiKey) {
-      cached = new OpenAICompatibleLLMProvider(key, config.baseUrl, apiKey, process.env[config.modelEnvKey] || config.defaultModel);
-      return cached;
+      return new OpenAICompatibleLLMProvider(key, config.baseUrl, apiKey, env(config.modelEnvKey) || config.defaultModel);
     }
   }
 
-  if (process.env.NODE_ENV === "production" && process.env.ALLOW_MOCK_PROVIDERS !== "true") {
+  if (process.env.NODE_ENV === "production" && env("ALLOW_MOCK_PROVIDERS") !== "true") {
     throw new Error(
       "No LLM provider is configured (checked GEMINI_API_KEY, OPENROUTER_API_KEY, NVIDIA_API_KEY, " +
         "GROQ_API_KEY, TOGETHER_API_KEY). Refusing to fall back to MockLLMProvider in production " +
@@ -87,8 +83,7 @@ export function getLLMProvider(): ILLMProvider {
     );
   }
 
-  cached = new MockLLMProvider();
-  return cached;
+  return new MockLLMProvider();
 }
 
 export type { ILLMProvider } from "./LLMProvider";

@@ -17,6 +17,7 @@ import { CostEngine } from "@/lib/cost/CostEngine";
 import { buildCacheKey } from "@/lib/cache/CacheKey";
 
 import { JobRepository, ProjectRepository, SceneRepository, StrategyRepository, RenderRepository, UsageRepository } from "@/lib/db/repositories";
+import { getCredentialOverrides, resolveEnv } from "@/lib/settings/resolveEnv";
 import type { StoryboardScene } from "@/types/agents";
 import type { VideoProductionJobData, VideoProductionJobResult } from "@/types/jobs";
 
@@ -38,16 +39,18 @@ export async function processVideoProductionJob(
 ): Promise<VideoProductionJobResult> {
   const { organizationId, projectId, productInput, targetSceneNumbers } = data;
 
-  const llm = getLLMProvider();
+  const overrides = await getCredentialOverrides(organizationId);
+
+  const llm = getLLMProvider(overrides);
   const orchestrator = new CreativeDirectorOrchestrator(llm);
   const voiceDirector = new VoiceDirectorAgent();
   const editor = new AudioVisualEditorAgent();
   const qcAgent = new QualityControllerAgent(llm);
 
-  const videoProvider = VideoProviderRegistry.getDefault();
-  const voiceProvider = getVoiceProvider();
-  const musicProvider = getMusicProvider();
-  const storage = getStorageProvider();
+  const videoProvider = VideoProviderRegistry.getDefault(overrides);
+  const voiceProvider = getVoiceProvider(overrides);
+  const musicProvider = getMusicProvider(overrides);
+  const storage = getStorageProvider(overrides);
 
   const cacheKey = buildCacheKey({ productInput });
   const costEstimate = CostEngine.estimateProjectCost({
@@ -149,7 +152,7 @@ export async function processVideoProductionJob(
 
     let masterVideoUrl = "";
     try {
-      if (process.env.SHOTSTACK_API_KEY) {
+      if (resolveEnv(overrides, "SHOTSTACK_API_KEY")) {
         // Preferred path in any serverless deployment: no ffmpeg binary or local
         // disk needed — Shotstack fetches every asset by URL and renders remotely.
         masterVideoUrl = await ShotstackRenderEngine.executeRender({
@@ -161,6 +164,7 @@ export async function processVideoProductionJob(
           backgroundMusicUrl: musicTrack.trackUrl,
           captionsSrtUrl: srtUpload.url,
           targetAspectRatio: productInput.aspectRatio,
+          overrides,
         });
       } else {
         const outputPath = `/tmp/ugc-engine/${projectId}/master.mp4`;

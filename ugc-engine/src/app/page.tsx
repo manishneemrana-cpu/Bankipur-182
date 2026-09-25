@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 type Mode = "simple" | "pro_studio";
 
@@ -34,6 +35,7 @@ export default function CreationDashboard() {
   const [step, setStep] = useState<"input" | "processing" | "complete" | "error">("input");
   const [progressMessage, setProgressMessage] = useState("Initializing");
   const [errorMessage, setErrorMessage] = useState("");
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
 
   const [form, setForm] = useState<FormState>({
     brandKitId: "00000000-0000-0000-0000-000000000003",
@@ -80,7 +82,8 @@ export default function CreationDashboard() {
         throw new Error(detail ? `${data.error}: ${detail}` : data.error || "Failed to create project");
       }
 
-      setProgressMessage(`Job ${data.jobId} queued — poll /api/jobs/${data.jobId} for live progress`);
+      setProgressMessage(`Job ${data.jobId} queued`);
+      setCreatedProjectId(data.projectId);
       setStep("complete");
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : String(err));
@@ -99,19 +102,23 @@ export default function CreationDashboard() {
               <p className="text-xs text-slate-500">Pro Studio Engine — white-label ready</p>
             </div>
           </div>
-          <div className="flex rounded-lg border border-white/10 p-1 text-xs">
-            <button
-              onClick={() => setMode("simple")}
-              className={`rounded-md px-3 py-1.5 transition ${mode === "simple" ? "bg-indigo-600 text-white" : "text-slate-400"}`}
-            >
-              Simple
-            </button>
-            <button
-              onClick={() => setMode("pro_studio")}
-              className={`rounded-md px-3 py-1.5 transition ${mode === "pro_studio" ? "bg-indigo-600 text-white" : "text-slate-400"}`}
-            >
-              Pro Studio
-            </button>
+          <div className="flex items-center gap-4">
+            <div className="flex rounded-lg border border-white/10 p-1 text-xs">
+              <button
+                onClick={() => setMode("simple")}
+                className={`rounded-md px-3 py-1.5 transition ${mode === "simple" ? "bg-indigo-600 text-white" : "text-slate-400"}`}
+              >
+                Simple
+              </button>
+              <button
+                onClick={() => setMode("pro_studio")}
+                className={`rounded-md px-3 py-1.5 transition ${mode === "pro_studio" ? "bg-indigo-600 text-white" : "text-slate-400"}`}
+              >
+                Pro Studio
+              </button>
+            </div>
+            <Link href="/projects" className="text-xs text-slate-400 hover:text-white">Projects</Link>
+            <Link href="/settings" className="text-xs text-slate-400 hover:text-white">Settings</Link>
           </div>
         </div>
       </header>
@@ -220,9 +227,16 @@ export default function CreationDashboard() {
           <div className="mx-auto mt-20 max-w-xl space-y-4 text-center">
             <h2 className="text-2xl font-bold">Job queued</h2>
             <p className="text-sm text-slate-400">{progressMessage}</p>
-            <button onClick={() => setStep("input")} className="rounded-lg bg-white/10 px-4 py-2 text-sm hover:bg-white/20">
-              Create another
-            </button>
+            <div className="flex justify-center gap-3">
+              {createdProjectId && (
+                <Link href={`/projects/${createdProjectId}`} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-500">
+                  View progress & output
+                </Link>
+              )}
+              <button onClick={() => setStep("input")} className="rounded-lg bg-white/10 px-4 py-2 text-sm hover:bg-white/20">
+                Create another
+              </button>
+            </div>
           </div>
         )}
 

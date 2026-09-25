@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireTenantContext } from "@/lib/auth/tenant";
 import { errorResponse } from "@/app/api/projects/route";
 import { getVoiceProvider } from "@/lib/providers/voice";
+import { getCredentialOverrides } from "@/lib/settings/resolveEnv";
 
 const schema = z.object({
   text: z.string().min(1),
@@ -16,9 +17,10 @@ const schema = z.object({
 /** POST /api/voice/generate — standalone voice preview/regeneration, independent of the full render pipeline. */
 export async function POST(req: NextRequest) {
   try {
-    requireTenantContext(req);
+    const tenant = requireTenantContext(req);
     const params = schema.parse(await req.json());
-    const result = await getVoiceProvider().synthesize(params);
+    const overrides = await getCredentialOverrides(tenant.organizationId);
+    const result = await getVoiceProvider(overrides).synthesize(params);
     return NextResponse.json(result);
   } catch (error) {
     return errorResponse(error);

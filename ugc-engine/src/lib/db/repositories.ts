@@ -61,6 +61,13 @@ export const ProjectRepository = {
     });
   },
 
+  async listRecent(organizationId: string, limit = 20): Promise<ProjectRow[]> {
+    return withTenant(organizationId, async (client) => {
+      const { rows } = await client.query<ProjectRow>(`SELECT * FROM projects ORDER BY created_at DESC LIMIT $1`, [limit]);
+      return rows;
+    });
+  },
+
   async updateStatus(organizationId: string, projectId: string, status: string): Promise<void> {
     await withTenant(organizationId, async (client) => {
       await client.query(`UPDATE projects SET status = $2, updated_at = now() WHERE id = $1`, [projectId, status]);
@@ -88,6 +95,16 @@ export const StrategyRepository = {
         ]
       );
       return rows[0].id;
+    });
+  },
+
+  async getLatest(organizationId: string, projectId: string): Promise<Record<string, unknown> | null> {
+    return withTenant(organizationId, async (client) => {
+      const { rows } = await client.query(
+        `SELECT * FROM creative_strategies WHERE project_id = $1 ORDER BY created_at DESC LIMIT 1`,
+        [projectId]
+      );
+      return rows[0] ?? null;
     });
   },
 };
@@ -152,6 +169,13 @@ export const SceneRepository = {
       return rows.map((r) => ({ sceneNumber: r.scene_number, videoAssetUrl: r.video_asset_url }));
     });
   },
+
+  async listAll(organizationId: string, projectId: string): Promise<Array<Record<string, unknown>>> {
+    return withTenant(organizationId, async (client) => {
+      const { rows } = await client.query(`SELECT * FROM scenes WHERE project_id = $1 ORDER BY scene_number ASC`, [projectId]);
+      return rows;
+    });
+  },
 };
 
 export const JobRepository = {
@@ -198,6 +222,16 @@ export const JobRepository = {
       return rows[0] ?? null;
     });
   },
+
+  async getLatestForProject(organizationId: string, projectId: string): Promise<Record<string, unknown> | null> {
+    return withTenant(organizationId, async (client) => {
+      const { rows } = await client.query(
+        `SELECT * FROM generation_jobs WHERE project_id = $1 ORDER BY created_at DESC LIMIT 1`,
+        [projectId]
+      );
+      return rows[0] ?? null;
+    });
+  },
 };
 
 export const RenderRepository = {
@@ -213,6 +247,16 @@ export const RenderRepository = {
         [projectId, render.masterVideoUrl, render.thumbnailUrl, render.subtitlesVttUrl, render.aspectRatio, render.durationSeconds]
       );
       return rows[0].id;
+    });
+  },
+
+  async getLatest(organizationId: string, projectId: string): Promise<Record<string, unknown> | null> {
+    return withTenant(organizationId, async (client) => {
+      const { rows } = await client.query(
+        `SELECT * FROM renders WHERE project_id = $1 ORDER BY created_at DESC LIMIT 1`,
+        [projectId]
+      );
+      return rows[0] ?? null;
     });
   },
 };
