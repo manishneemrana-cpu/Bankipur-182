@@ -79,7 +79,14 @@ export const CREDENTIAL_CATALOG: CredentialGroup[] = [
         options: ["pollinations-pan", "google-veo-2", "runway-gen4", "luma-dream-machine", "kling-1.5"],
         whereToGet: "Leave as \"pollinations-pan\" for a free result with no signup, or pick a paid model below.",
       },
-      { key: "GOOGLE_VEO_API_KEY", label: "Google Veo API key", type: "secret", whereToGet: "Google AI Studio / Vertex AI console — Veo access." },
+      {
+        key: "GOOGLE_VEO_API_KEY",
+        label: "Google Veo API key",
+        type: "secret",
+        whereToGet:
+          "Must be a Gemini API (AI Studio) key from aistudio.google.com/apikey — the SAME KIND of key as the Gemini key above, " +
+          "not a Google Cloud \"Video Intelligence\" key. Also needs prepaid credits on that AI Studio project (Billing) — there is no free tier for Veo generation.",
+      },
       { key: "RUNWAY_API_KEY", label: "Runway API key", type: "secret", whereToGet: "dev.runwayml.com — Developer Portal → API Keys." },
       { key: "LUMA_API_KEY", label: "Luma Dream Machine API key", type: "secret", whereToGet: "lumalabs.ai/dream-machine/api — API Keys." },
       { key: "LUMA_MODEL", label: "Luma model (optional)", type: "text", placeholder: "ray-2", whereToGet: "Leave blank for the default (ray-2)." },

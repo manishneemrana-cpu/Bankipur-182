@@ -1,9 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
 import type { ILLMProvider, LLMGenerateParams, MultimodalGenerateParams } from "./LLMProvider";
 
+// gemini-2.5-pro was retired for new API keys — confirmed via a live 404
+// ("no longer available to new users") naming gemini-3.1-pro-preview as its
+// replacement.
+const MODEL = "gemini-3.1-pro-preview";
+
 /** Real provider adapter. Used whenever GEMINI_API_KEY is configured. */
 export class GeminiLLMProvider implements ILLMProvider {
-  public readonly providerName = "gemini-2.5-pro";
+  public readonly providerName = MODEL;
   private ai: GoogleGenAI;
 
   constructor(apiKey: string) {
@@ -12,7 +17,7 @@ export class GeminiLLMProvider implements ILLMProvider {
 
   async generateJSON<T>(params: LLMGenerateParams): Promise<T> {
     const response = await this.ai.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: MODEL,
       contents: params.systemInstruction
         ? `${params.systemInstruction}\n\n${params.prompt}`
         : params.prompt,
@@ -29,7 +34,7 @@ export class GeminiLLMProvider implements ILLMProvider {
 
   async generateJSONFromVideo<T>(params: MultimodalGenerateParams): Promise<T> {
     const response = await this.ai.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: MODEL,
       contents: [
         { inlineData: { mimeType: params.mimeType, data: params.base64Data } },
         params.prompt,
