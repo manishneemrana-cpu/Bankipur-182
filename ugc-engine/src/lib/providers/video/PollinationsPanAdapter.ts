@@ -56,6 +56,13 @@ export class PollinationsPanAdapter implements IVideoProviderAdapter {
           return { providerJobId: url, status: "succeeded", videoUrl: url, costUsd: 0 };
         }
         lastError = `Pollinations error (${check.status})`;
+        // 429 means we're being rate-limited — a fixed 500ms backoff isn't
+        // nearly enough (confirmed live: repeated 429s across an entire run)
+        // and retrying immediately just extends the outage. Back off hard.
+        if (check.status === 429) {
+          await sleep(8_000);
+          continue;
+        }
       } catch (error) {
         lastError = error instanceof Error ? error.message : String(error);
       }
