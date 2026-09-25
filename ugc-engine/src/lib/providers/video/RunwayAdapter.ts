@@ -92,6 +92,11 @@ export class RunwayAdapter implements IVideoProviderAdapter {
 }
 
 /** Runway's `ratio` field takes an explicit "WIDTHxHEIGHT" string, not a bare aspect ratio. */
+// Confirmed against real 400s from Runway's own validator — image_to_video (the
+// only endpoint this adapter calls) accepts a SMALLER, DIFFERENT ratio enum than
+// text_to_image or other Runway endpoints: {1280:720, 720:1280, 1104:832,
+// 832:1104, 960:960, 1584:672}. Do not "fix" these to 1080:1920-style values —
+// that's the text_to_image enum and 400s here.
 function runwayRatio(aspectRatio: VideoGenerationParams["aspectRatio"]): string {
   switch (aspectRatio) {
     case "9:16":
