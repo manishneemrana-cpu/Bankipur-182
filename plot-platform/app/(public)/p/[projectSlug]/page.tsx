@@ -2,13 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { PlotMap } from "@/components/map2d/plot-map";
 import { LeadForm } from "@/components/lead/lead-form";
 import { EmiCalculator } from "@/components/public/emi-calculator";
+import { SiteInteractive } from "@/components/public/site-interactive";
 import { StickyActionBar } from "@/components/public/sticky-action-bar";
 import { getPublicSiteData } from "@/lib/data/public-site";
-import { toMapLayoutData } from "@/lib/data/public-map-adapter";
-import { formatIndianCurrency } from "@/lib/format";
 import type { Lang } from "@/lib/i18n/dictionary";
 import { t } from "@/lib/i18n/dictionary";
 
@@ -172,49 +170,8 @@ export default async function PublicProjectPage(
           </div>
         </section>
 
-        {/* Interactive Master Plan */}
-        <section id="layout" className="border-b border-border">
-          {plots.length === 0 ? (
-            <p className="p-6 text-sm text-muted-foreground">
-              {t(lang, "notProvided")}
-            </p>
-          ) : (
-            <PlotMap data={toMapLayoutData(result.data)} />
-          )}
-        </section>
-
-        {/* Available Plots */}
-        <section className="border-b border-border px-4 py-8 sm:px-8">
-          <div className="mx-auto flex max-w-5xl flex-col gap-4">
-            <h2 className="text-lg font-semibold">
-              {t(lang, "availablePlots")}
-            </h2>
-            {available.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                {t(lang, "notProvided")}
-              </p>
-            ) : (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                {available.map((p) => (
-                  <div key={p.id} className="rounded-md border p-3 text-sm">
-                    <p className="font-medium">{p.plot_number}</p>
-                    <p className="tabular text-xs text-muted-foreground">
-                      {p.area_official_value
-                        ? `${p.area_official_value} ${p.area_official_unit}`
-                        : t(lang, "notProvided")}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{p.facing}</p>
-                    <p className="tabular text-xs font-medium">
-                      {p.price_total
-                        ? formatIndianCurrency(p.price_total)
-                        : t(lang, "contactSales")}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
+        {/* Interactive Master Plan, Available Plots, Find My Plot, Compare (§9.1, §4) */}
+        <SiteInteractive data={result.data} lang={lang} />
 
         {/* Location */}
         <section

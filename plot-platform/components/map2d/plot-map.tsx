@@ -33,8 +33,26 @@ function ring(poly: MapPlot["geometry"]): string {
   return pts.map(([x, y]) => `${x},${y}`).join(" ");
 }
 
-export function PlotMap({ data }: { data: MapLayoutData }) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+export function PlotMap({
+  data,
+  highlightIds,
+  selectedId: controlledSelectedId,
+  onSelect,
+}: {
+  data: MapLayoutData;
+  /** When set (even empty), non-matching plots dim and matches get a match count (§10). */
+  highlightIds?: Set<string> | null;
+  selectedId?: string | null;
+  onSelect?: (id: string | null) => void;
+}) {
+  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
+    null,
+  );
+  const selectedId =
+    controlledSelectedId !== undefined
+      ? controlledSelectedId
+      : internalSelectedId;
+  const setSelectedId = onSelect ?? setInternalSelectedId;
   const [scale, setScale] = useState(1);
 
   const box = useMemo(
@@ -115,6 +133,7 @@ export function PlotMap({ data }: { data: MapLayoutData }) {
                   {data.plots.map((p) => {
                     const style = statusStyle(p.status);
                     const isSelected = p.id === selectedId;
+                    const isMatch = !highlightIds || highlightIds.has(p.id);
                     return (
                       <g key={p.id}>
                         <polygon
@@ -122,6 +141,7 @@ export function PlotMap({ data }: { data: MapLayoutData }) {
                           fill={style.fill}
                           stroke={isSelected ? "#111827" : style.stroke}
                           strokeWidth={isSelected ? 2.5 / scale : 0.8 / scale}
+                          opacity={isMatch ? 1 : 0.25}
                           tabIndex={0}
                           role="button"
                           aria-label={`Plot ${p.plot_number}, ${p.area_official_value ?? "area not provided"} ${p.area_official_unit ?? ""}, ${p.facing} facing, ${style.label.toLowerCase()}`}
@@ -169,6 +189,12 @@ export function PlotMap({ data }: { data: MapLayoutData }) {
           )}
         </TransformWrapper>
         <Legend counts={counts} statuses={PLOT_STATUSES} />
+        {highlightIds ? (
+          <div className="absolute top-2 left-1/2 z-10 -translate-x-1/2 rounded-md border border-input bg-background/90 px-3 py-1 text-xs shadow-sm">
+            {highlightIds.size} matching plot
+            {highlightIds.size === 1 ? "" : "s"}
+          </div>
+        ) : null}
       </div>
 
       <PlotDetailPanel
