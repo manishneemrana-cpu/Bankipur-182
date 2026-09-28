@@ -46,6 +46,12 @@ export default async function ProjectDetailPage(
             View public site
           </Link>
           <Link
+            href={`/dashboard/projects/${projectId}/leads`}
+            className="rounded-md border border-input px-3 py-1.5 hover:bg-accent"
+          >
+            Leads
+          </Link>
+          <Link
             href={`/dashboard/projects/${projectId}/settings`}
             className="rounded-md border border-input px-3 py-1.5 hover:bg-accent"
           >

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   TransformComponent,
   TransformWrapper,
@@ -14,7 +14,7 @@ import { statusStyle, PLOT_STATUSES } from "@/lib/map/status-colors";
 
 import { Compass } from "./compass";
 import { Legend } from "./legend";
-import { PlotDetailPanel } from "./plot-detail-panel";
+import { PlotDetailPanel, type PlotShareContext } from "./plot-detail-panel";
 
 const ZONE_FILL: Record<string, string> = {
   park: "#bbe4b4",
@@ -38,15 +38,20 @@ export function PlotMap({
   highlightIds,
   selectedId: controlledSelectedId,
   onSelect,
+  zoomToPlotId,
+  shareContext,
 }: {
   data: MapLayoutData;
   /** When set (even empty), non-matching plots dim and matches get a match count (§10). */
   highlightIds?: Set<string> | null;
   selectedId?: string | null;
   onSelect?: (id: string | null) => void;
+  /** Deep link (§13): auto-zoom to and select this plot on mount. */
+  zoomToPlotId?: string | null;
+  shareContext?: PlotShareContext;
 }) {
   const [internalSelectedId, setInternalSelectedId] = useState<string | null>(
-    null,
+    zoomToPlotId ?? null,
   );
   const selectedId =
     controlledSelectedId !== undefined
@@ -54,6 +59,16 @@ export function PlotMap({
       : internalSelectedId;
   const setSelectedId = onSelect ?? setInternalSelectedId;
   const [scale, setScale] = useState(1);
+  const transformRef = useRef<ReactZoomPanPinchRef>(null);
+
+  useEffect(() => {
+    if (!zoomToPlotId) return;
+    const id = window.setTimeout(() => {
+      transformRef.current?.zoomToElement(`plot-${zoomToPlotId}`, 3, 400);
+    }, 50);
+    return () => window.clearTimeout(id);
+    // Only re-run if the deep-linked plot itself changes.
+  }, [zoomToPlotId]);
 
   const box = useMemo(
     () =>
@@ -79,6 +94,7 @@ export function PlotMap({
     <div className="flex min-h-[70vh] flex-col sm:flex-row">
       <div className="relative min-h-[50vh] flex-1 overflow-hidden bg-slate-50 dark:bg-slate-900">
         <TransformWrapper
+          ref={transformRef}
           minScale={0.3}
           maxScale={12}
           doubleClick={{ mode: "zoomIn" }}
@@ -137,6 +153,7 @@ export function PlotMap({
                     return (
                       <g key={p.id}>
                         <polygon
+                          id={`plot-${p.id}`}
                           points={ring(p.geometry)}
                           fill={style.fill}
                           stroke={isSelected ? "#111827" : style.stroke}
@@ -201,6 +218,7 @@ export function PlotMap({
         plot={selected}
         unit={data.unit}
         onClose={() => setSelectedId(null)}
+        shareContext={shareContext}
       />
     </div>
   );

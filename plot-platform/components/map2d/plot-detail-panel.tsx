@@ -1,22 +1,35 @@
 "use client";
 
+import { useState } from "react";
+
+import { plotShareText, whatsAppUrl } from "@/lib/messaging/whatsapp";
 import { statusStyle } from "@/lib/map/status-colors";
 import type { MapPlot } from "@/lib/data/map";
 
+export interface PlotShareContext {
+  projectSlug: string;
+  projectName: string;
+  whatsappPhone?: string;
+  roadWidthFt?: number | null;
+}
+
 /**
- * Plot detail: side panel on desktop, bottom sheet on mobile (§10). A fuller
- * version (photos, price, buttons) lands with the buyer site in Phase 3;
- * this is the admin/Phase 2 map's read-only summary.
+ * Plot detail: side panel on desktop, bottom sheet on mobile (§10).
+ * `shareContext` (set on the buyer site) adds Share on WhatsApp / Copy link
+ * (§10.1, §13); without it (admin map) the panel is read-only.
  */
 export function PlotDetailPanel({
   plot,
   unit,
   onClose,
+  shareContext,
 }: {
   plot: MapPlot | null;
   unit: string;
   onClose: () => void;
+  shareContext?: PlotShareContext;
 }) {
+  const [copied, setCopied] = useState(false);
   if (!plot) {
     return (
       <aside className="hidden shrink-0 border-t border-border p-4 text-sm text-muted-foreground sm:block sm:w-72 sm:border-t-0 sm:border-l">
@@ -65,6 +78,46 @@ export function PlotDetailPanel({
           </Row>
         ) : null}
       </dl>
+
+      {shareContext ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          <a
+            href={whatsAppUrl(
+              shareContext.whatsappPhone,
+              plotShareText({
+                plotNumber: plot.plot_number,
+                projectName: shareContext.projectName,
+                areaValue: plot.area_official_value,
+                areaUnit: plot.area_official_unit,
+                facing: plot.facing,
+                roadWidthFt: shareContext.roadWidthFt ?? null,
+                deepLink:
+                  typeof window !== "undefined"
+                    ? `${window.location.origin}/p/${shareContext.projectSlug}/plot/${plot.plot_number}`
+                    : `/p/${shareContext.projectSlug}/plot/${plot.plot_number}`,
+              }),
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-md border border-input px-3 py-1.5 text-xs"
+          >
+            Share on WhatsApp
+          </a>
+          <button
+            type="button"
+            onClick={() => {
+              const url = `${window.location.origin}/p/${shareContext.projectSlug}/plot/${plot.plot_number}`;
+              navigator.clipboard.writeText(url).then(() => {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              });
+            }}
+            className="rounded-md border border-input px-3 py-1.5 text-xs"
+          >
+            {copied ? "Copied!" : "Copy link"}
+          </button>
+        </div>
+      ) : null}
     </aside>
   );
 }

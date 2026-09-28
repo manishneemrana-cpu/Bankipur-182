@@ -25,13 +25,18 @@ const MAX_COMPARE = 4;
 export function SiteInteractive({
   data,
   lang,
+  deepLinkPlotId,
 }: {
   data: PublicSiteData;
   lang: Lang;
+  /** Set when arriving via a /plot/[plotNo] deep link (§13, test 7). */
+  deepLinkPlotId?: string | null;
 }) {
   const [filters, setFilters] = useState<SearchFilters | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(
+    deepLinkPlotId ?? null,
+  );
 
   const available = useMemo(
     () => data.plots.filter((p) => p.status === "AVAILABLE"),
@@ -78,6 +83,12 @@ export function SiteInteractive({
             highlightIds={matchedIds}
             selectedId={selectedId}
             onSelect={setSelectedId}
+            zoomToPlotId={deepLinkPlotId}
+            shareContext={{
+              projectSlug: data.project.slug,
+              projectName: data.project.name,
+              whatsappPhone: data.org.contact.whatsapp,
+            }}
           />
         )}
       </section>
