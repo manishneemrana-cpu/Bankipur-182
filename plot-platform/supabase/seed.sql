@@ -58,105 +58,160 @@ insert into public.phases (id, org_id, project_id, name, sort) values
   ('00000000-0000-0000-0000-0000000000f2', '00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', 'Phase 2', 2)
 on conflict (id) do nothing;
 
+-- Layout geometry (§22 "premium, professional"): four blocks tiled edge to
+-- edge with zero gaps or overlaps, every row's front edge flush against a
+-- real road/lane polygon, and a central + approach road giving every
+-- corner plot genuine second-road frontage. Blocks A/B sit north of the
+-- Main Boulevard, C/D south of it; the central road splits west (A/C) from
+-- east (B/D); the approach road runs the full west edge.
 insert into public.roads (org_id, project_id, layout_version_id, name, width_value, width_unit, kind, geometry, direction_label) values
   ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
-   'Main Boulevard', 60, 'ft', 'main',
-   '{"type":"Polygon","coordinates":[[[0,290],[1200,290],[1200,320],[0,320],[0,290]]]}', 'East-West'),
+   'Main Boulevard', 40, 'ft', 'main',
+   '{"type":"Polygon","coordinates":[[[20,195],[850,195],[850,235],[20,235],[20,195]]]}', 'East-West'),
   ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
-   '30ft Internal Road', 30, 'ft', 'internal',
-   '{"type":"Polygon","coordinates":[[[290,0],[320,0],[320,290],[290,290],[290,0]]]}', 'North-South'),
-  ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
-   '40ft Internal Road', 40, 'ft', 'internal',
-   '{"type":"Polygon","coordinates":[[[590,0],[630,0],[630,590],[590,590],[590,0]]]}', 'North-South'),
+   'Central Road', 30, 'ft', 'internal',
+   '{"type":"Polygon","coordinates":[[[420,20],[450,20],[450,410],[420,410],[420,20]]]}', 'North-South'),
   ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
    'Approach Road (20ft)', 20, 'ft', 'approach',
-   '{"type":"Polygon","coordinates":[[[0,0],[20,0],[20,290],[0,290],[0,0]]]}', 'North-South');
+   '{"type":"Polygon","coordinates":[[[0,20],[20,20],[20,410],[0,410],[0,20]]]}', 'North-South'),
+  ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
+   'Lane N1 (20ft)', 20, 'ft', 'internal',
+   '{"type":"Polygon","coordinates":[[[20,130],[850,130],[850,150],[20,150],[20,130]]]}', 'East-West'),
+  ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
+   'Lane N2 (20ft)', 20, 'ft', 'internal',
+   '{"type":"Polygon","coordinates":[[[20,65],[850,65],[850,85],[20,85],[20,65]]]}', 'East-West'),
+  ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
+   'Lane S1 (20ft)', 20, 'ft', 'internal',
+   '{"type":"Polygon","coordinates":[[[20,280],[850,280],[850,300],[20,300],[20,280]]]}', 'East-West'),
+  ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
+   'Lane S2 (20ft)', 20, 'ft', 'internal',
+   '{"type":"Polygon","coordinates":[[[20,345],[850,345],[850,365],[20,365],[20,345]]]}', 'East-West');
 
 insert into public.zones (org_id, project_id, layout_version_id, kind, name, geometry) values
   ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
-   'park', 'Central Park', '{"type":"Polygon","coordinates":[[[340,340],[580,340],[580,540],[340,540],[340,340]]]}'),
+   'amenity', 'Club House', '{"type":"Polygon","coordinates":[[[20,-140],[260,-140],[260,-20],[20,-20],[20,-140]]]}'),
   ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
-   'park', 'North Green', '{"type":"Polygon","coordinates":[[[650,20],[900,20],[900,150],[650,150],[650,20]]]}'),
+   'park', 'North Green', '{"type":"Polygon","coordinates":[[[300,-140],[640,-140],[640,-20],[300,-20],[300,-140]]]}'),
   ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
-   'amenity', 'Club House', '{"type":"Polygon","coordinates":[[[340,20],[500,20],[500,150],[340,150],[340,20]]]}'),
+   'park', 'Central Park', '{"type":"Polygon","coordinates":[[[280,410],[660,410],[660,490],[280,490],[280,410]]]}'),
   ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
-   'gate_entry', 'Main Gate', '{"type":"Polygon","coordinates":[[[0,290],[20,290],[20,320],[0,320],[0,290]]]}'),
+   'gate_entry', 'Main Gate', '{"type":"Polygon","coordinates":[[[-20,195],[0,195],[0,235],[-20,235],[-20,195]]]}'),
   ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
-   'gate_exit', 'Exit Gate', '{"type":"Polygon","coordinates":[[[1180,290],[1200,290],[1200,320],[1180,320],[1180,290]]]}'),
+   'gate_exit', 'Exit Gate', '{"type":"Polygon","coordinates":[[[850,195],[870,195],[870,235],[850,235],[850,195]]]}'),
   ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
-   'boundary', 'Project Boundary', '{"type":"Polygon","coordinates":[[[0,0],[1200,0],[1200,590],[0,590],[0,0]]]}');
+   'boundary', 'Project Boundary', '{"type":"Polygon","coordinates":[[[-20,-140],[870,-140],[870,490],[-20,490],[-20,-140]]]}');
 
--- 120 plots across 4 blocks. Rows south of the main road (y>320) sit in
--- Block A/B; rows north (y<290) sit in Block C/D. Sizes cycle through the
--- spec's list; a handful get irregular polygons and corner positions.
+-- 120 plots across 4 blocks, 3 rows x 10 columns each, tiled exactly (no
+-- gaps/overlaps) to their block's footprint. Every plot is 40x45 ft
+-- (1,800 sqft) so the grid reads as one consistent, professionally
+-- platted scheme; a few get unit/conflict variations below, same as before.
 do $$
 declare
-  sizes int[] := array[800, 1000, 1200, 1500, 1800, 2400];
   blocks uuid[] := array[
     '00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000b2',
     '00000000-0000-0000-0000-0000000000b3', '00000000-0000-0000-0000-0000000000b4'
   ];
   phases uuid[] := array['00000000-0000-0000-0000-0000000000f1', '00000000-0000-0000-0000-0000000000f2'];
   statuses text[] := array['AVAILABLE','AVAILABLE','AVAILABLE','HOLD','RESERVED','BOOKED','SOLD','AVAILABLE'];
-  i int;
+  w constant numeric := 40;
+  d constant numeric := 45;
+  i int := 0;
+  block_i int;
   row_i int;
   col_i int;
-  side numeric;
-  w numeric;
-  d numeric;
+  block_x numeric;
+  north boolean;
+  west boolean;
   x numeric;
   y numeric;
   is_corner boolean;
   facing_v text;
+  frontage_road uuid;
   road_ids uuid[];
+  frontage_width numeric;
   main_road uuid;
-  road_30 uuid;
-  road_40 uuid;
+  central_road uuid;
+  approach_road uuid;
+  lane_n1 uuid; lane_n2 uuid; lane_s1 uuid; lane_s2 uuid;
 begin
   select id into main_road from public.roads where project_id = '00000000-0000-0000-0000-00000000000b' and name = 'Main Boulevard';
-  select id into road_30 from public.roads where project_id = '00000000-0000-0000-0000-00000000000b' and name = '30ft Internal Road';
-  select id into road_40 from public.roads where project_id = '00000000-0000-0000-0000-00000000000b' and name = '40ft Internal Road';
+  select id into central_road from public.roads where project_id = '00000000-0000-0000-0000-00000000000b' and name = 'Central Road';
+  select id into approach_road from public.roads where project_id = '00000000-0000-0000-0000-00000000000b' and name = 'Approach Road (20ft)';
+  select id into lane_n1 from public.roads where project_id = '00000000-0000-0000-0000-00000000000b' and name = 'Lane N1 (20ft)';
+  select id into lane_n2 from public.roads where project_id = '00000000-0000-0000-0000-00000000000b' and name = 'Lane N2 (20ft)';
+  select id into lane_s1 from public.roads where project_id = '00000000-0000-0000-0000-00000000000b' and name = 'Lane S1 (20ft)';
+  select id into lane_s2 from public.roads where project_id = '00000000-0000-0000-0000-00000000000b' and name = 'Lane S2 (20ft)';
 
-  for i in 1..120 loop
-    row_i := (i - 1) / 10;      -- 12 rows of 10
-    col_i := (i - 1) % 10;
-    side := sizes[1 + (i % 6)];
-    -- ~30x30 for 800 sqft up to ~52x52 for 2400 sqft, kept roughly square
-    w := round(sqrt(side)::numeric, 1);
-    d := round((side / w)::numeric, 1);
-    x := 40 + col_i * 116;
-    y := case when row_i < 6 then 20 + row_i * 44 else 340 + (row_i - 6) * 44 end;
-    is_corner := col_i = 0 or col_i = 9;
-    facing_v := (array['E','W','N','S','NE','SW'])[1 + (i % 6)];
-    road_ids := case when col_i = 0 then array[road_30] when col_i = 9 then array[road_40] else array[main_road] end;
+  for block_i in 0..3 loop
+    -- 0=A(NW) 1=B(NE) 2=C(SW) 3=D(SE)
+    north := block_i in (0, 1);
+    west := block_i in (0, 2);
+    block_x := case when west then 20 else 450 end;
 
-    insert into public.plots (
-      project_id, layout_version_id, phase_id, block_id, plot_number, plot_type, status,
-      area_official_value, area_official_unit, area_calculated_sqft,
-      dimensions, frontage_ft, depth_ft, facing, facing_source, corner_status, corner_source,
-      adjacent_road_ids, road_width_primary_ft, price_total, rate_per_unit, rate_unit,
-      price_visibility, booking_amount, geometry, centroid_x, centroid_y, tags,
-      public_visibility, verified_fields
-    ) values (
-      '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
-      phases[1 + (row_i % 2)], blocks[1 + (row_i % 4)],
-      'P-' || (100 + i), 'residential', statuses[1 + (i % 8)],
-      side, 'sqft', side,
-      jsonb_build_array(
-        jsonb_build_object('side', 'front', 'value', w, 'unit', 'ft'),
-        jsonb_build_object('side', 'depth', 'value', d, 'unit', 'ft')
-      ),
-      w, d, facing_v::text, 'admin', case when is_corner then 'YES' else 'NO' end, 'admin',
-      road_ids, case when col_i = 0 then 30 when col_i = 9 then 40 else 60 end,
-      side * 1800, 1800, 'sqft', 'public', round(side * 1800 * 0.1),
-      jsonb_build_object('type', 'Polygon', 'coordinates', jsonb_build_array(jsonb_build_array(
-        jsonb_build_array(x, y), jsonb_build_array(x + w, y),
-        jsonb_build_array(x + w, y + d), jsonb_build_array(x, y + d), jsonb_build_array(x, y)
-      ))),
-      x + w / 2, y + d / 2,
-      case when is_corner then array['corner'] else '{}' end,
-      true, array['area_official_value', 'facing', 'corner_status']
-    );
+    for row_i in 0..2 loop
+      for col_i in 0..9 loop
+        i := i + 1;
+        x := block_x + col_i * w;
+        -- Row 0 is nearest the Main Boulevard; rows 1/2 step away from it,
+        -- each separated by a 20ft lane, so every row has a road on its
+        -- front edge — never floating disconnected from the network.
+        y := case
+          when north and row_i = 0 then 195 - d
+          when north and row_i = 1 then 130 - d
+          when north and row_i = 2 then 65 - d
+          when row_i = 0 then 235
+          when row_i = 1 then 300
+          else 365
+        end;
+        facing_v := case when north then 'S' else 'N' end;
+        frontage_road := case
+          when row_i = 0 then main_road
+          when north and row_i = 1 then lane_n1
+          when north then lane_n2
+          when row_i = 1 then lane_s1
+          else lane_s2
+        end;
+        frontage_width := case when row_i = 0 then 40 else 20 end;
+
+        -- Corner plots also front the approach road (west block, col 0)
+        -- or the central road (west block col 9 / east block col 0).
+        is_corner := (west and (col_i = 0 or col_i = 9)) or (not west and col_i = 0);
+        road_ids := case
+          when west and col_i = 0 then array[frontage_road, approach_road]
+          when west and col_i = 9 then array[frontage_road, central_road]
+          when not west and col_i = 0 then array[frontage_road, central_road]
+          else array[frontage_road]
+        end;
+
+        insert into public.plots (
+          project_id, layout_version_id, phase_id, block_id, plot_number, plot_type, status,
+          area_official_value, area_official_unit, area_calculated_sqft,
+          dimensions, frontage_ft, depth_ft, facing, facing_source, corner_status, corner_source,
+          adjacent_road_ids, road_width_primary_ft, price_total, rate_per_unit, rate_unit,
+          price_visibility, booking_amount, geometry, centroid_x, centroid_y, tags,
+          public_visibility, verified_fields
+        ) values (
+          '00000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-00000000000c',
+          phases[1 + (block_i % 2)], blocks[1 + block_i],
+          'P-' || (100 + i), 'residential', statuses[1 + (i % 8)],
+          w * d, 'sqft', w * d,
+          jsonb_build_array(
+            jsonb_build_object('side', 'front', 'value', w, 'unit', 'ft'),
+            jsonb_build_object('side', 'depth', 'value', d, 'unit', 'ft')
+          ),
+          w, d, facing_v, 'admin', case when is_corner then 'YES' else 'NO' end, 'admin',
+          road_ids, frontage_width,
+          w * d * 1800, 1800, 'sqft', 'public', round(w * d * 1800 * 0.1),
+          jsonb_build_object('type', 'Polygon', 'coordinates', jsonb_build_array(jsonb_build_array(
+            jsonb_build_array(x, y), jsonb_build_array(x + w, y),
+            jsonb_build_array(x + w, y + d), jsonb_build_array(x, y + d), jsonb_build_array(x, y)
+          ))),
+          x + w / 2, y + d / 2,
+          case when is_corner then array['corner'] else '{}' end,
+          true, array['area_official_value', 'facing', 'corner_status']
+        );
+      end loop;
+    end loop;
   end loop;
 end;
 $$;
