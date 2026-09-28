@@ -64,6 +64,12 @@ export default async function ProjectDetailPage(
             Map
           </Link>
           <Link
+            href={`/dashboard/projects/${projectId}/layout`}
+            className="rounded-md border border-input px-3 py-1.5 hover:bg-accent"
+          >
+            Layout
+          </Link>
+          <Link
             href={`/dashboard/projects/${projectId}/import`}
             className="rounded-md border border-input px-3 py-1.5 hover:bg-accent"
           >

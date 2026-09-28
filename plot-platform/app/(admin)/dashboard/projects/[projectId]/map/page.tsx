@@ -27,8 +27,14 @@ export default async function ProjectMapPage(
       </div>
       {mapData.plots.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No plot geometry yet — the layout tracing editor (Phase 7) or a
-          published layout version is needed before plots appear here.
+          No plot geometry yet —{" "}
+          <a
+            href={`/dashboard/projects/${projectId}/layout`}
+            className="underline"
+          >
+            upload and trace a layout
+          </a>{" "}
+          to add plot outlines.
         </p>
       ) : (
         <div className="min-h-0 flex-1 overflow-hidden rounded-md border">

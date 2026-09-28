@@ -53,6 +53,40 @@ $$;
 
 grant execute on all functions in schema auth to anon, authenticated, service_role;
 
+-- Minimal stand-in for Supabase Storage (§7 layout uploads): just enough
+-- (buckets/objects + foldername()) to test the storage.objects RLS policies
+-- our migrations add.
+create schema storage;
+grant usage on schema storage to anon, authenticated, service_role;
+
+create table storage.buckets (
+  id text primary key,
+  name text not null,
+  owner uuid,
+  public boolean not null default false,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table storage.objects (
+  id uuid primary key default gen_random_uuid(),
+  bucket_id text references storage.buckets (id),
+  name text,
+  owner uuid,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  metadata jsonb
+);
+alter table storage.objects enable row level security;
+alter table storage.objects force row level security;
+
+create function storage.foldername(name text) returns text[] language sql immutable as $$
+  select (regexp_split_to_array(name, '/'))[1:array_length(regexp_split_to_array(name, '/'), 1) - 1];
+$$;
+
+grant select, insert, update, delete on storage.buckets, storage.objects to anon, authenticated, service_role;
+grant execute on function storage.foldername(text) to anon, authenticated, service_role;
+
 -- Supabase grants table privileges broadly and relies on RLS; mirror that.
 alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
 alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
