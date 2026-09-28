@@ -104,7 +104,14 @@ export interface PublicSiteData {
     contact: { phone?: string; whatsapp?: string; email?: string };
     powered_by_visible: boolean;
   };
-  layout: { north_angle_deg: number; unit: string };
+  layout: {
+    north_angle_deg: number;
+    unit: string;
+    background_image_path: string | null;
+    background_width_ft: number | null;
+    background_height_ft: number | null;
+    background_opacity: number | null;
+  };
   plots: PublicPlot[];
   roads: PublicRoad[];
   zones: PublicZone[];

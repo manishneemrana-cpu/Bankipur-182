@@ -34,7 +34,14 @@ function makeData(overrides: Partial<PublicSiteData> = {}): PublicSiteData {
       contact: {},
       powered_by_visible: false,
     },
-    layout: { north_angle_deg: 0, unit: "sqft" },
+    layout: {
+      north_angle_deg: 0,
+      unit: "sqft",
+      background_image_path: null,
+      background_width_ft: null,
+      background_height_ft: null,
+      background_opacity: null,
+    },
     plots: [
       {
         id: "p1",

@@ -34,10 +34,21 @@ export interface MapZone {
   geometry: Polygon;
 }
 
+export interface MapBackgroundImage {
+  /** Static asset path (served from /public), e.g. the original source
+   * drawing rendered to a raster, shown as a faint underlay so viewers can
+   * visually cross-check the traced plots against the real document. */
+  path: string;
+  widthFt: number;
+  heightFt: number;
+  opacity: number;
+}
+
 export interface MapLayoutData {
   layoutVersionId: string | null;
   northAngleDeg: number;
   unit: string;
+  backgroundImage: MapBackgroundImage | null;
   plots: MapPlot[];
   roads: MapRoad[];
   zones: MapZone[];
@@ -49,7 +60,9 @@ export async function getMapData(projectId: string): Promise<MapLayoutData> {
 
   const { data: layoutVersion } = await supabase
     .from("layout_versions")
-    .select("id, calibration")
+    .select(
+      "id, calibration, background_image_path, background_width_ft, background_height_ft, background_opacity",
+    )
     .eq("project_id", projectId)
     .eq("status", "published")
     .maybeSingle();
@@ -58,6 +71,18 @@ export async function getMapData(projectId: string): Promise<MapLayoutData> {
     north_angle_deg?: number;
     unit?: string;
   };
+
+  const backgroundImage: MapBackgroundImage | null =
+    layoutVersion?.background_image_path &&
+    layoutVersion.background_width_ft &&
+    layoutVersion.background_height_ft
+      ? {
+          path: layoutVersion.background_image_path,
+          widthFt: layoutVersion.background_width_ft,
+          heightFt: layoutVersion.background_height_ft,
+          opacity: layoutVersion.background_opacity ?? 0.45,
+        }
+      : null;
 
   const [{ data: plots }, { data: roads }, { data: zones }] = await Promise.all(
     [
@@ -84,6 +109,7 @@ export async function getMapData(projectId: string): Promise<MapLayoutData> {
     layoutVersionId: layoutVersion?.id ?? null,
     northAngleDeg: calibration.north_angle_deg ?? 0,
     unit: calibration.unit ?? "ft",
+    backgroundImage,
     plots: (plots ?? []).flatMap((p) =>
       isPolygon(p.geometry)
         ? [

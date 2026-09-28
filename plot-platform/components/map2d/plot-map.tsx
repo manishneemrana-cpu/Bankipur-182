@@ -169,6 +169,20 @@ export function PlotMap({
                     </linearGradient>
                   </defs>
 
+                  {data.backgroundImage ? (
+                    <image
+                      href={data.backgroundImage.path}
+                      x={0}
+                      y={0}
+                      width={data.backgroundImage.widthFt}
+                      height={data.backgroundImage.heightFt}
+                      opacity={data.backgroundImage.opacity}
+                      preserveAspectRatio="none"
+                      className="pointer-events-none select-none"
+                      aria-hidden
+                    />
+                  ) : null}
+
                   {data.zones.map((z) => (
                     <polygon
                       key={z.id}
