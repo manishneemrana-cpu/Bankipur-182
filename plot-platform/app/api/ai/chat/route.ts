@@ -13,6 +13,8 @@ import { serverEnv } from "@/lib/env/server";
 
 const bodySchema = z.object({
   projectSlug: z.string().min(1),
+  sessionId: z.string().min(1),
+  lang: z.enum(["en", "hi"]).default("en"),
   messages: z
     .array(
       z.object({
@@ -26,6 +28,9 @@ const bodySchema = z.object({
 
 const NOT_CONFIGURED_TEXT =
   "The AI assistant is not configured for this project yet. Please use the search box above, or contact the sales team directly.";
+const UNANSWERED_PHRASE = "I don't have that information";
+const USAGE_LIMIT_TEXT =
+  "This project's AI assistant has reached its monthly usage limit. Please use the search box above, or contact the sales team directly.";
 
 function providerFor(): ChatProvider | null {
   const env = serverEnv();
@@ -50,7 +55,7 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
   }
-  const { projectSlug, messages } = parsed.data;
+  const { projectSlug, sessionId, lang, messages } = parsed.data;
 
   if (isRateLimited(`${ip}:${projectSlug}`)) {
     return NextResponse.json({ error: "RATE_LIMITED" }, { status: 429 });
@@ -70,6 +75,16 @@ export async function POST(request: Request) {
   const supabase = await createClient();
   const cookieStore = await cookies();
   const password = cookieStore.get(passwordCookieName(projectSlug))?.value;
+
+  // Reserve a turn against this org's plan before ever calling the model —
+  // never bill/log a call that wasn't actually made (§9 usage metering).
+  const { data: reserved } = await supabase.rpc("reserve_ai_turn", {
+    p_slug: projectSlug,
+    p_password: password ?? null,
+  });
+  if (reserved === false) {
+    return NextResponse.json({ text: USAGE_LIMIT_TEXT, toolCalls: [] });
+  }
 
   const submitLead: SubmitLeadFn = async (args) => {
     const { error } = await supabase.rpc("submit_public_lead", {
@@ -104,6 +119,17 @@ export async function POST(request: Request) {
       messages,
       tools: specs,
       executeTool: execute,
+    });
+    const lastUserMessage = messages[messages.length - 1]?.content ?? "";
+    await supabase.rpc("log_ai_turn", {
+      p_slug: projectSlug,
+      p_password: password ?? null,
+      p_session_id: sessionId,
+      p_lang: lang,
+      p_user_message: lastUserMessage,
+      p_assistant_message: turn.text,
+      p_tool_calls: turn.toolCalls,
+      p_unanswered: turn.text.includes(UNANSWERED_PHRASE),
     });
     return NextResponse.json(turn);
   } catch {

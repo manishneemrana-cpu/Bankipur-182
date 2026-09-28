@@ -82,6 +82,12 @@ export default async function ProjectDetailPage(
             Conflicts{" "}
             {counts.openConflicts > 0 ? `(${counts.openConflicts})` : ""}
           </Link>
+          <Link
+            href={`/dashboard/projects/${projectId}/analytics`}
+            className="rounded-md border border-input px-3 py-1.5 hover:bg-accent"
+          >
+            Analytics
+          </Link>
         </div>
       </div>
 

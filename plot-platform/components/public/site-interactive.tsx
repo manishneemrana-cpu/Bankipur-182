@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { ChatWidget } from "@/components/chat/chat-widget";
 import { PlotDetailPanel } from "@/components/map2d/plot-detail-panel";
 import { PlotMap } from "@/components/map2d/plot-map";
 import { PlotMap3DLazy } from "@/components/map3d/plot-map-3d-lazy";
+import { track } from "@/lib/analytics/track";
 import { toMapLayoutData } from "@/lib/data/public-map-adapter";
 import { formatIndianCurrency } from "@/lib/format";
 import type { Lang } from "@/lib/i18n/dictionary";
@@ -47,6 +48,20 @@ export function SiteInteractive({
   >(null);
   const [chatZoomPlotId, setChatZoomPlotId] = useState<string | null>(null);
   const [view, setView] = useState<"2d" | "3d">("2d");
+
+  useEffect(() => {
+    track(projectSlug, "project_view");
+    // Fires once per mount — a full page load, not every re-render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const plot = data.plots.find((p) => p.id === selectedId);
+    if (plot)
+      track(projectSlug, "plot_detail_open", { plotNumber: plot.plot_number });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId]);
 
   const available = useMemo(
     () => data.plots.filter((p) => p.status === "AVAILABLE"),
@@ -90,6 +105,7 @@ export function SiteInteractive({
     setCompareIds((prev) => {
       if (prev.includes(plot.id)) return prev.filter((id) => id !== plot.id);
       if (prev.length >= MAX_COMPARE) return prev;
+      track(projectSlug, "compare_use", { plotNumber: plot.plot_number });
       return [...prev, plot.id];
     });
   }
@@ -98,7 +114,15 @@ export function SiteInteractive({
     <>
       <section className="border-b border-border px-4 py-6 sm:px-8">
         <div className="mx-auto max-w-5xl">
-          <SearchBar onChange={setFilters} />
+          <SearchBar
+            onChange={(f) => {
+              setFilters(f);
+              if (f)
+                track(projectSlug, "search_query", {
+                  payload: f as unknown as Record<string, unknown>,
+                });
+            }}
+          />
         </div>
       </section>
 
@@ -119,7 +143,10 @@ export function SiteInteractive({
               </button>
               <button
                 type="button"
-                onClick={() => setView("3d")}
+                onClick={() => {
+                  setView("3d");
+                  track(projectSlug, "view_3d");
+                }}
                 className={`rounded-md border px-2.5 py-1 text-xs ${view === "3d" ? "bg-primary text-primary-foreground" : ""}`}
               >
                 3D

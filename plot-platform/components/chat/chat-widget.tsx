@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import type { ChatMessage, ExecutedToolCall } from "@/lib/ai/chat-types";
+import { getSessionId, track } from "@/lib/analytics/track";
 import type { Lang } from "@/lib/i18n/dictionary";
 import { t } from "@/lib/i18n/dictionary";
 
@@ -69,11 +70,17 @@ export function ChatWidget({
     setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
     setInput("");
     setPending(true);
+    track(projectSlug, "chat_message");
     try {
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectSlug, messages: nextMessages }),
+        body: JSON.stringify({
+          projectSlug,
+          sessionId: getSessionId(),
+          lang,
+          messages: nextMessages,
+        }),
       });
       if (!res.ok) {
         setMessages((prev) => [
@@ -107,6 +114,12 @@ export function ChatWidget({
         const openedInput = opened.input as { plot_number?: string };
         if (openedInput.plot_number) onOpenPlot(openedInput.plot_number);
       }
+      const handoff = data.toolCalls.find(
+        (c) => c.name === "create_lead" || c.name === "request_site_visit",
+      );
+      if (handoff && (handoff.output as { ok?: boolean }).ok) {
+        track(projectSlug, "chat_handoff");
+      }
 
       setMessages((prev) => [
         ...prev,
@@ -136,7 +149,10 @@ export function ChatWidget({
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+          track(projectSlug, "chat_open");
+        }}
         className="fixed right-4 bottom-20 z-30 rounded-full bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-lg sm:bottom-6"
       >
         {t(lang, "chat")}

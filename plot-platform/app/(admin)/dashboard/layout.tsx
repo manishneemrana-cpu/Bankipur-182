@@ -8,6 +8,7 @@ import { signOut } from "./actions";
 const NAV = [
   { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/projects", label: "Projects" },
+  { href: "/dashboard/billing", label: "Billing" },
 ];
 
 export default async function DashboardLayout({
@@ -35,6 +36,11 @@ export default async function DashboardLayout({
               {item.label}
             </Link>
           ))}
+          {user.isPlatformOwner ? (
+            <Link href="/ops" className="hover:underline">
+              Ops console
+            </Link>
+          ) : null}
         </nav>
         <form action={signOut}>
           <button

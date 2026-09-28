@@ -344,6 +344,7 @@ export function PublicProjectView({
         phone={org.contact.phone}
         whatsapp={org.contact.whatsapp}
         lang={lang}
+        projectSlug={projectSlug}
       />
     </>
   );
