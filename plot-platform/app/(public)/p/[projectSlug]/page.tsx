@@ -1,0 +1,438 @@
+import Link from "next/link";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+import { PlotMap } from "@/components/map2d/plot-map";
+import { LeadForm } from "@/components/lead/lead-form";
+import { EmiCalculator } from "@/components/public/emi-calculator";
+import { StickyActionBar } from "@/components/public/sticky-action-bar";
+import { getPublicSiteData } from "@/lib/data/public-site";
+import { toMapLayoutData } from "@/lib/data/public-map-adapter";
+import { formatIndianCurrency } from "@/lib/format";
+import type { Lang } from "@/lib/i18n/dictionary";
+import { t } from "@/lib/i18n/dictionary";
+
+import { PasswordGate } from "./password-gate";
+
+function parseLang(value: string | undefined): Lang {
+  return value === "hi" ? "hi" : "en";
+}
+
+export async function generateMetadata(
+  props: PageProps<"/p/[projectSlug]">,
+): Promise<Metadata> {
+  const { projectSlug } = await props.params;
+  const result = await getPublicSiteData(projectSlug);
+
+  // Rule 1 (white-label): never a platform brand in the title. Rule 17/18:
+  // never leak a name before access is actually granted.
+  if (!result.ok || result.data.project.visibility !== "public") {
+    return { title: "Project", robots: { index: false, follow: false } };
+  }
+  return {
+    title: result.data.project.name,
+    description: result.data.project.description ?? undefined,
+    robots: { index: true, follow: true },
+  };
+}
+
+export default async function PublicProjectPage(
+  props: PageProps<"/p/[projectSlug]">,
+) {
+  const { projectSlug } = await props.params;
+  const searchParams = await props.searchParams;
+  const lang = parseLang(
+    typeof searchParams.lang === "string" ? searchParams.lang : undefined,
+  );
+  const shareRef =
+    typeof searchParams.ref === "string" ? searchParams.ref : undefined;
+
+  const result = await getPublicSiteData(projectSlug);
+
+  if (!result.ok) {
+    if (result.error === "NOT_FOUND") notFound();
+    if (result.error === "PASSWORD_REQUIRED")
+      return <PasswordGate slug={projectSlug} />;
+    if (result.error === "LINK_DISABLED" || result.error === "LINK_EXPIRED") {
+      return (
+        <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-2 px-4 text-center">
+          <h1 className="text-lg font-semibold">
+            This link is no longer active
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Please ask for an updated link.
+          </p>
+        </main>
+      );
+    }
+    // UNAVAILABLE: rule 5/17 — never show cached data, say so plainly.
+    return (
+      <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-2 px-4 text-center">
+        <h1 className="text-lg font-semibold">
+          {t(lang, "liveAvailabilityUnavailable")}
+        </h1>
+      </main>
+    );
+  }
+
+  const { project, org, plots, landmarks, faqs, documents } = result.data;
+  const available = plots.filter((p) => p.status === "AVAILABLE");
+  const lastUpdate = plots.reduce<string | null>(
+    (latest, p) =>
+      !latest || p.last_inventory_update > latest
+        ? p.last_inventory_update
+        : latest,
+    null,
+  );
+  const langFaqs = faqs.filter((f) => f.lang === lang);
+  const examplePlot = available.find((p) => p.price_total);
+
+  return (
+    <>
+      {project.is_demo ? (
+        <div className="bg-warning py-1 text-center text-xs font-semibold text-black">
+          {t(lang, "demoDataRibbon")}
+        </div>
+      ) : null}
+
+      <main className="pb-16 sm:pb-0">
+        {/* Hero */}
+        <section className="border-b border-border px-4 py-8 sm:px-8">
+          <div className="mx-auto flex max-w-5xl flex-col gap-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                  {project.name}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  {[project.address, project.city, project.state]
+                    .filter(Boolean)
+                    .join(", ") || t(lang, "notProvided")}
+                </p>
+              </div>
+              <div className="flex gap-1 text-xs">
+                <Link
+                  href={`/p/${projectSlug}?lang=en`}
+                  className={
+                    lang === "en"
+                      ? "font-semibold underline"
+                      : "text-muted-foreground"
+                  }
+                >
+                  EN
+                </Link>
+                <span className="text-muted-foreground">·</span>
+                <Link
+                  href={`/p/${projectSlug}?lang=hi`}
+                  className={
+                    lang === "hi"
+                      ? "font-semibold underline"
+                      : "text-muted-foreground"
+                  }
+                >
+                  हिं
+                </Link>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-4 text-sm">
+              <Stat label={t(lang, "totalArea")}>
+                {project.total_area_value
+                  ? `${project.total_area_value} ${project.total_area_unit}`
+                  : t(lang, "notProvided")}
+              </Stat>
+              <Stat label={t(lang, "totalPlots")}>{plots.length}</Stat>
+              <Stat label={t(lang, "availableNow")}>
+                {available.length}
+                {lastUpdate ? (
+                  <span className="ml-1 font-normal text-muted-foreground">
+                    · {t(lang, "updated")}{" "}
+                    {new Date(lastUpdate).toLocaleString(
+                      lang === "hi" ? "hi-IN" : "en-IN",
+                    )}
+                  </span>
+                ) : null}
+              </Stat>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <a
+                href="#layout"
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+              >
+                {t(lang, "exploreLayout")}
+              </a>
+              <a
+                href="#site-visit"
+                className="rounded-md border border-input px-4 py-2 text-sm font-medium"
+              >
+                {t(lang, "bookSiteVisit")}
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Interactive Master Plan */}
+        <section id="layout" className="border-b border-border">
+          {plots.length === 0 ? (
+            <p className="p-6 text-sm text-muted-foreground">
+              {t(lang, "notProvided")}
+            </p>
+          ) : (
+            <PlotMap data={toMapLayoutData(result.data)} />
+          )}
+        </section>
+
+        {/* Available Plots */}
+        <section className="border-b border-border px-4 py-8 sm:px-8">
+          <div className="mx-auto flex max-w-5xl flex-col gap-4">
+            <h2 className="text-lg font-semibold">
+              {t(lang, "availablePlots")}
+            </h2>
+            {available.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                {t(lang, "notProvided")}
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                {available.map((p) => (
+                  <div key={p.id} className="rounded-md border p-3 text-sm">
+                    <p className="font-medium">{p.plot_number}</p>
+                    <p className="tabular text-xs text-muted-foreground">
+                      {p.area_official_value
+                        ? `${p.area_official_value} ${p.area_official_unit}`
+                        : t(lang, "notProvided")}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{p.facing}</p>
+                    <p className="tabular text-xs font-medium">
+                      {p.price_total
+                        ? formatIndianCurrency(p.price_total)
+                        : t(lang, "contactSales")}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Location */}
+        <section
+          id="location"
+          className="border-b border-border px-4 py-8 sm:px-8"
+        >
+          <div className="mx-auto flex max-w-5xl flex-col gap-4">
+            <h2 className="text-lg font-semibold">{t(lang, "location")}</h2>
+            {project.lat && project.lng ? (
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${project.lat},${project.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm underline underline-offset-4"
+              >
+                View on Google Maps
+              </a>
+            ) : null}
+            {landmarks.length > 0 ? (
+              <ul className="flex flex-col gap-1 text-sm">
+                {landmarks.map((l) => (
+                  <li key={l.id} className="flex justify-between gap-3">
+                    <span>{l.name}</span>
+                    <span className="tabular text-xs text-muted-foreground">
+                      {l.distance_value
+                        ? `${l.distance_value} ${l.distance_unit}`
+                        : t(lang, "notProvided")}
+                      {l.distance_source === "calculated"
+                        ? " (approx., calculated)"
+                        : ""}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {t(lang, "notProvided")}
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* Trust & Documents */}
+        <section
+          id="trust"
+          className="border-b border-border px-4 py-8 sm:px-8"
+        >
+          <div className="mx-auto flex max-w-5xl flex-col gap-3">
+            <h2 className="text-lg font-semibold">
+              {t(lang, "trustDocuments")}
+            </h2>
+            <dl className="flex flex-col gap-1 text-sm">
+              <div className="flex justify-between gap-3">
+                <dt className="text-muted-foreground">
+                  {t(lang, "reraNumber")}
+                </dt>
+                <dd>
+                  {project.rera_number ?? t(lang, "notProvided")}
+                  {project.rera_authority ? ` (${project.rera_authority})` : ""}
+                  {project.rera_url ? (
+                    <>
+                      {" "}
+                      ·{" "}
+                      <a
+                        href={project.rera_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        Official link
+                      </a>
+                    </>
+                  ) : null}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-3">
+                <dt className="text-muted-foreground">
+                  {t(lang, "possession")}
+                </dt>
+                <dd>{project.possession_info ?? t(lang, "notProvided")}</dd>
+              </div>
+            </dl>
+            {documents.length > 0 ? (
+              <ul className="flex flex-col gap-1 text-sm">
+                {documents.map((d) => (
+                  <li key={d.id}>
+                    <a
+                      href={d.url ?? "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      {d.title}
+                    </a>
+                    {d.verified_at ? (
+                      <span className="text-xs text-muted-foreground">
+                        {" "}
+                        · {t(lang, "verifiedOn")}{" "}
+                        {new Date(d.verified_at).toLocaleDateString("en-IN")}
+                      </span>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        </section>
+
+        {/* Cost & EMI calculator */}
+        <section id="cost" className="border-b border-border px-4 py-8 sm:px-8">
+          <div className="mx-auto flex max-w-5xl flex-col gap-4">
+            <h2 className="text-lg font-semibold">
+              {t(lang, "costEmiCalculator")}
+            </h2>
+            {examplePlot ? (
+              <>
+                <p className="text-xs text-muted-foreground">
+                  Example based on plot {examplePlot.plot_number}.
+                </p>
+                <EmiCalculator
+                  priceTotal={examplePlot.price_total}
+                  lang={lang}
+                />
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {t(lang, "contactSalesTeam")}.
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        {langFaqs.length > 0 ? (
+          <section
+            id="faq"
+            className="border-b border-border px-4 py-8 sm:px-8"
+          >
+            <div className="mx-auto flex max-w-5xl flex-col gap-3">
+              <h2 className="text-lg font-semibold">{t(lang, "faq")}</h2>
+              <dl className="flex flex-col gap-3 text-sm">
+                {langFaqs.map((f) => (
+                  <div key={f.id}>
+                    <dt className="font-medium">{f.q}</dt>
+                    <dd className="text-muted-foreground">{f.a}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </section>
+        ) : null}
+
+        {/* Contact / Site visit */}
+        <section
+          id="site-visit"
+          className="border-b border-border px-4 py-8 sm:px-8"
+        >
+          <div
+            id="contact"
+            className="mx-auto flex max-w-5xl flex-col gap-6 sm:flex-row"
+          >
+            <div className="flex-1">
+              <h2 className="mb-2 text-lg font-semibold">
+                {t(lang, "contact")}
+              </h2>
+              <p className="text-sm">{org.name}</p>
+              {org.contact.phone ? (
+                <p className="text-sm">{org.contact.phone}</p>
+              ) : null}
+              {org.contact.email ? (
+                <p className="text-sm">{org.contact.email}</p>
+              ) : null}
+            </div>
+            <div className="flex-1">
+              <h2 className="mb-2 text-lg font-semibold">
+                {t(lang, "bookSiteVisit")}
+              </h2>
+              <LeadForm
+                slug={projectSlug}
+                lang={lang}
+                source="site_visit"
+                withVisitFields
+                ref={shareRef}
+              />
+            </div>
+          </div>
+        </section>
+
+        <footer className="px-4 py-6 text-center text-xs">
+          <p>
+            © {new Date().getFullYear()} {org.name}
+          </p>
+          {org.powered_by_visible ? (
+            <p className="mt-1 text-muted-foreground">Powered by {org.name}</p>
+          ) : null}
+        </footer>
+      </main>
+
+      <StickyActionBar
+        phone={org.contact.phone}
+        whatsapp={org.contact.whatsapp}
+        lang={lang}
+      />
+    </>
+  );
+}
+
+function Stat({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="tabular font-medium">{children}</p>
+    </div>
+  );
+}

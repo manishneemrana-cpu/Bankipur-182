@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { clientEnv } from "@/lib/env/client";
 
-const PUBLIC_PATHS = ["/login", "/signup", "/auth/callback"];
+const PUBLIC_PATHS = ["/login", "/signup", "/auth/callback", "/p"];
 
 /**
  * Refreshes the Supabase session on every request and gates admin routes.

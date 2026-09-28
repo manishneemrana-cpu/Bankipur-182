@@ -1,0 +1,99 @@
+export type Lang = "en" | "hi";
+
+/**
+ * UI strings for the buyer site (§9.4). Content fields (FAQs, project
+ * description) carry their own `lang` per row instead — this dictionary is
+ * for chrome only: labels, buttons, section headings.
+ */
+export const DICT = {
+  en: {
+    exploreLayout: "Explore Layout",
+    findMyPlot: "Find My Plot",
+    chat: "Chat",
+    bookSiteVisit: "Book Site Visit",
+    totalArea: "Total area",
+    totalPlots: "Total plots",
+    availableNow: "Available now",
+    updated: "Updated",
+    availablePlots: "Available Plots",
+    location: "Location",
+    amenities: "Amenities & Specifications",
+    trustDocuments: "Trust & Documents",
+    costEmiCalculator: "Cost & EMI Calculator",
+    faq: "FAQ",
+    contact: "Contact",
+    call: "Call",
+    whatsapp: "WhatsApp",
+    notProvided: "Not provided",
+    contactSales: "Contact sales",
+    contactSalesTeam: "Contact the sales team",
+    indicativeEstimate:
+      "Indicative estimate — confirm with the sales team and your bank.",
+    liveAvailabilityUnavailable:
+      "Live availability temporarily unavailable — please contact sales.",
+    name: "Name",
+    phone: "Phone",
+    email: "Email (optional)",
+    message: "Message (optional)",
+    preferredDate: "Preferred date",
+    consent: "I agree to be contacted about this project.",
+    submit: "Submit",
+    thankYou: "Thank you — the sales team will contact you shortly.",
+    demoDataRibbon: "DEMO DATA",
+    verifiedOn: "Verified on",
+    reraNumber: "RERA number",
+    possession: "Possession",
+    plotPrice: "Plot price",
+    loanTenureYears: "Loan tenure (years)",
+    interestRatePercent: "Interest rate (% p.a.)",
+    monthlyEmi: "Monthly EMI",
+    totalPayment: "Total payment",
+  },
+  hi: {
+    exploreLayout: "लेआउट देखें",
+    findMyPlot: "अपना प्लॉट खोजें",
+    chat: "चैट",
+    bookSiteVisit: "साइट विज़िट बुक करें",
+    totalArea: "कुल क्षेत्रफल",
+    totalPlots: "कुल प्लॉट",
+    availableNow: "अभी उपलब्ध",
+    updated: "अपडेट किया गया",
+    availablePlots: "उपलब्ध प्लॉट",
+    location: "स्थान",
+    amenities: "सुविधाएं और विवरण",
+    trustDocuments: "भरोसा और दस्तावेज़",
+    costEmiCalculator: "लागत और EMI कैलकुलेटर",
+    faq: "सामान्य प्रश्न",
+    contact: "संपर्क करें",
+    call: "कॉल करें",
+    whatsapp: "व्हाट्सएप",
+    notProvided: "उपलब्ध नहीं",
+    contactSales: "बिक्री टीम से संपर्क करें",
+    contactSalesTeam: "बिक्री टीम से संपर्क करें",
+    indicativeEstimate:
+      "अनुमानित राशि — कृपया बिक्री टीम और अपने बैंक से पुष्टि करें।",
+    liveAvailabilityUnavailable:
+      "उपलब्धता अस्थायी रूप से अनुपलब्ध — कृपया बिक्री टीम से संपर्क करें।",
+    name: "नाम",
+    phone: "फ़ोन",
+    email: "ईमेल (वैकल्पिक)",
+    message: "संदेश (वैकल्पिक)",
+    preferredDate: "पसंदीदा तारीख",
+    consent: "मैं इस प्रोजेक्ट के बारे में संपर्क किए जाने के लिए सहमत हूं।",
+    submit: "जमा करें",
+    thankYou: "धन्यवाद — बिक्री टीम जल्द ही आपसे संपर्क करेगी।",
+    demoDataRibbon: "डेमो डेटा",
+    verifiedOn: "सत्यापित तिथि",
+    reraNumber: "RERA नंबर",
+    possession: "कब्ज़ा",
+    plotPrice: "प्लॉट की कीमत",
+    loanTenureYears: "लोन अवधि (वर्ष)",
+    interestRatePercent: "ब्याज दर (% प्रति वर्ष)",
+    monthlyEmi: "मासिक EMI",
+    totalPayment: "कुल भुगतान",
+  },
+} as const satisfies Record<Lang, Record<string, string>>;
+
+export function t(lang: Lang, key: keyof (typeof DICT)["en"]): string {
+  return DICT[lang][key] ?? DICT.en[key];
+}

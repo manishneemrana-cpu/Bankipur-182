@@ -39,6 +39,19 @@ export default async function ProjectDetailPage(
         </div>
         <div className="flex gap-2 text-sm">
           <Link
+            href={`/p/${project.slug}`}
+            target="_blank"
+            className="rounded-md border border-input px-3 py-1.5 hover:bg-accent"
+          >
+            View public site
+          </Link>
+          <Link
+            href={`/dashboard/projects/${projectId}/settings`}
+            className="rounded-md border border-input px-3 py-1.5 hover:bg-accent"
+          >
+            Settings
+          </Link>
+          <Link
             href={`/dashboard/projects/${projectId}/map`}
             className="rounded-md border border-input px-3 py-1.5 hover:bg-accent"
           >
