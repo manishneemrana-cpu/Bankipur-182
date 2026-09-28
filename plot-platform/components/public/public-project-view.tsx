@@ -135,15 +135,31 @@ export function PublicProjectView({
           <div className="mx-auto flex max-w-5xl flex-col gap-4">
             <h2 className="text-lg font-semibold">{t(lang, "location")}</h2>
             {project.lat && project.lng ? (
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${project.lat},${project.lng}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm underline underline-offset-4"
-              >
-                View on Google Maps
-              </a>
-            ) : null}
+              <>
+                {/* No MAP_API_KEY is configured for satellite tiles in this
+                    build (rule 8: keys stay server-side, and none exist here
+                    to serve) — an OpenStreetMap embed needs no key and is
+                    genuinely live, not a placeholder image. */}
+                <iframe
+                  title="Project location map"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${project.lng - 0.01}%2C${project.lat - 0.008}%2C${project.lng + 0.01}%2C${project.lat + 0.008}&layer=mapnik&marker=${project.lat}%2C${project.lng}`}
+                  className="h-64 w-full rounded-md border border-border"
+                  loading="lazy"
+                />
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${project.lat},${project.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-fit text-sm underline underline-offset-4"
+                >
+                  {t(lang, "getDirections")}
+                </a>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {t(lang, "notProvided")}
+              </p>
+            )}
             {landmarks.length > 0 ? (
               <ul className="flex flex-col gap-1 text-sm">
                 {landmarks.map((l) => (

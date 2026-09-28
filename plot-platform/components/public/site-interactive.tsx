@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 
 import { ChatWidget } from "@/components/chat/chat-widget";
+import { PlotDetailPanel } from "@/components/map2d/plot-detail-panel";
 import { PlotMap } from "@/components/map2d/plot-map";
+import { PlotMap3DLazy } from "@/components/map3d/plot-map-3d-lazy";
 import { toMapLayoutData } from "@/lib/data/public-map-adapter";
 import { formatIndianCurrency } from "@/lib/format";
 import type { Lang } from "@/lib/i18n/dictionary";
@@ -44,6 +46,7 @@ export function SiteInteractive({
     string[] | null
   >(null);
   const [chatZoomPlotId, setChatZoomPlotId] = useState<string | null>(null);
+  const [view, setView] = useState<"2d" | "3d">("2d");
 
   const available = useMemo(
     () => data.plots.filter((p) => p.status === "AVAILABLE"),
@@ -105,18 +108,62 @@ export function SiteInteractive({
             {t(lang, "notProvided")}
           </p>
         ) : (
-          <PlotMap
-            data={toMapLayoutData(data)}
-            highlightIds={matchedIds}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            zoomToPlotId={chatZoomPlotId ?? deepLinkPlotId}
-            shareContext={{
-              projectSlug: data.project.slug,
-              projectName: data.project.name,
-              whatsappPhone: data.org.contact.whatsapp,
-            }}
-          />
+          <>
+            <div className="flex justify-end gap-1 border-b border-border p-2">
+              <button
+                type="button"
+                onClick={() => setView("2d")}
+                className={`rounded-md border px-2.5 py-1 text-xs ${view === "2d" ? "bg-primary text-primary-foreground" : ""}`}
+              >
+                2D
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("3d")}
+                className={`rounded-md border px-2.5 py-1 text-xs ${view === "3d" ? "bg-primary text-primary-foreground" : ""}`}
+              >
+                3D
+              </button>
+            </div>
+            {view === "2d" ? (
+              <PlotMap
+                data={toMapLayoutData(data)}
+                highlightIds={matchedIds}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                zoomToPlotId={chatZoomPlotId ?? deepLinkPlotId}
+                shareContext={{
+                  projectSlug: data.project.slug,
+                  projectName: data.project.name,
+                  whatsappPhone: data.org.contact.whatsapp,
+                }}
+              />
+            ) : (
+              <div className="flex flex-col sm:flex-row">
+                <div className="min-w-0 flex-1">
+                  <PlotMap3DLazy
+                    data={toMapLayoutData(data)}
+                    selectedId={selectedId}
+                    onSelect={setSelectedId}
+                  />
+                </div>
+                <PlotDetailPanel
+                  plot={
+                    toMapLayoutData(data).plots.find(
+                      (p) => p.id === selectedId,
+                    ) ?? null
+                  }
+                  unit={data.layout.unit}
+                  onClose={() => setSelectedId(null)}
+                  shareContext={{
+                    projectSlug: data.project.slug,
+                    projectName: data.project.name,
+                    whatsappPhone: data.org.contact.whatsapp,
+                  }}
+                />
+              </div>
+            )}
+          </>
         )}
       </section>
 
