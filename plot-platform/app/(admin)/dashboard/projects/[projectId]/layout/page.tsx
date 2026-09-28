@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getProject } from "@/lib/data/projects";
 import { listLayoutVersions } from "@/lib/data/layout";
 
+import { ImportVectorForm } from "./import-vector-form";
 import { UploadForm } from "./upload-form";
 
 export default async function LayoutPage(
@@ -28,6 +29,7 @@ export default async function LayoutPage(
       </div>
 
       <UploadForm projectId={projectId} />
+      <ImportVectorForm projectId={projectId} />
 
       <div className="flex flex-col gap-2">
         <h2 className="text-sm font-semibold text-muted-foreground">

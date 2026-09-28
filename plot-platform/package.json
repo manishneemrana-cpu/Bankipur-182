@@ -17,7 +17,8 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "ci": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run test:db",
-    "test:db": "bash scripts/run-db-tests.sh"
+    "test:db": "bash scripts/run-db-tests.sh",
+    "test:eval": "vitest run --config vitest.eval.config.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",
@@ -30,6 +31,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "exceljs": "^4.4.0",
+    "fast-xml-parser": "^5.11.1",
     "lucide-react": "^1.48.0",
     "next": "^16.3.5",
     "papaparse": "^5.7.0",

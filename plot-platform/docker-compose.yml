@@ -1,0 +1,30 @@
+# VPS self-hosting (Phase 10, docs/RUNBOOK.md). This runs the Next.js app
+# only — it still talks to a Supabase project (hosted or self-hosted
+# separately) for Postgres/Auth/Storage, the same as the Vercel deployment.
+# Self-hosting the full Supabase stack (Postgres + GoTrue + Storage +
+# Realtime) is a separate, much larger undertaking that isn't in scope
+# here; see https://supabase.com/docs/guides/self-hosting for that if
+# you need it — this compose file assumes you already have a Supabase
+# project (hosted, or self-hosted elsewhere) and just points the app at it.
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      DATABASE_URL: ${DATABASE_URL}
+      AI_PROVIDER: ${AI_PROVIDER}
+      AI_API_KEY: ${AI_API_KEY}
+      AI_MODEL: ${AI_MODEL}
+      MAP_TILE_PROVIDER: ${MAP_TILE_PROVIDER}
+      MAP_API_KEY: ${MAP_API_KEY}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-project-files}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+      WHATSAPP_API_ADAPTER: ${WHATSAPP_API_ADAPTER:-none}
+      WEBHOOK_SIGNING_SECRET: ${WEBHOOK_SIGNING_SECRET}
+    restart: unless-stopped

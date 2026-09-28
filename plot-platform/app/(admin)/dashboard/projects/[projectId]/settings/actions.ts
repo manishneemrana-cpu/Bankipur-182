@@ -43,6 +43,39 @@ export async function updateLinkSecurity(
   return { success: true };
 }
 
+export async function updateLocation(
+  projectId: string,
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const address = String(formData.get("address") ?? "").trim();
+  const city = String(formData.get("city") ?? "").trim();
+  const state = String(formData.get("state") ?? "").trim();
+  const latRaw = String(formData.get("lat") ?? "").trim();
+  const lngRaw = String(formData.get("lng") ?? "").trim();
+  const lat = latRaw ? Number(latRaw) : null;
+  const lng = lngRaw ? Number(lngRaw) : null;
+  if ((latRaw && Number.isNaN(lat)) || (lngRaw && Number.isNaN(lng))) {
+    return { error: "Latitude/longitude must be numbers." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("projects")
+    .update({
+      address: address || null,
+      city: city || null,
+      state: state || null,
+      lat,
+      lng,
+    })
+    .eq("id", projectId);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/dashboard/projects/${projectId}/settings`);
+  return { success: true };
+}
+
 export async function publishProject(projectId: string): Promise<ActionState> {
   const supabase = await createClient();
   const { error } = await supabase
