@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { ChatWidget } from "@/components/chat/chat-widget";
 import { PlotMap } from "@/components/map2d/plot-map";
 import { toMapLayoutData } from "@/lib/data/public-map-adapter";
 import { formatIndianCurrency } from "@/lib/format";
@@ -25,10 +26,12 @@ const MAX_COMPARE = 4;
 export function SiteInteractive({
   data,
   lang,
+  projectSlug,
   deepLinkPlotId,
 }: {
   data: PublicSiteData;
   lang: Lang;
+  projectSlug: string;
   /** Set when arriving via a /plot/[plotNo] deep link (§13, test 7). */
   deepLinkPlotId?: string | null;
 }) {
@@ -37,13 +40,17 @@ export function SiteInteractive({
   const [selectedId, setSelectedId] = useState<string | null>(
     deepLinkPlotId ?? null,
   );
+  const [chatHighlightNumbers, setChatHighlightNumbers] = useState<
+    string[] | null
+  >(null);
+  const [chatZoomPlotId, setChatZoomPlotId] = useState<string | null>(null);
 
   const available = useMemo(
     () => data.plots.filter((p) => p.status === "AVAILABLE"),
     [data.plots],
   );
 
-  const matchedIds = useMemo(() => {
+  const searchMatchedIds = useMemo(() => {
     if (!filters) return null;
     return new Set(
       data.plots
@@ -51,6 +58,26 @@ export function SiteInteractive({
         .map((p) => p.id),
     );
   }, [filters, data.plots, data.project.state]);
+
+  // Chat-driven highlights (highlight_plots tool, §12.1) take over the map
+  // highlight while active; search filters resume once chat is cleared.
+  const matchedIds = useMemo(() => {
+    if (chatHighlightNumbers) {
+      return new Set(
+        data.plots
+          .filter((p) => chatHighlightNumbers.includes(p.plot_number))
+          .map((p) => p.id),
+      );
+    }
+    return searchMatchedIds;
+  }, [chatHighlightNumbers, searchMatchedIds, data.plots]);
+
+  function handleChatOpenPlot(plotNumber: string) {
+    const plot = data.plots.find((p) => p.plot_number === plotNumber);
+    if (!plot) return;
+    setSelectedId(plot.id);
+    setChatZoomPlotId(plot.id);
+  }
 
   const comparePlots = compareIds.flatMap(
     (id) => data.plots.find((p) => p.id === id) ?? [],
@@ -83,7 +110,7 @@ export function SiteInteractive({
             highlightIds={matchedIds}
             selectedId={selectedId}
             onSelect={setSelectedId}
-            zoomToPlotId={deepLinkPlotId}
+            zoomToPlotId={chatZoomPlotId ?? deepLinkPlotId}
             shareContext={{
               projectSlug: data.project.slug,
               projectName: data.project.name,
@@ -169,6 +196,13 @@ export function SiteInteractive({
           </div>
         </section>
       ) : null}
+
+      <ChatWidget
+        projectSlug={projectSlug}
+        lang={lang}
+        onHighlight={(numbers) => setChatHighlightNumbers(numbers)}
+        onOpenPlot={handleChatOpenPlot}
+      />
     </>
   );
 }

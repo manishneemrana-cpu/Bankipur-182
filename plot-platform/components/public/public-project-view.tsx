@@ -123,6 +123,7 @@ export function PublicProjectView({
         <SiteInteractive
           data={data}
           lang={lang}
+          projectSlug={projectSlug}
           deepLinkPlotId={deepLinkPlotId}
         />
 
