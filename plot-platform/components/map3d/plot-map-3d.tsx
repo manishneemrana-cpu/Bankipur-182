@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { ContactShadows, OrbitControls, Text } from "@react-three/drei";
+import { ContactShadows, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 
 import type { MapLayoutData, MapPlot } from "@/lib/data/map";
@@ -159,6 +159,33 @@ function Ground({ span }: { span: number }) {
   );
 }
 
+/**
+ * Draws a label onto a local <canvas> and uses it as a sprite texture —
+ * deliberately not drei's <Text> (troika-three-text), which loads its font
+ * over the network with no Suspense/error boundary around it here: on a
+ * slow or blocked connection that fetch failure crashes the whole R3F tree,
+ * leaving only the background visible (§22 — no unverifiable external
+ * fetch, same reasoning as skipping drei's <Environment>).
+ */
+function useLabelTexture(label: string): THREE.CanvasTexture {
+  return useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 128;
+    canvas.height = 128;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.fillStyle = "#111827";
+      ctx.font = "bold 96px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, 64, 68);
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  }, [label]);
+}
+
 function Compass3D({
   northAngleDeg,
   span,
@@ -167,6 +194,7 @@ function Compass3D({
   span: number;
 }) {
   const r = span * 0.02;
+  const labelTexture = useLabelTexture("N");
   return (
     <group position={[0, span * 0.01, 0]}>
       <group rotation={[0, (northAngleDeg * Math.PI) / 180, 0]}>
@@ -178,15 +206,12 @@ function Compass3D({
           <coneGeometry args={[r * 0.35, r * 0.9, 4]} />
           <meshStandardMaterial color="#dc2626" />
         </mesh>
-        <Text
+        <sprite
           position={[0, span * 0.003, -r * 1.3]}
-          fontSize={r * 0.7}
-          color="#111827"
-          anchorX="center"
-          anchorY="middle"
+          scale={[r * 0.9, r * 0.9, 1]}
         >
-          N
-        </Text>
+          <spriteMaterial map={labelTexture} transparent depthTest={false} />
+        </sprite>
       </group>
     </group>
   );
@@ -234,7 +259,16 @@ function Scene({
         shadow-camera-bottom={-span}
         shadow-camera-far={span * 4}
       />
-      <group position={[-center[0], 0, -center[1]]}>
+      {/*
+        Each child mesh below is laid flat with rotation={[-Math.PI/2,0,0]},
+        which maps its local (x, y) plane onto world (x, z) as (x, -y) — so
+        centering the layout at world origin needs +center[1] here, not
+        -center[1]; the sign flip cancels the rotation's y→-z flip. Getting
+        this wrong silently pushes the whole layout ~2*center[1] units away
+        from where the camera/OrbitControls target look, so nothing but the
+        (unpositioned) ground plane ever appears in frame.
+      */}
+      <group position={[-center[0], 0, center[1]]}>
         <Ground span={span} />
         {data.zones.map((z) => (
           <FlatPolygon
