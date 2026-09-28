@@ -13,7 +13,9 @@ type-check or lint each other).
 ## Commands (run from `plot-platform/`)
 
 - `npm run dev` — dev server (works with no env vars set)
-- `npm run ci` — typecheck + lint + format check + unit tests (same as CI)
+- `npm run ci` — typecheck + lint + format check + unit tests + DB/RLS tests (same as CI)
+- `npm run test:db` — just the DB/RLS suite (`tests/db/`), against a throwaway local Postgres
+  spun up by `scripts/db-local.sh` (no Docker needed for this one)
 - `npm run test:e2e` — Playwright smoke tests (desktop + Pixel 7)
 - `npm run db:start` / `db:reset` — local Supabase (needs Docker)
 

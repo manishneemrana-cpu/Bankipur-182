@@ -26,9 +26,42 @@ jobs:
       - run: npm run format:check
       - run: npm test
 
+  db:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: plot-platform/package-lock.json
+      - run: npm ci
+      - run: node scripts/db-apply.mjs
+      - run: npx vitest run -c vitest.db.config.mts
+
   e2e:
     runs-on: ubuntu-latest
     needs: checks
+    # Public (RLS-protected) config for the seeded demo Supabase project — see
+    # supabase/README or .env.example; never put server-only keys here.
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://qpieifeawuedgzybfnch.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_9_7zL8HhSz5kyWMPPDs33A_ddbOlnCG
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
