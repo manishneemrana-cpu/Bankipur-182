@@ -44,52 +44,57 @@ export function PublicProjectView({
 
       <main className="pb-16 sm:pb-0">
         {/* Hero */}
-        <section className="border-b border-border px-4 py-8 sm:px-8">
-          <div className="mx-auto flex max-w-5xl flex-col gap-4">
+        <section
+          className="relative overflow-hidden border-b border-border px-4 py-10 sm:px-8 sm:py-14"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, color-mix(in oklch, var(--color-primary) 6%, var(--color-background)), var(--color-background))",
+          }}
+        >
+          <div className="mx-auto flex max-w-5xl flex-col gap-5">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                <h1 className="font-display text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
                   {project.name}
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="mt-1.5 text-sm text-muted-foreground">
                   {[project.address, project.city, project.state]
                     .filter(Boolean)
                     .join(", ") || t(lang, "notProvided")}
                 </p>
               </div>
-              <div className="flex gap-1 text-xs">
+              <div className="flex shrink-0 gap-0.5 rounded-full border border-black/5 bg-background/70 p-0.5 text-xs shadow-sm backdrop-blur-sm">
                 <Link
                   href={`/p/${projectSlug}?lang=en`}
-                  className={
+                  className={`rounded-full px-2.5 py-1 transition ${
                     lang === "en"
-                      ? "font-semibold underline"
-                      : "text-muted-foreground"
-                  }
+                      ? "bg-primary font-semibold text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   EN
                 </Link>
-                <span className="text-muted-foreground">·</span>
                 <Link
                   href={`/p/${projectSlug}?lang=hi`}
-                  className={
+                  className={`rounded-full px-2.5 py-1 transition ${
                     lang === "hi"
-                      ? "font-semibold underline"
-                      : "text-muted-foreground"
-                  }
+                      ? "bg-primary font-semibold text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   हिं
                 </Link>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-4 text-sm">
+            <div className="flex flex-wrap gap-2.5 text-sm">
               <Stat label={t(lang, "totalArea")}>
                 {project.total_area_value
                   ? `${project.total_area_value} ${project.total_area_unit}`
                   : t(lang, "notProvided")}
               </Stat>
               <Stat label={t(lang, "totalPlots")}>{plots.length}</Stat>
-              <Stat label={t(lang, "availableNow")}>
+              <Stat label={t(lang, "availableNow")} emphasize>
                 {available.length}
                 {lastUpdate ? (
                   <span className="ml-1 font-normal text-muted-foreground">
@@ -102,16 +107,16 @@ export function PublicProjectView({
               </Stat>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5">
               <a
                 href="#layout"
-                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-md shadow-primary/20 transition hover:shadow-lg hover:brightness-110"
               >
                 {t(lang, "exploreLayout")}
               </a>
               <a
                 href="#site-visit"
-                className="rounded-md border border-input px-4 py-2 text-sm font-medium"
+                className="rounded-full border border-input bg-background/80 px-5 py-2.5 text-sm font-medium backdrop-blur-sm transition hover:bg-muted"
               >
                 {t(lang, "bookSiteVisit")}
               </a>
@@ -133,7 +138,9 @@ export function PublicProjectView({
           className="border-b border-border px-4 py-8 sm:px-8"
         >
           <div className="mx-auto flex max-w-5xl flex-col gap-4">
-            <h2 className="text-lg font-semibold">{t(lang, "location")}</h2>
+            <h2 className="font-display text-lg font-bold tracking-tight">
+              {t(lang, "location")}
+            </h2>
             {project.lat && project.lng ? (
               <>
                 {/* No MAP_API_KEY is configured for satellite tiles in this
@@ -190,7 +197,7 @@ export function PublicProjectView({
           className="border-b border-border px-4 py-8 sm:px-8"
         >
           <div className="mx-auto flex max-w-5xl flex-col gap-3">
-            <h2 className="text-lg font-semibold">
+            <h2 className="font-display text-lg font-bold tracking-tight">
               {t(lang, "trustDocuments")}
             </h2>
             <dl className="flex flex-col gap-1 text-sm">
@@ -253,7 +260,7 @@ export function PublicProjectView({
         {/* Cost & EMI calculator */}
         <section id="cost" className="border-b border-border px-4 py-8 sm:px-8">
           <div className="mx-auto flex max-w-5xl flex-col gap-4">
-            <h2 className="text-lg font-semibold">
+            <h2 className="font-display text-lg font-bold tracking-tight">
               {t(lang, "costEmiCalculator")}
             </h2>
             {examplePlot ? (
@@ -281,7 +288,9 @@ export function PublicProjectView({
             className="border-b border-border px-4 py-8 sm:px-8"
           >
             <div className="mx-auto flex max-w-5xl flex-col gap-3">
-              <h2 className="text-lg font-semibold">{t(lang, "faq")}</h2>
+              <h2 className="font-display text-lg font-bold tracking-tight">
+                {t(lang, "faq")}
+              </h2>
               <dl className="flex flex-col gap-3 text-sm">
                 {langFaqs.map((f) => (
                   <div key={f.id}>
@@ -304,7 +313,7 @@ export function PublicProjectView({
             className="mx-auto flex max-w-5xl flex-col gap-6 sm:flex-row"
           >
             <div className="flex-1">
-              <h2 className="mb-2 text-lg font-semibold">
+              <h2 className="mb-2 font-display text-lg font-bold tracking-tight">
                 {t(lang, "contact")}
               </h2>
               <p className="text-sm">{org.name}</p>
@@ -316,7 +325,7 @@ export function PublicProjectView({
               ) : null}
             </div>
             <div className="flex-1">
-              <h2 className="mb-2 text-lg font-semibold">
+              <h2 className="mb-2 font-display text-lg font-bold tracking-tight">
                 {t(lang, "bookSiteVisit")}
               </h2>
               <LeadForm
@@ -353,14 +362,22 @@ export function PublicProjectView({
 function Stat({
   label,
   children,
+  emphasize,
 }: {
   label: string;
   children: React.ReactNode;
+  emphasize?: boolean;
 }) {
   return (
-    <div>
+    <div
+      className={`rounded-xl border px-3.5 py-2 ${
+        emphasize
+          ? "border-success/25 bg-success/10"
+          : "border-black/5 bg-background/70 backdrop-blur-sm"
+      }`}
+    >
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="tabular font-medium">{children}</p>
+      <p className="tabular font-display font-bold">{children}</p>
     </div>
   );
 }

@@ -98,6 +98,23 @@ export function rect(x: number, y: number, w: number, h: number): Polygon {
   };
 }
 
+/**
+ * Shrinks a ring toward its (simple vertex-average) centroid by `factor`
+ * (0–1) — a purely visual effect used to render a small gap between
+ * adjacent plots (§22 premium look) instead of edges touching directly.
+ * Never used for area, dimensions or any other real calculation.
+ */
+export function shrinkRingTowardCentroid(ring: Ring, factor: number): Ring {
+  const open = openRing(ring);
+  if (open.length === 0) return ring;
+  const cx = open.reduce((s, p) => s + p[0], 0) / open.length;
+  const cy = open.reduce((s, p) => s + p[1], 0) / open.length;
+  return open.map(([x, y]): Point => [
+    cx + (x - cx) * factor,
+    cy + (y - cy) * factor,
+  ]);
+}
+
 export function isPolygon(value: unknown): value is Polygon {
   if (!value || typeof value !== "object") return false;
   const v = value as { type?: unknown; coordinates?: unknown };

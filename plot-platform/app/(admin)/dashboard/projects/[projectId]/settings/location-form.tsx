@@ -84,7 +84,7 @@ export function LocationForm({
         <p className="text-sm text-destructive">{formState.error}</p>
       ) : null}
       {formState.success ? (
-        <p className="text-success-foreground text-sm">Saved.</p>
+        <p className="text-sm text-success-foreground">Saved.</p>
       ) : null}
       <button
         type="submit"

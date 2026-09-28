@@ -29,7 +29,7 @@ export default async function ProjectsPage() {
                   {p.name}
                 </Link>
                 {p.is_demo ? (
-                  <span className="text-warning-foreground ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs dark:bg-amber-900">
+                  <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-warning-foreground dark:bg-amber-900">
                     DEMO DATA
                   </span>
                 ) : null}

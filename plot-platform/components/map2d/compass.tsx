@@ -6,7 +6,7 @@
 export function Compass({ northAngleDeg }: { northAngleDeg: number }) {
   return (
     <div
-      className="absolute top-2 left-2 z-10 flex size-11 items-center justify-center rounded-full border border-input bg-background/90 shadow-sm"
+      className="absolute top-2 left-2 z-10 flex size-12 items-center justify-center rounded-full border border-black/5 bg-background/85 shadow-md ring-1 ring-black/5 backdrop-blur-sm"
       role="img"
       aria-label={`North is ${northAngleDeg}° clockwise from up on this map`}
     >

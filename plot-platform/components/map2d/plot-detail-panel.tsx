@@ -41,13 +41,15 @@ export function PlotDetailPanel({
   const style = statusStyle(plot.status);
 
   return (
-    <aside className="fixed inset-x-0 bottom-0 z-20 max-h-[45vh] overflow-y-auto rounded-t-xl border-t border-border bg-background p-4 shadow-[0_-4px_16px_rgba(0,0,0,0.1)] sm:static sm:z-auto sm:max-h-none sm:w-72 sm:shrink-0 sm:rounded-none sm:border-t-0 sm:border-l sm:shadow-none">
+    <aside className="fixed inset-x-0 bottom-0 z-20 max-h-[45vh] overflow-y-auto rounded-t-2xl border-t border-border bg-background p-5 shadow-[0_-8px_24px_rgba(15,23,42,0.12)] sm:static sm:z-auto sm:max-h-none sm:w-72 sm:shrink-0 sm:rounded-none sm:border-t-0 sm:border-l sm:shadow-none">
       <div className="mb-3 flex items-start justify-between">
-        <h2 className="text-lg font-semibold">Plot {plot.plot_number}</h2>
+        <h2 className="font-display text-lg font-bold tracking-tight">
+          Plot {plot.plot_number}
+        </h2>
         <button
           type="button"
           onClick={onClose}
-          className="text-sm text-muted-foreground"
+          className="rounded-full px-2 py-0.5 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
         >
           Close
         </button>
@@ -55,10 +57,16 @@ export function PlotDetailPanel({
 
       <dl className="flex flex-col gap-2 text-sm">
         <Row label="Status">
-          <span className="inline-flex items-center gap-1.5">
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
+            style={{
+              backgroundColor: `color-mix(in oklch, ${style.fill} 16%, white)`,
+              color: style.stroke,
+            }}
+          >
             <span
-              className="inline-block size-2.5 rounded-sm border"
-              style={{ backgroundColor: style.fill, borderColor: style.stroke }}
+              className="inline-block size-2 shrink-0 rounded-full"
+              style={{ backgroundColor: style.fill }}
             />
             {style.label}
           </span>

@@ -36,7 +36,7 @@ export function LeadForm({
 
   if (state.success) {
     return (
-      <p className="text-success-foreground text-sm font-medium">
+      <p className="text-sm font-medium text-success-foreground">
         {t(lang, "thankYou")}
       </p>
     );

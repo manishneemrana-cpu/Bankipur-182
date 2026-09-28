@@ -11,6 +11,7 @@ import {
   polygonArea,
   polygonCentroid,
   rect,
+  shrinkRingTowardCentroid,
 } from "@/lib/geometry/polygon";
 import type { Polygon } from "@/lib/geometry/types";
 
@@ -49,6 +50,29 @@ describe("polygon geometry", () => {
     expect(isPolygon({ type: "Polygon", coordinates: [] })).toBe(false);
     expect(isPolygon({ type: "Point" })).toBe(false);
     expect(isPolygon(null)).toBe(false);
+  });
+
+  it("shrinks a ring toward its centroid without moving the centroid", () => {
+    const square = rect(0, 0, 10, 10).coordinates[0]!;
+    const shrunk = shrinkRingTowardCentroid(square, 0.5);
+    // Centroid of the 10x10 square (vertex average) is [5, 5].
+    const cx = shrunk.reduce((s, p) => s + p[0], 0) / shrunk.length;
+    const cy = shrunk.reduce((s, p) => s + p[1], 0) / shrunk.length;
+    expect(cx).toBeCloseTo(5);
+    expect(cy).toBeCloseTo(5);
+    // Every vertex is now half as far from the centroid.
+    expect(shrunk[0]).toEqual([2.5, 2.5]);
+  });
+
+  it("a shrink factor of 1 leaves vertex positions unchanged", () => {
+    const square = rect(0, 0, 10, 10).coordinates[0]!;
+    const shrunk = shrinkRingTowardCentroid(square, 1);
+    expect(shrunk).toEqual([
+      [0, 0],
+      [10, 0],
+      [10, 10],
+      [0, 10],
+    ]);
   });
 });
 

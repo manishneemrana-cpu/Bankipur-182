@@ -12,14 +12,14 @@ export function Legend({
   if (present.length === 0) return null;
 
   return (
-    <div className="absolute right-2 bottom-2 z-10 flex flex-col gap-1 rounded-md border border-input bg-background/90 p-2 text-xs shadow-sm">
+    <div className="absolute right-2 bottom-2 z-10 flex flex-col gap-1.5 rounded-xl border border-black/5 bg-background/85 p-3 text-xs shadow-md ring-1 ring-black/5 backdrop-blur-sm">
       {present.map((s) => {
         const style = statusStyle(s);
         return (
-          <div key={s} className="flex items-center gap-1.5">
+          <div key={s} className="flex items-center gap-2">
             <span
-              className="inline-block size-2.5 rounded-sm border"
-              style={{ backgroundColor: style.fill, borderColor: style.stroke }}
+              className="inline-block size-2.5 shrink-0 rounded-full ring-1 ring-black/10"
+              style={{ backgroundColor: style.fill }}
             />
             <span>
               {style.label}{" "}

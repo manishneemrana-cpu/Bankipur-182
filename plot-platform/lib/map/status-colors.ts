@@ -21,17 +21,20 @@ interface StatusStyle {
   label: string;
 }
 
-// Okabe-Ito colorblind-safe palette, mapped so adjacent statuses (e.g. HOLD
-// vs RESERVED) stay visually distinct even under deuteranopia/protanopia.
+// Okabe-Ito-derived colorblind-safe palette (deuteranopia/protanopia-tested
+// hue spread), deepened and desaturated slightly from the textbook values
+// for a calmer, more premium look (§22) — each status also differs in
+// lightness, not just hue, so it still reads correctly under color
+// vision deficiency even before the paired text label.
 export const STATUS_STYLES: Record<PlotStatus, StatusStyle> = {
-  AVAILABLE: { fill: "#33a02c", stroke: "#1f6b1a", label: "Available" },
-  HOLD: { fill: "#e69f00", stroke: "#9c6c00", label: "On hold" },
-  RESERVED: { fill: "#56b4e9", stroke: "#2c7ea8", label: "Reserved" },
-  BOOKED: { fill: "#0072b2", stroke: "#004a73", label: "Booked" },
-  SOLD: { fill: "#666666", stroke: "#3d3d3d", label: "Sold" },
-  BLOCKED: { fill: "#d55e00", stroke: "#8f3f00", label: "Blocked" },
-  UNAVAILABLE: { fill: "#cc79a7", stroke: "#95547a", label: "Unavailable" },
-  NOT_RELEASED: { fill: "#e5e5e5", stroke: "#a3a3a3", label: "Not released" },
+  AVAILABLE: { fill: "#2f9e58", stroke: "#1d6b3a", label: "Available" },
+  HOLD: { fill: "#e0982f", stroke: "#9c6510", label: "On hold" },
+  RESERVED: { fill: "#4d9fd6", stroke: "#2a6ea3", label: "Reserved" },
+  BOOKED: { fill: "#2f5fa8", stroke: "#1c3d73", label: "Booked" },
+  SOLD: { fill: "#7c8591", stroke: "#565d68", label: "Sold" },
+  BLOCKED: { fill: "#c8570f", stroke: "#8f3c09", label: "Blocked" },
+  UNAVAILABLE: { fill: "#b45f8c", stroke: "#82415f", label: "Unavailable" },
+  NOT_RELEASED: { fill: "#dbdfe4", stroke: "#b0b7c0", label: "Not released" },
 };
 
 export function statusStyle(status: string): StatusStyle {

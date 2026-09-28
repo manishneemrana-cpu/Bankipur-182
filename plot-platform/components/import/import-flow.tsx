@@ -79,7 +79,7 @@ export function ImportFlow({ projectId }: { projectId: string }) {
           ) : null}
 
           {applyState.applied ? (
-            <p className="text-success-foreground text-sm font-medium">
+            <p className="text-sm font-medium text-success-foreground">
               Applied {applyState.validCount} rows.
             </p>
           ) : okRows.length > 0 ? (
