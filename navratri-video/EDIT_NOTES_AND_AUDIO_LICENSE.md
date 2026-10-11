@@ -19,11 +19,11 @@ Note: the source is 1254 px wide, so 4K is an upscale (Lanczos). It is delivered
 
 Transitions 0.8 s (fade / smooth / flash-white), light warm grade + vignette, burned-in gold keyword captions timed to the voiceover, SRT in captions_hinglish.srt.
 
-## Voiceover - IMPORTANT
-Generated offline with espeak-ng (Hindi voice, sped to fit each scene). It is intelligible but clearly synthetic/robotic: treat it as a scratch track.
-No better TTS was reachable from this sandbox. For publication, record a human voice (or a licensed TTS) reading build_voiceover.py's lines and replace the voice track; scene timing already has room (each line starts at 0.8, 5.9, 12.3, 17.9, 24.1 s).
-Licence: espeak-ng is GPL software, but speech it produces is not subject to copyright in its own right; no third-party voice data or actors involved.
-Mix: music ducked under voice via sidechain compression, loudnorm -16 LUFS, peak -1.5 dB.
+## Voiceover
+Neural Hindi voice: Kokoro-82M v1.0 (quantised ONNX), voice `hf_alpha`, run fully offline (build_voiceover.py), speed 0.97, at most 1.15x time-fit per line, light compression and room reverb.
+Model/voice weights: Apache-2.0 (Kokoro-82M by hexgrad; obtained via the npm packages expo-kokoro / kokoro-q8-shards). Apache-2.0 permits commercial use; keep this attribution.
+It is far more natural than the previous espeak-ng track but is still synthetic: loan words (Buyers, Brokers, SitesNSign) are read with Hindi phonetics. For a final brand film, a human recording is still the best option.
+Lines start at 0.8, 5.9, 12.3, 17.9, 24.1 s. Mix: music sidechain-ducked under voice, loudnorm -16 LUFS, peak -1.5 dB.
 
 ## Audio licensing (music/SFX)
 Drone pad and bell strikes are synthesised with ffmpeg `aevalsrc` (see this folder's scripts). No samples or stock library; original, free for commercial use, no attribution required.
