@@ -2,11 +2,11 @@ import subprocess, sys
 S="/tmp/claude-0/-home-user-Bankipur-182/d2deabbc-9422-5b24-9c54-c972fdd501ad/scratchpad"
 W,H=3840,2160; FPS=30; XF=0.8
 # name, crop(x,y,w,h), duration, zoom direction
-scenes=[("full",(0,0,1254,1254),5.0,"in"),
-        ("goddess",(540,60,714,700),5.5,"in"),
-        ("title",(0,120,560,620),5.0,"in"),
-        ("cards",(0,740,1254,310),5.5,"pan"),
-        ("close",(0,0,1254,1254),5.5,"out")]
+scenes=[("full",(0,0,1254,1254),6.2,"in"),
+        ("goddess",(540,60,714,700),7.2,"in"),
+        ("title",(0,120,560,620),6.4,"in"),
+        ("cards",(0,740,1254,310),7.0,"pan"),
+        ("close",(0,0,1254,1254),6.4,"out")]
 
 import os
 def sh(c): subprocess.check_call(c)
