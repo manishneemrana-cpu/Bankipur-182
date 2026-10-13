@@ -86,7 +86,7 @@ Useful scripts (all in `apps/worker`):
 - **Map flyby is frame-stepped** (`jumpTo` per frame, then wait for idle) rather than real-time `flyTo()`. Same easing and look, but deterministic: no dropped frames on a slow box.
 - The route line is an illustrative arc into the project, not a real driving route. Swap in a Directions API polyline in `providers/map/page.ts` if you want one.
 - Map + cinematic clips are captured **square** so one asset center-crops cleanly to both 9:16 and 16:9.
-- Sentence timings are estimated proportionally from audio length. ElevenLabs' `/with-timestamps` endpoint returns exact alignment — a possible upgrade now that the provider is live.
+- Sentence timings are estimated proportionally from audio length. With ElevenLabs the timings are exact (`/with-timestamps` character alignment); other providers, or a text-normalised alignment, fall back to the estimate.
 - Provider-hosted video URLs expire; the stage must download and re-upload (noted in each TODO).
 - The map picker uses Leaflet + OpenStreetMap tiles and Nominatim search (free, no key; light, user-initiated use only per their policy). Swap for Mapbox GL in `MapPickerInner.tsx` if you prefer.
 - Mapbox ToS requires its logo/attribution to remain visible in captured output — keep that in mind when implementing the live Mapbox backend.

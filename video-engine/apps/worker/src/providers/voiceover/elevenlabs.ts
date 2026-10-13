@@ -3,7 +3,7 @@ import { config } from "../../config.js";
 import { paidGate } from "../../lib/paid.js";
 import { log } from "../../lib/logger.js";
 import { MockVoiceoverProvider } from "./mock.js";
-import type { SaveAudio, VoiceoverProvider } from "./types.js";
+import type { CharAlignment, SaveAudio, VoiceoverProvider } from "./types.js";
 
 const MODEL_ID = "eleven_multilingual_v2"; // best Hindi quality; also handles English and Hinglish (Roman script)
 const MAX_CHARS = 5000; // per-request limit for this model
@@ -17,15 +17,20 @@ export class ElevenLabsProvider implements VoiceoverProvider {
   constructor(private save: SaveAudio) { this.mock = new MockVoiceoverProvider(save, "elevenlabs-mock"); }
 
   async generate(text: string, lang: Language, voiceId: string): Promise<string> {
-    if (paidGate("elevenlabs", config.ELEVENLABS_API_KEY) === "mock") return this.mock.generate(text, lang, voiceId);
+    return (await this.generateWithAlignment(text, lang, voiceId)).audioUrl;
+  }
+
+  /** POST …/with-timestamps → JSON { audio_base64, alignment }. Alignment indexes the ORIGINAL input text. */
+  async generateWithAlignment(text: string, lang: Language, voiceId: string): Promise<{ audioUrl: string; alignment?: CharAlignment }> {
+    if (paidGate("elevenlabs", config.ELEVENLABS_API_KEY) === "mock") return { audioUrl: await this.mock.generate(text, lang, voiceId) };
     if (text.length > MAX_CHARS) throw new Error(`ElevenLabs: script is ${text.length} chars; limit is ${MAX_CHARS}. Shorten the custom script.`);
 
     const voice = voiceId || config.ELEVENLABS_VOICE_ID || FALLBACK_VOICE_ID;
     if (voice === FALLBACK_VOICE_ID) log.warn("ElevenLabs: no voice configured (Settings or ELEVENLABS_VOICE_ID); using the default premade voice");
 
-    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voice)}?output_format=mp3_44100_128`, {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voice)}/with-timestamps?output_format=mp3_44100_128`, {
       method: "POST",
-      headers: { "xi-api-key": config.ELEVENLABS_API_KEY, "content-type": "application/json", accept: "audio/mpeg" },
+      headers: { "xi-api-key": config.ELEVENLABS_API_KEY, "content-type": "application/json" },
       body: JSON.stringify({
         text,
         model_id: MODEL_ID,
@@ -39,8 +44,17 @@ export class ElevenLabsProvider implements VoiceoverProvider {
       // never include request headers (the API key) in errors
       throw new Error(`ElevenLabs ${res.status}: ${body || res.statusText}${res.status === 401 ? " (check ELEVENLABS_API_KEY)" : res.status === 404 ? ` (voice "${voice}" not found on this account)` : ""}`);
     }
-    const bytes = Buffer.from(await res.arrayBuffer());
+    const json = (await res.json()) as {
+      audio_base64?: string;
+      alignment?: { characters?: string[]; character_start_times_seconds?: number[]; character_end_times_seconds?: number[] } | null;
+    };
+    const bytes = Buffer.from(json.audio_base64 ?? "", "base64");
     if (bytes.length < 1000) throw new Error(`ElevenLabs returned an implausibly small audio payload (${bytes.length} bytes)`);
-    return this.save(bytes, "mp3", "audio/mpeg");
+    const a = json.alignment;
+    const alignment: CharAlignment | undefined =
+      a?.characters && a.character_start_times_seconds && a.character_end_times_seconds
+        ? { characters: a.characters, starts: a.character_start_times_seconds, ends: a.character_end_times_seconds }
+        : undefined;
+    return { audioUrl: await this.save(bytes, "mp3", "audio/mpeg"), alignment };
   }
 }

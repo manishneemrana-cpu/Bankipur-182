@@ -5,7 +5,8 @@ import { generateScript } from "../script/index.js";
 import { createVoiceoverProvider } from "../providers/voiceover/index.js";
 import { repo } from "../lib/repo.js";
 import { config } from "../config.js";
-import { estimateSegments } from "./timing.js";
+import { estimateSegments, segmentsFromAlignment } from "./timing.js";
+import { log } from "../lib/logger.js";
 
 /** Stage 1 — script (template or custom) -> TTS via the VoiceoverProvider adapter -> stored audio + duration. */
 export const voiceoverStage: StageHandler = async (ctx) => {
@@ -25,17 +26,21 @@ export const voiceoverStage: StageHandler = async (ctx) => {
     return ctx.save(`voiceover.${e}`, bytes, mime);
   });
   const voiceId = ctx.settings.providers.voiceId || config.ELEVENLABS_VOICE_ID;
-  const audioUrl = await provider.generate(script.text, input.language, voiceId);
+  const { audioUrl, alignment } = provider.generateWithAlignment
+    ? await provider.generateWithAlignment(script.text, input.language, voiceId)
+    : { audioUrl: await provider.generate(script.text, input.language, voiceId), alignment: undefined };
   await ctx.progress(70);
 
   const duration = await mediaDurationFromBytes(await storage.fetchBytes(audioUrl), ext);
   if (!Number.isFinite(duration) || duration <= 0) throw new Error(`Could not determine voiceover duration for ${audioUrl} (.${ext})`);
 
+  const exact = alignment ? segmentsFromAlignment(script.sentences, script.text, alignment, duration) : null;
+  if (alignment && !exact) log.warn({ projectId: ctx.project.id }, "TTS alignment didn't match script text; using estimated sentence timings");
   await repo.patchProject(ctx.project.id, {
     assets: {
       voiceoverUrl: audioUrl,
       voiceoverDuration: Math.round(duration * 1000) / 1000,
-      segments: estimateSegments(script.sentences, duration),
+      segments: exact ?? estimateSegments(script.sentences, duration),
     },
   });
   await ctx.progress(100);
