@@ -45,14 +45,14 @@ questions) and Playfair Display / Inter / Noto Sans Devanagari (SIL OFL).
 
 ## ⚠️ Paid APIs are OFF by default
 
-As requested, **no paid API call is implemented yet**. Every real provider call is a clearly marked
+As requested, paid calls are implemented one provider at a time after you confirm a key. **Live now: ElevenLabs TTS** (`providers/voiceover/elevenlabs.ts`, verified only against a stubbed `fetch` — not yet against the real API). Everything else is still stubbed: Each remaining real provider call is a clearly marked
 `TODO(paid-api)` block (with the endpoint, headers, body and polling flow written out in the comment) and, while
 `PAID_APIS_ENABLED=false`, each adapter returns a **mock** result (synthetic voiceover, procedural map, local push-in clip) so the whole
 pipeline works end to end for free. If you set `PAID_APIS_ENABLED=true` + a key before the TODO is implemented, the stage fails with an
 explicit `PaidApiNotImplemented` error rather than silently mocking.
 
 TODO stubs to enable one at a time, once you confirm each key is ready:
-`providers/voiceover/{elevenlabs,google,azure}.ts` · `providers/map/{mapbox,google,cesium}.ts` · `providers/video/{luma,runway,kling}.ts`.
+`providers/voiceover/{google,azure}.ts` · `providers/map/{mapbox,google,cesium}.ts` · `providers/video/{luma,runway,kling}.ts`.
 
 ## Quick start (no keys, no Supabase needed)
 
@@ -86,7 +86,7 @@ Useful scripts (all in `apps/worker`):
 - **Map flyby is frame-stepped** (`jumpTo` per frame, then wait for idle) rather than real-time `flyTo()`. Same easing and look, but deterministic: no dropped frames on a slow box.
 - The route line is an illustrative arc into the project, not a real driving route. Swap in a Directions API polyline in `providers/map/page.ts` if you want one.
 - Map + cinematic clips are captured **square** so one asset center-crops cleanly to both 9:16 and 16:9.
-- Sentence timings are estimated proportionally from audio length. ElevenLabs' `/with-timestamps` endpoint returns exact alignment — use it when you wire that provider (noted in its TODO).
+- Sentence timings are estimated proportionally from audio length. ElevenLabs' `/with-timestamps` endpoint returns exact alignment — a possible upgrade now that the provider is live.
 - Provider-hosted video URLs expire; the stage must download and re-upload (noted in each TODO).
 - The map picker uses Leaflet + OpenStreetMap tiles and Nominatim search (free, no key; light, user-initiated use only per their policy). Swap for Mapbox GL in `MapPickerInner.tsx` if you prefer.
 - Mapbox ToS requires its logo/attribution to remain visible in captured output — keep that in mind when implementing the live Mapbox backend.
