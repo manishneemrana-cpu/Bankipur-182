@@ -1,0 +1,16 @@
+{
+  "name": "@dt/tools",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "generate-sample": "node generate-sample.mjs"
+  },
+  "dependencies": {
+    "@gltf-transform/core": "^4.1.0",
+    "@gltf-transform/extensions": "^4.1.0",
+    "@gltf-transform/functions": "^4.1.0",
+    "draco3dgltf": "^1.5.7",
+    "meshoptimizer": "^0.22.0"
+  }
+}

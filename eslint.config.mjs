@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Separate npm-workspaces project with its own tooling.
+    "digital-twin/**",
   ]),
 ]);
 

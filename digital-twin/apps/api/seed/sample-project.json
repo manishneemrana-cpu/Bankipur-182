@@ -1,0 +1,2792 @@
+{
+ "projects": [
+  {
+   "id": "5bf037ff-a8d3-5586-aca9-3aff091d7aa4",
+   "slug": "skyline-residences",
+   "name": "Skyline Residences",
+   "location": "Sample City (demo data)",
+   "description": "Procedurally generated demo project that ships with the repo. Replace it with a real artist-built GLB set via the admin panel.",
+   "cover_image_url": "/files/sample/cover.svg",
+   "site_glb_url": "/files/sample/site.glb",
+   "site_lod_glb_url": "/files/sample/site.lod.glb",
+   "model_scale": 1,
+   "is_published": true,
+   "created_at": "2026-01-01T00:00:00.000Z"
+  }
+ ],
+ "towers": [
+  {
+   "id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "project_id": "5bf037ff-a8d3-5586-aca9-3aff091d7aa4",
+   "name": "Tower A",
+   "glb_url": "/files/sample/tower-a.glb",
+   "lod_glb_url": "/files/sample/tower-a.lod.glb",
+   "floor_count": 12,
+   "floor_height": 3,
+   "floor_node_prefix": "Floor_",
+   "footprint_w": 24,
+   "footprint_d": 14,
+   "position": [
+    -34,
+    0,
+    4
+   ],
+   "rotation_y": 0,
+   "sort_order": 0
+  },
+  {
+   "id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "project_id": "5bf037ff-a8d3-5586-aca9-3aff091d7aa4",
+   "name": "Tower B",
+   "glb_url": "/files/sample/tower-b.glb",
+   "lod_glb_url": "/files/sample/tower-b.lod.glb",
+   "floor_count": 10,
+   "floor_height": 3,
+   "floor_node_prefix": "Floor_",
+   "footprint_w": 24,
+   "footprint_d": 14,
+   "position": [
+    34,
+    0,
+    4
+   ],
+   "rotation_y": 0,
+   "sort_order": 1
+  }
+ ],
+ "floors": [
+  {
+   "id": "317dad1b-c77c-5cf0-a81c-5e7e4a9e4790",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 1,
+   "label": "Ground",
+   "elevation": 0,
+   "glb_url": null
+  },
+  {
+   "id": "72e538f3-de25-50fa-a4f4-567272b80337",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 2,
+   "label": null,
+   "elevation": 3,
+   "glb_url": null
+  },
+  {
+   "id": "4837fd11-4f44-5949-a19f-d3c9e5d8514c",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 3,
+   "label": null,
+   "elevation": 6,
+   "glb_url": null
+  },
+  {
+   "id": "e929c072-5ddd-528e-ab33-6c18cb896223",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 4,
+   "label": null,
+   "elevation": 9,
+   "glb_url": null
+  },
+  {
+   "id": "e679d6b6-538f-5b60-a158-80b4aad8fe19",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 5,
+   "label": null,
+   "elevation": 12,
+   "glb_url": null
+  },
+  {
+   "id": "ddc3d048-352c-567f-a030-a46183a2df28",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 6,
+   "label": null,
+   "elevation": 15,
+   "glb_url": null
+  },
+  {
+   "id": "5937df1d-b11d-5aad-a676-8ae50ba3c8e7",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 7,
+   "label": null,
+   "elevation": 18,
+   "glb_url": null
+  },
+  {
+   "id": "fda10121-e8cb-5f71-a008-c82a30586515",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 8,
+   "label": null,
+   "elevation": 21,
+   "glb_url": null
+  },
+  {
+   "id": "8ab569a5-dce2-5656-a968-20be789e1e4c",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 9,
+   "label": null,
+   "elevation": 24,
+   "glb_url": null
+  },
+  {
+   "id": "25a183d6-2015-5d3e-aa63-e8b8a597a1d9",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 10,
+   "label": null,
+   "elevation": 27,
+   "glb_url": null
+  },
+  {
+   "id": "e5884654-ffe0-5a64-a2cf-c92df1b75130",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 11,
+   "label": null,
+   "elevation": 30,
+   "glb_url": null
+  },
+  {
+   "id": "0e98979a-ab75-5391-ad95-44f630f07916",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 12,
+   "label": null,
+   "elevation": 33,
+   "glb_url": null
+  },
+  {
+   "id": "89aec941-23e8-5f1b-a547-91b8425d32fb",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 1,
+   "label": "Ground",
+   "elevation": 0,
+   "glb_url": null
+  },
+  {
+   "id": "0a2f6e8c-fad6-583a-a6fe-e6996137f7d0",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 2,
+   "label": null,
+   "elevation": 3,
+   "glb_url": null
+  },
+  {
+   "id": "49bc061d-4f9a-5284-ab4c-e071c8373522",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 3,
+   "label": null,
+   "elevation": 6,
+   "glb_url": null
+  },
+  {
+   "id": "e92c17c1-fbeb-5947-a523-e44593206ff5",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 4,
+   "label": null,
+   "elevation": 9,
+   "glb_url": null
+  },
+  {
+   "id": "3ba6edbc-968b-5d57-a025-c4cff9e4d712",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 5,
+   "label": null,
+   "elevation": 12,
+   "glb_url": null
+  },
+  {
+   "id": "065daabf-e61b-522e-a21b-49b161e4a543",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 6,
+   "label": null,
+   "elevation": 15,
+   "glb_url": null
+  },
+  {
+   "id": "e662aa98-6e60-5d54-acf8-69d6aadbed45",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 7,
+   "label": null,
+   "elevation": 18,
+   "glb_url": null
+  },
+  {
+   "id": "4f1584f2-eb06-50c4-a628-11961ade0f39",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 8,
+   "label": null,
+   "elevation": 21,
+   "glb_url": null
+  },
+  {
+   "id": "5fdd6d53-9c97-5b00-a492-b32420d55dd8",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 9,
+   "label": null,
+   "elevation": 24,
+   "glb_url": null
+  },
+  {
+   "id": "85843c21-9087-5530-aefd-0bc2f4ba9e76",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 10,
+   "label": null,
+   "elevation": 27,
+   "glb_url": null
+  }
+ ],
+ "unit_types": [
+  {
+   "id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "project_id": "5bf037ff-a8d3-5586-aca9-3aff091d7aa4",
+   "code": "2BHK",
+   "name": "2 BHK Apartment",
+   "glb_url": "/files/sample/unit-2bhk.glb",
+   "area_sqm": 54,
+   "bedrooms": 2,
+   "bathrooms": 2,
+   "spawn": [
+    -3.05,
+    1.6,
+    -2.4
+   ],
+   "rooms": [
+    {
+     "name": "Living & Dining",
+     "position": [
+      -2,
+      2.1,
+      -1.25
+     ],
+     "area_sqm": 16.5
+    },
+    {
+     "name": "Master Bedroom",
+     "position": [
+      -0.9,
+      2.1,
+      1.9
+     ],
+     "area_sqm": 7.5
+    },
+    {
+     "name": "Bathroom",
+     "position": [
+      -3.5,
+      2.1,
+      2.3
+     ],
+     "area_sqm": 3
+    },
+    {
+     "name": "Kitchen",
+     "position": [
+      2.5,
+      2.1,
+      -2
+     ],
+     "area_sqm": 8
+    },
+    {
+     "name": "Bedroom 2",
+     "position": [
+      2.5,
+      2.1,
+      1
+     ],
+     "area_sqm": 16
+    }
+   ]
+  },
+  {
+   "id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "project_id": "5bf037ff-a8d3-5586-aca9-3aff091d7aa4",
+   "code": "3BHK",
+   "name": "3 BHK Apartment",
+   "glb_url": "/files/sample/unit-3bhk.glb",
+   "area_sqm": 72,
+   "bedrooms": 3,
+   "bathrooms": 2,
+   "spawn": [
+    -3.05,
+    1.6,
+    -3.2
+   ],
+   "rooms": [
+    {
+     "name": "Living & Dining",
+     "position": [
+      -2,
+      2.1,
+      -2
+     ],
+     "area_sqm": 20
+    },
+    {
+     "name": "Master Bedroom",
+     "position": [
+      -1.2,
+      2.1,
+      1
+     ],
+     "area_sqm": 16
+    },
+    {
+     "name": "Master Bath",
+     "position": [
+      -3.5,
+      2.1,
+      3
+     ],
+     "area_sqm": 4
+    },
+    {
+     "name": "Kitchen",
+     "position": [
+      2.5,
+      2.1,
+      -2.75
+     ],
+     "area_sqm": 10
+    },
+    {
+     "name": "Bedroom 2",
+     "position": [
+      2.5,
+      2.1,
+      -0.25
+     ],
+     "area_sqm": 10
+    },
+    {
+     "name": "Bedroom 3",
+     "position": [
+      2.5,
+      2.1,
+      2.5
+     ],
+     "area_sqm": 12
+    }
+   ]
+  }
+ ],
+ "units": [
+  {
+   "id": "82908818-b12c-56db-ae7a-3bd3442501cd",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 1,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "101",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "62d417d5-3458-56e2-af71-919e68befffe",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 1,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "102",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "sold"
+  },
+  {
+   "id": "c1df0c37-6f51-5889-aea0-59b1cecb9c9b",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 1,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "103",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "42512be6-556c-5390-a9d8-9883c54b6354",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 1,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "104",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "749e0eaf-f126-544f-aa7e-0c40814686eb",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 2,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "201",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "5c207733-e239-527d-ab7d-e47ae73adbce",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 2,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "202",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "f70eb343-20c3-529b-aee2-8e3269dc9d4f",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 2,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "203",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "3fc9a410-8d30-56a1-a295-a5cfb664bb45",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 2,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "204",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "sold"
+  },
+  {
+   "id": "9f128f6b-5ddc-5a41-acfd-95bb9ef8e2f5",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 3,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "301",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "1155976f-074f-5dac-a8f4-8e86a3d1f55d",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 3,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "302",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "5fbd51ca-29e4-5fb1-ae6e-e5339bcb7ba1",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 3,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "303",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "8bb192c1-dacc-5162-aa1f-c8ce3f7f86d4",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 3,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "304",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "633fa9cd-21dd-5fb6-a384-90352ecb2290",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 4,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "401",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "48dad8f3-84c8-5563-a916-5c50ad8ec60e",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 4,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "402",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "fc2ef7a1-3919-5b44-a8b0-e1662930940e",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 4,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "403",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "8241e2c2-2d03-58c8-ab64-2ea64c56cb3d",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 4,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "404",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "aceaa638-bee2-506f-a97c-94cb56bbb650",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 5,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "501",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "sold"
+  },
+  {
+   "id": "edca2c42-8bb5-54a2-aab8-5f454f0cfa83",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 5,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "502",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "8df406e0-875c-5283-a616-30785e1d8677",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 5,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "503",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "4ce33994-d3cf-528d-ab81-f9136f095669",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 5,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "504",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "e3657e58-757e-548c-a740-7b618d2cb9df",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 6,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "601",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "2281fa7d-cf99-562d-a0f0-c13e7b3d1df6",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 6,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "602",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "64c7dc81-8889-5a94-aa90-12b5d460b43f",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 6,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "603",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "sold"
+  },
+  {
+   "id": "b3fb0a0d-ae56-568c-abe4-9ca533c2f453",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 6,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "604",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "6c6596f8-f448-5a97-a3fc-e81a2d6c7bf8",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 7,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "701",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "a0ea7d68-0764-5ea7-ab39-294229e5bda9",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 7,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "702",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "e1c42e32-8096-5fe7-ae89-738cbf20ef16",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 7,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "703",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "0f7162bd-1103-5a04-a380-718540ad010a",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 7,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "704",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "c0233959-13ab-5f44-a143-b7411ce1404b",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 8,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "801",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "d5732e35-7daf-5bd5-acb6-d64773b69225",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 8,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "802",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "e6c00c60-40cb-59b0-a243-52a19785086e",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 8,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "803",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "be5fc464-43d8-5cf9-aafa-10053c49d8ae",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 8,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "804",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "910a87ac-1475-59bf-ac50-1c8b79e19512",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 9,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "901",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "019927a0-b920-59a2-ae79-44e17f32d711",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 9,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "902",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "c3ff60d2-2679-5c09-a225-74cff40a4701",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 9,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "903",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "a2f142ba-538f-5672-a3f2-a4901d251ce0",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 9,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "904",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "ba75436b-148e-5f6f-a9f6-8880d70993a7",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 10,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "1001",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "47b2ca68-c160-5ec7-a49e-26688dca4069",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 10,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "1002",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "sold"
+  },
+  {
+   "id": "523070d2-94f2-5fab-a6d6-7ae088f25dfb",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 10,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "1003",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "49dd8516-88e5-5603-ae9c-a48041e5bf45",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 10,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "1004",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "5d2f458e-50fd-57cf-a2b6-0830a3aea31c",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 11,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "1101",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "f9db0dc0-cef7-5bf8-a016-0436c78a6940",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 11,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "1102",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "a66ac922-b0c6-5daf-a832-68ef9ac954c5",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 11,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "1103",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "9fa4aa42-b931-52b4-ad32-d95d61088a94",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 11,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "1104",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "sold"
+  },
+  {
+   "id": "6dfa701a-1b75-5772-a6aa-81dec9516efb",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 12,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "1201",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "d10c9be0-45ff-5a98-ab8f-64bcc2481db4",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 12,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "1202",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "70d97e5b-96e8-508c-a67f-99b6b993bbcd",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 12,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "1203",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "83c1e296-4883-58f1-abf5-1bde6ff19f03",
+   "tower_id": "fe7898fb-47e9-5463-a110-65a20e4453f8",
+   "floor_number": 12,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "1204",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "782e2f97-4217-5464-acc0-421590386ad8",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 1,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "101",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "ee0d0cf9-deff-5d34-a4ac-850704c4b15c",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 1,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "102",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "sold"
+  },
+  {
+   "id": "0f430dfd-4390-58f7-aff8-31c2f6ac0727",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 1,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "103",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "5a135e6b-41fd-50f7-a67c-e6bc22613240",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 1,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "104",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "9b0ef3fd-6671-5de8-a377-9296abf3482b",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 2,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "201",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "4bb5a6f4-ff93-59b9-aeda-cecef7059102",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 2,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "202",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "309e3390-7040-5904-a909-26facd4aeb89",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 2,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "203",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "88dda0aa-3d8f-5270-a704-8ea74c4282a5",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 2,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "204",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "sold"
+  },
+  {
+   "id": "4942a012-da91-5f35-aae0-b13abc147b5f",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 3,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "301",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "5978b526-2beb-5800-a2b7-1f029ad8841a",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 3,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "302",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "9c2f0cd8-3ec4-5503-a91e-f5d542615bb7",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 3,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "303",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "f6bc20b6-054a-5aef-a9ea-71a7cc22db34",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 3,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "304",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "ae08fcad-03f7-5567-a841-bd3cb6e7d4e3",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 4,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "401",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "38b5747c-9535-5a13-a21a-684dd247a6b2",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 4,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "402",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "473b3539-5f99-5cfc-a75f-1be5477f290d",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 4,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "403",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "a709ebbc-a5cd-5b47-aee0-1d41bfb36675",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 4,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "404",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "4910f585-16b1-58c8-a715-367f43a4f0a6",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 5,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "501",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "sold"
+  },
+  {
+   "id": "8f34026f-a9ec-58ff-a000-290aa5a10c1c",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 5,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "502",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "9606e0e9-73c9-5efb-aa79-eaf38ffb1f5e",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 5,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "503",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "259fe231-2854-578c-a61b-dd59bea1f61c",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 5,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "504",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "489270f1-e882-5bc8-a8e7-af2eed752603",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 6,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "601",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "ea3797f1-ef89-5fcf-a124-de9f8ace3722",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 6,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "602",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "208604e7-7ab3-59dc-ae0f-29a0a1c53e67",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 6,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "603",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "sold"
+  },
+  {
+   "id": "251ecce4-a15b-5aef-a922-2e6afec79a30",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 6,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "604",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "2123e77b-4e2d-5d5f-a298-8b99146fccc3",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 7,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "701",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "cd28bd8b-fe4b-5b83-a9c3-d17fb7c7e8fb",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 7,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "702",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "f4fad0a1-05f6-5c2c-a405-503f8a8e3875",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 7,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "703",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "3e36b510-6812-5936-aff4-c827adf92572",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 7,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "704",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "6c68513c-98a3-50e9-a5ce-193a54cf292b",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 8,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "801",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "3ff47a1a-ec0c-5924-a9de-dac13dda6e14",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 8,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "802",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "642a4b83-842d-54ad-ac1d-07d95588e8b1",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 8,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "803",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "10eefb46-2fe0-5755-a8cf-80a09bb7f1f4",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 8,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "804",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "4a2ae088-f90f-56f9-a30b-f6b64148cc55",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 9,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "901",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "1616454e-f374-514e-a2eb-5171b29ec291",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 9,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "902",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "4bbf4bc5-ec6c-5bfe-a2fd-a2092516753f",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 9,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "903",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "60aff4ec-f317-5d12-a9c7-4e81d4f638e7",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 9,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "904",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  },
+  {
+   "id": "47521535-d90d-5abc-a9ac-dee88a4bd793",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 10,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "1001",
+   "outline": [
+    [
+     -11.85,
+     -6.85
+    ],
+    [
+     -3.15,
+     -6.85
+    ],
+    [
+     -3.15,
+     0.85
+    ],
+    [
+     -11.85,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "e518c45b-afdc-5fbd-a7ee-4c4256a6285a",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 10,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "1002",
+   "outline": [
+    [
+     -11.85,
+     1.15
+    ],
+    [
+     -3.15,
+     1.15
+    ],
+    [
+     -3.15,
+     6.85
+    ],
+    [
+     -11.85,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "sold"
+  },
+  {
+   "id": "1864e90b-5423-5cfe-a31c-090adf18c8ae",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 10,
+   "unit_type_id": "24dfd5c9-1389-5c16-a042-73e0ed725baa",
+   "label": "1003",
+   "outline": [
+    [
+     3.15,
+     -6.85
+    ],
+    [
+     11.85,
+     -6.85
+    ],
+    [
+     11.85,
+     0.85
+    ],
+    [
+     3.15,
+     0.85
+    ]
+   ],
+   "area_sqm": 72,
+   "status": "available"
+  },
+  {
+   "id": "8aac9818-2c7e-5c23-ac5d-9dcb045dd71e",
+   "tower_id": "d1af70e3-9a61-5c8f-a06b-8b2dfe303f84",
+   "floor_number": 10,
+   "unit_type_id": "02ea400f-166c-5d14-aa74-9ae91d14da73",
+   "label": "1004",
+   "outline": [
+    [
+     3.15,
+     1.15
+    ],
+    [
+     11.85,
+     1.15
+    ],
+    [
+     11.85,
+     6.85
+    ],
+    [
+     3.15,
+     6.85
+    ]
+   ],
+   "area_sqm": 54,
+   "status": "available"
+  }
+ ],
+ "hotspots": [
+  {
+   "id": "1bd29f3f-fb76-536e-a28e-2fab7710a196",
+   "project_id": "5bf037ff-a8d3-5586-aca9-3aff091d7aa4",
+   "tower_id": null,
+   "title": "Infinity Pool",
+   "category": "pool",
+   "position": [
+    0,
+    3,
+    -38
+   ],
+   "photo_url": "/files/sample/pool.svg",
+   "description": "20 m x 10 m heated pool with sun deck and kids' shallow zone. Open 6 am to 10 pm."
+  },
+  {
+   "id": "5675979d-cc0f-590c-a10a-5d0e5771851b",
+   "project_id": "5bf037ff-a8d3-5586-aca9-3aff091d7aa4",
+   "tower_id": null,
+   "title": "Clubhouse",
+   "category": "clubhouse",
+   "position": [
+    0,
+    8.5,
+    48
+   ],
+   "photo_url": "/files/sample/clubhouse.svg",
+   "description": "Gym, indoor games, party hall and co-working lounge across 264 sq m."
+  },
+  {
+   "id": "34d24941-7aaa-5d65-ae7c-2ad507846c3d",
+   "project_id": "5bf037ff-a8d3-5586-aca9-3aff091d7aa4",
+   "tower_id": null,
+   "title": "Central Garden",
+   "category": "garden",
+   "position": [
+    -62,
+    7,
+    -34
+   ],
+   "photo_url": "/files/sample/garden.svg",
+   "description": "Landscaped 720 sq m garden with walking track and seating."
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "digital-twin",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*", "tools"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "concurrently -n api,viewer,admin -c blue,green,magenta \"npm run dev -w @dt/api\" \"npm run dev -w @dt/viewer\" \"npm run dev -w @dt/admin\"",
+    "build": "npm run build -w @dt/api && npm run build -w @dt/viewer && npm run build -w @dt/admin",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "gen:samples": "npm run generate-sample -w @dt/tools",
+    "optimize": "node tools/optimize-glb.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "typescript": "^5.6.0"
+  }
+}
