@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+apps/api/data/db.json
+apps/api/storage/uploads
+apps/*/public/draco
+.DS_Store
