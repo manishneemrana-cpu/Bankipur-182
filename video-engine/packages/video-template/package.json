@@ -1,0 +1,24 @@
+{
+  "name": "@ave/video-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "studio": "remotion studio src/entry.ts"
+  },
+  "dependencies": {
+    "@remotion/media-utils": "^4.0.535",
+    "@remotion/transitions": "^4.0.535",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "^4.0.535",
+    "@ave/shared-types": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}

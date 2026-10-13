@@ -1,0 +1,16 @@
+{
+  "name": "auto-video-engine",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:api": "npm run dev:api -w @ave/worker",
+    "dev:worker": "npm run dev:worker -w @ave/worker",
+    "dev:web": "npm run dev -w @ave/web-admin",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "assets": "node packages/video-template/scripts/generate-music.mjs",
+    "smoke": "npm run smoke -w @ave/worker"
+  },
+  "engines": { "node": ">=20" }
+}
