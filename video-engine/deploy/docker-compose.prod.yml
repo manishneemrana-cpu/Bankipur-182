@@ -1,0 +1,42 @@
+# Production stack for a single VPS: HTTPS reverse proxy + API + render worker + Redis.
+# Run from video-engine/deploy:   docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+# The web UI stays on Vercel; it calls https://$API_DOMAIN/api.
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment: { API_DOMAIN: "${API_DOMAIN:?set API_DOMAIN in .env}" }
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [api]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: [redis-data:/data]          # not published to the host: only reachable inside this compose network
+
+  api:
+    build: { context: .., dockerfile: apps/worker/Dockerfile }
+    restart: unless-stopped
+    command: ["node", "--import", "tsx", "apps/worker/src/api.ts"]
+    env_file: .env
+    environment: { REDIS_URL: "redis://redis:6379", LOCAL_DATA_DIR: /data, PORT: "4100", PUBLIC_API_URL: "https://${API_DOMAIN}" }
+    expose: ["4100"]                     # only Caddy talks to it
+    depends_on: [redis]
+    volumes: [local-data:/data]
+
+  worker:
+    build: { context: .., dockerfile: apps/worker/Dockerfile }
+    restart: unless-stopped
+    command: ["node", "--import", "tsx", "apps/worker/src/worker.ts"]
+    env_file: .env
+    environment: { REDIS_URL: "redis://redis:6379", LOCAL_DATA_DIR: /data }
+    shm_size: "1gb"                      # Chromium needs more than the 64MB default /dev/shm
+    depends_on: [redis]
+    volumes: [local-data:/data]
+
+volumes: { redis-data: {}, local-data: {}, caddy-data: {}, caddy-config: {} }

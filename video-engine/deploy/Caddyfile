@@ -1,0 +1,5 @@
+# Automatic HTTPS (Let's Encrypt). API_DOMAIN must resolve to this VPS's public IP.
+{$API_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy api:4100
+}
