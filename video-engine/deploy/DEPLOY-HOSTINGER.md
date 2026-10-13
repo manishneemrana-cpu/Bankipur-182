@@ -20,7 +20,7 @@ Also create a swap file if the VPS has < 8 GB RAM (renders can spike).
 ```bash
 git clone -b claude/sharp-cori-socm3c https://github.com/manishneemrana-cpu/Bankipur-182.git
 cd Bankipur-182/video-engine/deploy
-cp .env.production.example .env && chmod 600 .env && nano .env
+cp env.production.example .env && chmod 600 .env && nano .env
 ```
 
 ## 3. Start
