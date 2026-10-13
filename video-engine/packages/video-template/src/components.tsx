@@ -78,9 +78,11 @@ export const TextOverlays: React.FC<{ segments: ScriptSegment[]; startFrame: num
     <>
       {segments.map((seg, i) => {
         const from = startFrame + Math.round(seg.start * fps) - 3;
-        const dur = Math.max(12, Math.round((seg.end - seg.start) * fps) + 12);
+        const next = segments[i + 1];
+        // end exactly when the next caption starts so cards never overlap (no ghosting)
+        const to = next ? startFrame + Math.round(next.start * fps) - 3 : startFrame + Math.round(seg.end * fps) + 12;
         return (
-          <Sequence key={i} from={from} durationInFrames={dur}>
+          <Sequence key={i} from={from} durationInFrames={Math.max(12, to - from)}>
             <SegmentCard text={seg.text} accent={accent} brand={brand} portrait={portrait} u={u} />
           </Sequence>
         );
@@ -93,7 +95,7 @@ const SegmentCard: React.FC<{ text: string; accent: string; brand: string; portr
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
   const inP = spring({ frame, fps, config: { damping: 20, stiffness: 120 } });
-  const out = interpolate(frame, [durationInFrames - 8, durationInFrames], [1, 0], { extrapolateLeft: "clamp" });
+  const out = interpolate(frame, [durationInFrames - 5, durationInFrames], [1, 0], { extrapolateLeft: "clamp" });
   const long = text.length > 70;
   const size = (portrait ? (long ? 58 : 68) : long ? 46 : 54) * u;
   return (

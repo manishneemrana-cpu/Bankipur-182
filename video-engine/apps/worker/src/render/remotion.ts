@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { bundle } from "@remotion/bundler";
-import { renderMedia, renderStill, selectComposition } from "@remotion/renderer";
+import { ensureBrowser, renderMedia, renderStill, selectComposition } from "@remotion/renderer";
 import { COMPOSITION_IDS, ENTRY_POINT, PUBLIC_DIR } from "@ave/video-template";
 import type { Aspect, VideoProps } from "@ave/shared-types";
 import { config } from "../config.js";
@@ -14,6 +14,7 @@ let serveUrlP: Promise<string> | undefined;
 export function getServeUrl(): Promise<string> {
   serveUrlP ??= (async () => {
     const t = Date.now();
+    if (!findHeadlessShell()) await ensureBrowser(); // downloads Remotion's own chrome-headless-shell once
     const outDir = path.join(config.LOCAL_DATA_DIR, "remotion-bundle");
     await fs.mkdir(outDir, { recursive: true });
     const url = await bundle({ entryPoint: ENTRY_POINT, publicDir: PUBLIC_DIR, outDir });

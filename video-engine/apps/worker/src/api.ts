@@ -12,6 +12,7 @@ import { authenticate } from "./lib/auth.js";
 import { repo } from "./lib/repo.js";
 import { storage } from "./lib/storage.js";
 import { enqueuePipeline } from "./pipeline/queues.js";
+import { generateScript } from "./script/index.js";
 
 export const app = express();
 app.use(cors({ origin: config.WEB_ORIGIN.split(",") }));
@@ -22,6 +23,7 @@ if (!useSupabase) {
   app.use("/files", express.static(path.join(config.LOCAL_DATA_DIR, "files"), { fallthrough: false, setHeaders: (res) => res.setHeader("Cross-Origin-Resource-Policy", "cross-origin") }));
 }
 
+app.get("/favicon.ico", (_req, res) => res.status(204).end());
 app.get("/health", (_req, res) => res.json({ ok: true, storage: useSupabase ? "supabase" : "local", paidApisEnabled: config.PAID_APIS_ENABLED }));
 
 const api = express.Router();
@@ -117,6 +119,18 @@ api.delete("/projects/:id", asyncH(async (req, res) => {
   if (!p) return;
   await repo.deleteProject(p.id);
   res.status(204).end();
+}));
+
+/* ---- script preview (same generator the pipeline uses) ---- */
+api.post("/script/preview", asyncH(async (req, res) => {
+  const parsed = ProjectInputSchema.partial().safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Invalid input", issues: parsed.error.issues });
+  const i = parsed.data;
+  res.json(generateScript({
+    name: i.name || "Your Project", builderName: i.builderName || "Your Company", tagline: i.tagline ?? "",
+    projectType: i.projectType ?? "tower", addressText: i.addressText || "your chosen location",
+    language: i.language ?? "en", images: i.images ?? [], customScript: i.customScript ?? null,
+  }));
 }));
 
 /* ---- notifications ---- */

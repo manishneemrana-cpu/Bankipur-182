@@ -45,8 +45,10 @@ const schema = z.object({
   RUNWAY_API_KEY: z.string().default(""),
   KLING_API_KEY: z.string().default(""),
 
-  /** Chromium for Puppeteer (map capture) and Remotion (render). Auto-detected when empty. */
-  CHROME_EXECUTABLE: z.string().default(""),
+  /** Full Chromium for Puppeteer map capture (auto-detected when empty). */
+  PUPPETEER_EXECUTABLE_PATH: z.string().default(""),
+  /** chrome-headless-shell for Remotion renders; when empty Remotion downloads its own on first use. */
+  REMOTION_BROWSER_EXECUTABLE: z.string().default(""),
   RENDER_CONCURRENCY: z.coerce.number().default(2),
   WORKER_CONCURRENCY: z.coerce.number().default(2),
 

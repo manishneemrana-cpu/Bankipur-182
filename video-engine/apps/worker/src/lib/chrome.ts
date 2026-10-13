@@ -7,7 +7,7 @@ import { config } from "../config.js";
  * Remotion downloads its own via ensureBrowser() (production Docker image does this at build time).
  */
 export function findHeadlessShell(): string | undefined {
-  if (config.CHROME_EXECUTABLE) return config.CHROME_EXECUTABLE;
+  if (config.REMOTION_BROWSER_EXECUTABLE) return config.REMOTION_BROWSER_EXECUTABLE;
   const pw = process.env.PLAYWRIGHT_BROWSERS_PATH;
   if (pw && fs.existsSync(pw)) {
     for (const d of fs.readdirSync(pw)) {
@@ -22,8 +22,7 @@ export function findHeadlessShell(): string | undefined {
 
 /** Find a full Chromium binary for Puppeteer without downloading one. */
 export function findChrome(): string | undefined {
-  if (config.CHROME_EXECUTABLE) return config.CHROME_EXECUTABLE;
-  if (process.env.PUPPETEER_EXECUTABLE_PATH) return process.env.PUPPETEER_EXECUTABLE_PATH;
+  if (config.PUPPETEER_EXECUTABLE_PATH) return config.PUPPETEER_EXECUTABLE_PATH;
   const pw = process.env.PLAYWRIGHT_BROWSERS_PATH;
   if (pw && fs.existsSync(pw)) {
     for (const d of fs.readdirSync(pw)) {
