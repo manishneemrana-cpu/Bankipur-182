@@ -16,17 +16,28 @@ Result: **one HTTPS link + one password**. Open it, create a reel, get real 9:16
    (also saved in `/root/video-engine-credentials.txt`).
 3. Open the link, log in with the printed user/password, create a project.
 
-## Adding your API keys
-Keys live on the server, not in the web UI. On the VPS terminal:
+## Adding your API keys (real voice + real map)
+Keys live on the server, not in the web UI. On the VPS terminal (each command asks for the key, hidden):
 ```bash
 cd /opt/video-engine-src/video-engine/deploy
-./set-key.sh ELEVENLABS_API_KEY        # asks for the key, hidden
+./set-key.sh ELEVENLABS_API_KEY
+./set-key.sh MAPBOX_ACCESS_TOKEN        # must be a PUBLIC token starting with pk.  (never an sk. secret token)
+./set-key.sh ELEVENLABS_VOICE_ID abc123 # the voice you want (non-secret, pass it directly)
 ./set-key.sh TTS_PROVIDER elevenlabs
-./set-key.sh PAID_APIS_ENABLED true    # the master switch; false = every paid provider returns mock output
+./set-key.sh MAP_PROVIDER mapbox
+./set-key.sh PAID_APIS_ENABLED true     # master switch; false = every paid provider returns mock output
 ```
-**Current limits of the code:** only **ElevenLabs** voice-over is implemented live. The map (Mapbox/Google/Cesium) and
-image-to-video (Luma/Runway/Kling) providers are still `TODO` stubs and return mock output even with keys set.
-Until then those stages produce placeholder/mock footage, but the full pipeline still renders a real reel.
+Then open the project and press **Regenerate**.
+
+**What is live today:** ElevenLabs voice-over (`eleven_multilingual_v2`) and the **Mapbox** map flyby.
+**Still mock:** image-to-video (Luma/Runway/Kling) and Google/Azure TTS, Google/Cesium maps. The cinematic shot keeps using the free
+Ken Burns pan/zoom of your uploaded building photo.
+
+Notes on Mapbox:
+- The token must have no URL restriction that blocks `http://127.0.0.1` (the server renders the flyby in a local headless browser).
+- One rendered video = one Mapbox map load plus tile requests; the map flyby renders frame by frame in a software-GL browser, so it is the
+  slowest stage (expect several minutes). The Mapbox logo/attribution stays visible in the video, as Mapbox's terms require.
+- If the map stage fails, the project page shows the reason (e.g. invalid token) and only that stage fails.
 
 ## Operations
 - Logs: `cd /opt/video-engine-src/video-engine/deploy && docker compose -f docker-compose.prod.yml logs --tail=200 api worker`

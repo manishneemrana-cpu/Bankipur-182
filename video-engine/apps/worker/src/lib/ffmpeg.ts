@@ -38,6 +38,10 @@ export function startFrameEncoder(opts: { fps: number; outPath: string }) {
     proc.on("error", reject);
     proc.on("close", (code) => (code === 0 ? resolve() : reject(new Error(`ffmpeg exited ${code}: ${stderr.slice(-500)}`))));
   });
+  // If the caller aborts (e.g. the capture failed) nobody awaits `done`; without this its rejection is
+  // unhandled and takes down the whole worker process instead of just failing the stage.
+  done.catch(() => undefined);
+  proc.stdin.on("error", () => undefined); // EPIPE after the process is killed
   return {
     async write(frame: Uint8Array) {
       if (!proc.stdin.write(frame)) await new Promise<void>((r) => proc.stdin.once("drain", r));

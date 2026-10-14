@@ -43,7 +43,7 @@ api.get("/options", (_req, res) => {
       luma: !!config.LUMA_API_KEY, runway: !!config.RUNWAY_API_KEY, kling: !!config.KLING_API_KEY,
     },
     /** Public map token for the in-browser location picker (Mapbox public tokens are designed to be client-visible). */
-    mapPickerToken: config.MAPBOX_ACCESS_TOKEN || null,
+    mapPickerToken: config.MAPBOX_ACCESS_TOKEN.startsWith("pk.") ? config.MAPBOX_ACCESS_TOKEN : null, // never expose a secret (sk.) token to browsers
   });
 });
 
