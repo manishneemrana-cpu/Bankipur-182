@@ -9,12 +9,13 @@
     "studio": "remotion studio src/entry.ts"
   },
   "dependencies": {
+    "@ave/shared-types": "*",
     "@remotion/media-utils": "^4.0.535",
     "@remotion/transitions": "^4.0.535",
+    "qrcode-generator": "^1.4.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "remotion": "^4.0.535",
-    "@ave/shared-types": "*"
+    "remotion": "^4.0.535"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",

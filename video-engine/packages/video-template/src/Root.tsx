@@ -32,6 +32,7 @@ export const defaultProps: VideoProps = {
   musicUrl: null,
   ctaText: "Book a site visit",
   language: "en",
+  twinUrl: "https://digital-twin-viewer-three.vercel.app/",
 };
 
 const calc = async ({ props }: { props: VideoProps }) => ({ durationInFrames: computeTimeline(props).totalFrames, props });

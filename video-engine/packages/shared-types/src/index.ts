@@ -74,6 +74,8 @@ export const ProjectInputSchema = z.object({
   images: z.array(ProjectImageSchema).max(5).default([]),
   customScript: z.string().max(4000).nullable().default(null),
   language: z.enum(LANGUAGES).default("en"),
+  /** Optional Digital Twin viewer link: shown on the project page and as a QR code on the video's end card. */
+  twinUrl: z.string().max(500).refine((v) => v === "" || /^https?:\/\//i.test(v), "Must start with http:// or https://").default(""),
   /** Optional per-project overrides; otherwise account brand kit / provider settings apply. */
   brandKitOverride: BrandKitSchema.partial().optional(),
 });
@@ -171,6 +173,8 @@ export const VideoPropsSchema = z.object({
   musicUrl: z.string().nullable().default(null),
   ctaText: z.string().default("Book a site visit"),
   language: z.enum(LANGUAGES).default("en"),
+  /** When set, the end card shows a QR code + this link. */
+  twinUrl: z.string().default(""),
 });
 export type VideoProps = z.infer<typeof VideoPropsSchema>;
 

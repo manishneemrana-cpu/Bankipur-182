@@ -1,4 +1,5 @@
 import React from "react";
+import qrcode from "qrcode-generator";
 import { AbsoluteFill, Easing, Freeze, Img, OffthreadVideo, Sequence, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import type { ScriptSegment, VideoProps } from "@ave/shared-types";
 import { CALL_LABEL, CTA_TEXT, FONT_BODY, FONT_HEADING, shade } from "./theme";
@@ -129,7 +130,7 @@ export const FadeEdges: React.FC<{ inFrames?: number; outFrames?: number }> = ({
   return <AbsoluteFill style={{ background: "#000", opacity: Math.max(a, b) }} />;
 };
 
-export const Outro: React.FC<Pick<VideoProps, "logoUrl" | "builderName" | "projectName" | "contactNumber" | "brandColor" | "accentColor" | "ctaText" | "language">> = (p) => {
+export const Outro: React.FC<Pick<VideoProps, "logoUrl" | "builderName" | "projectName" | "contactNumber" | "brandColor" | "accentColor" | "ctaText" | "language" | "twinUrl">> = (p) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const { u } = useScale();
@@ -146,6 +147,30 @@ export const Outro: React.FC<Pick<VideoProps, "logoUrl" | "builderName" | "proje
           <div style={{ fontSize: 66 * u, fontWeight: 600, letterSpacing: 2 }}>{p.contactNumber}</div>
         </div>
       )}
+      {p.twinUrl && (
+        <div style={{ opacity: s(32), display: "flex", flexDirection: "column", alignItems: "center", gap: 14 * u, fontFamily: FONT_BODY, color: "#fff" }}>
+          <div style={{ background: "#fff", padding: 16 * u, borderRadius: 16 * u }}><QrCode value={p.twinUrl} size={230 * u} /></div>
+          <div style={{ fontSize: 26 * u, letterSpacing: 4, textTransform: "uppercase", color: p.accentColor }}>{TWIN_LABEL[p.language]}</div>
+          <div style={{ fontSize: 28 * u, opacity: 0.9 }}>{p.twinUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}</div>
+        </div>
+      )}
     </AbsoluteFill>
   );
+};
+
+const TWIN_LABEL: Record<VideoProps["language"], string> = {
+  en: "Scan for the 3D tour",
+  hi: "3D टूर के लिए स्कैन करें",
+  hinglish: "3D tour ke liye scan karein",
+};
+
+/** Inline-SVG QR code (no network, renders identically in headless Chromium). */
+const QrCode: React.FC<{ value: string; size: number }> = ({ value, size }) => {
+  const qr = qrcode(0, "M");
+  qr.addData(value);
+  qr.make();
+  const n = qr.getModuleCount();
+  const cells: React.ReactNode[] = [];
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) cells.push(<rect key={`${r}-${c}`} x={c} y={r} width={1.02} height={1.02} />);
+  return <svg width={size} height={size} viewBox={`0 0 ${n} ${n}`} shapeRendering="crispEdges" fill="#000">{cells}</svg>;
 };

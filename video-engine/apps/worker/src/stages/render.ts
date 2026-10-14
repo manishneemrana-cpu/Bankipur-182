@@ -34,6 +34,7 @@ export function buildVideoProps(project: ProjectRow, assets: ProjectAssets): Vid
     // stable per-project pick so re-renders keep the same track
     musicTrack: MUSIC[[...project.id].reduce((a, c) => a + c.charCodeAt(0), 0) % MUSIC.length],
     language: i.language,
+    twinUrl: i.twinUrl ?? "",
   });
 }
 

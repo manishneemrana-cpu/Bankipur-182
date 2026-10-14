@@ -42,6 +42,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
           <p className="text-sm text-slate-500">{p.input.builderName} · {p.input.addressText}</p>
         </div>
         <div className="flex items-center gap-2">
+          {p.input.twinUrl && <a className="btn btn-ghost" href={p.input.twinUrl} target="_blank" rel="noopener noreferrer">Open Digital Twin ↗</a>}
           <StatusBadge status={p.status} />
           {p.status === "failed" && <button className="btn" onClick={() => api.retry(p.id).then(setP)}>Retry</button>}
           {!active && <button className="btn btn-ghost" onClick={() => api.retry(p.id).then(setP)}>Regenerate</button>}

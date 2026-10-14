@@ -13,7 +13,7 @@ const ROLE_LABEL: Record<ImageRole, string> = { site_layout: "Site layout (2D)",
 export default function NewProjectPage() {
   const ready = useAuthGuard();
   const router = useRouter();
-  const [f, setF] = useState({ name: "", builderName: "", tagline: "", projectType: "tower" as ProjectType, addressText: "", language: "en" as Language, customScript: "" });
+  const [f, setF] = useState({ name: "", builderName: "", tagline: "", projectType: "tower" as ProjectType, addressText: "", language: "en" as Language, customScript: "", twinUrl: "https://digital-twin-viewer-three.vercel.app/" });
   const [pos, setPos] = useState<{ lat: number | null; lng: number | null }>({ lat: null, lng: null });
   const [images, setImages] = useState<ProjectImage[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -82,6 +82,7 @@ export default function NewProjectPage() {
 
       <section className="card space-y-4 p-5">
         <h2 className="font-display text-lg font-bold">Location</h2>
+        <div><label className="label">Digital Twin link (optional)</label><input className="input" maxLength={500} value={f.twinUrl} onChange={(e) => set("twinUrl", e.target.value)} placeholder="https://…" /><p className="mt-1 text-xs text-slate-500">Shown as a QR code on the video's last screen and as a button on the project page.</p></div>
         <div><label className="label">Address</label><input required className="input" value={f.addressText} onChange={(e) => set("addressText", e.target.value)} placeholder="Sector 150, Noida, Uttar Pradesh" /></div>
         <MapPicker lat={pos.lat} lng={pos.lng} onPick={(lat, lng) => setPos({ lat, lng })} onAddress={(a) => !f.addressText && set("addressText", a)} />
         <div className="grid grid-cols-2 gap-4">
