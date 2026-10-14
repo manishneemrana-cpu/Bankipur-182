@@ -7,6 +7,8 @@ const apiRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
 export interface Config {
   port: number;
   isProd: boolean;
+  /** Single-server deploys (VPS + Docker volume) may use the JSON-file store in production. Not safe for multiple API instances. */
+  allowFileStore: boolean;
   adminToken: string;
   corsOrigins: string[];
   publicApiUrl: string;
@@ -35,6 +37,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   return {
     port,
     isProd,
+    allowFileStore: env.ALLOW_FILE_STORE === '1',
     adminToken,
     corsOrigins: (env.CORS_ORIGINS ?? 'http://localhost:5173,http://localhost:5174').split(',').map((s) => s.trim()).filter(Boolean),
     publicApiUrl: (env.PUBLIC_API_URL ?? `http://localhost:${port}`).replace(/\/$/, ''),

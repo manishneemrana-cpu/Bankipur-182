@@ -17,10 +17,10 @@ if (cfg.supabaseUrl && cfg.supabaseServiceKey) {
   storage = new SupabaseStorage(sb.client, cfg.bucket);
   console.log('[api] using Supabase (db + storage)');
 } else {
-  if (cfg.isProd) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_KEY are required in production');
+  if (cfg.isProd && !cfg.allowFileStore) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_KEY are required in production (or set ALLOW_FILE_STORE=1 for a single-server deploy)');
   db = await FileDb.open(cfg.dataFile, cfg.seedFile);
   storage = new LocalStorage(cfg.storageDir, cfg.publicApiUrl);
-  console.log(`[api] using local JSON store (${cfg.dataFile}) + disk uploads – dev/demo only`);
+  console.log(`[api] using local JSON store (${cfg.dataFile}) + disk uploads (single-server mode)`);
 }
 
 createApp(cfg, db, storage, createFloorPlanProvider(cfg)).listen(cfg.port, () =>

@@ -1,0 +1,67 @@
+# Digital Twin on a VPS that already runs Traefik. Three hostnames: API, admin, public viewer.
+# Data (JSON store + uploads) lives in the dt-data volume.
+services:
+  api:
+    build: { context: .., dockerfile: deploy/Dockerfile.api }
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      ALLOW_FILE_STORE: "1"
+      PORT: "8787"
+      ADMIN_API_TOKEN: "${ADMIN_API_TOKEN:?set in .env}"
+      PUBLIC_API_URL: "https://${API_DOMAIN}"
+      CORS_ORIGINS: "https://${ADMIN_DOMAIN},https://${VIEWER_DOMAIN}"
+      DATA_FILE: /data/db.json
+    volumes:
+      - dt-data:/data
+      - dt-uploads:/app/apps/api/storage/uploads
+    networks: [default, proxy]
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK}"
+      traefik.http.routers.dt-api.rule: "Host(`${API_DOMAIN}`)"
+      traefik.http.routers.dt-api.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
+      traefik.http.routers.dt-api.tls: "true"
+      traefik.http.routers.dt-api.tls.certresolver: "${TRAEFIK_RESOLVER}"
+      traefik.http.services.dt-api.loadbalancer.server.port: "8787"
+
+  admin:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+      args: { APP: admin, VITE_API_URL: "https://${API_DOMAIN}", VITE_VIEWER_URL: "https://${VIEWER_DOMAIN}" }
+    restart: unless-stopped
+    networks: [proxy]
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK}"
+      traefik.http.routers.dt-admin.rule: "Host(`${ADMIN_DOMAIN}`)"
+      traefik.http.routers.dt-admin.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
+      traefik.http.routers.dt-admin.tls: "true"
+      traefik.http.routers.dt-admin.tls.certresolver: "${TRAEFIK_RESOLVER}"
+      traefik.http.services.dt-admin.loadbalancer.server.port: "80"
+
+  viewer:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+      args: { APP: viewer, VITE_API_URL: "https://${API_DOMAIN}" }
+    restart: unless-stopped
+    networks: [proxy]
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK}"
+      traefik.http.routers.dt-viewer.rule: "Host(`${VIEWER_DOMAIN}`)"
+      traefik.http.routers.dt-viewer.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
+      traefik.http.routers.dt-viewer.tls: "true"
+      traefik.http.routers.dt-viewer.tls.certresolver: "${TRAEFIK_RESOLVER}"
+      traefik.http.services.dt-viewer.loadbalancer.server.port: "80"
+
+networks:
+  proxy:
+    external: true
+    name: "${TRAEFIK_NETWORK}"
+
+volumes:
+  dt-data:
+  dt-uploads:
