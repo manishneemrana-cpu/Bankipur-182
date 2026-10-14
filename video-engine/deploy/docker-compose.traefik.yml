@@ -1,0 +1,70 @@
+# Use this instead of docker-compose.prod.yml when the VPS ALREADY runs a Traefik reverse proxy on ports 80/443
+# (e.g. Hostinger's n8n template). We join Traefik's docker network and register routers via labels; no Caddy.
+# setup.sh picks this file automatically and fills TRAEFIK_* in .env.
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: apps/web-admin/Dockerfile
+      args: { NEXT_PUBLIC_API_URL: "/api" }
+    restart: unless-stopped
+    networks: [default, proxy]
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK:?set TRAEFIK_NETWORK in .env}"
+      traefik.http.middlewares.reel-auth.basicauth.users: "${BASIC_USER:-admin}:${BASIC_APR1:?set BASIC_APR1 in .env}"
+      traefik.http.routers.reel-web.rule: "Host(`${API_DOMAIN:?set API_DOMAIN in .env}`)"
+      traefik.http.routers.reel-web.priority: "10"
+      traefik.http.routers.reel-web.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
+      traefik.http.routers.reel-web.tls: "true"
+      traefik.http.routers.reel-web.tls.certresolver: "${TRAEFIK_RESOLVER:?set TRAEFIK_RESOLVER in .env}"
+      traefik.http.routers.reel-web.middlewares: "reel-auth"
+      traefik.http.services.reel-web.loadbalancer.server.port: "3100"
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: [redis-data:/data]               # private to this stack's network
+
+  api:
+    build: { context: .., dockerfile: apps/worker/Dockerfile }
+    restart: unless-stopped
+    command: ["node", "--import", "tsx", "apps/worker/src/api.ts"]
+    env_file: .env
+    environment:
+      REDIS_URL: "redis://redis:6379"
+      LOCAL_DATA_DIR: /data
+      PORT: "4100"
+      PUBLIC_API_URL: "https://${API_DOMAIN}"
+      WEB_ORIGIN: "https://${API_DOMAIN}"
+    networks: [default, proxy]
+    depends_on: [redis]
+    volumes: [local-data:/data]
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK}"
+      traefik.http.routers.reel-api.rule: "Host(`${API_DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/files`) || Path(`/health`))"
+      traefik.http.routers.reel-api.priority: "20"
+      traefik.http.routers.reel-api.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
+      traefik.http.routers.reel-api.tls: "true"
+      traefik.http.routers.reel-api.tls.certresolver: "${TRAEFIK_RESOLVER}"
+      traefik.http.routers.reel-api.middlewares: "reel-auth"
+      traefik.http.services.reel-api.loadbalancer.server.port: "4100"
+
+  worker:
+    build: { context: .., dockerfile: apps/worker/Dockerfile }
+    restart: unless-stopped
+    command: ["node", "--import", "tsx", "apps/worker/src/worker.ts"]
+    env_file: .env
+    environment: { REDIS_URL: "redis://redis:6379", LOCAL_DATA_DIR: /data }
+    shm_size: "1gb"
+    depends_on: [redis]
+    volumes: [local-data:/data]
+
+networks:
+  proxy:
+    external: true
+    name: "${TRAEFIK_NETWORK}"
+
+volumes: { redis-data: {}, local-data: {} }

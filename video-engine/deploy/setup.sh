@@ -45,8 +45,29 @@ if [ ! -f .env ]; then
   printf 'URL: https://%s\nUser: admin\nPassword: %s\n' "$HOST" "$PASS" > /root/video-engine-credentials.txt
 fi
 
+# ---- Pick the proxy mode -------------------------------------------------------------------------------------
+# If the server already runs Traefik (e.g. Hostinger's n8n template) it owns ports 80/443, so we join it instead of Caddy.
+setenv() { if grep -q "^$1=" .env; then sed -i "s|^$1=.*|$1='$2'|" .env; else printf "%s='%s'\n" "$1" "$2" >> .env; fi; }
+COMPOSE=docker-compose.prod.yml
+TNAME="$(docker ps --format '{{.Names}}' | grep -i traefik | head -1 || true)"
+if [ -n "$TNAME" ]; then
+  say "Existing Traefik found ($TNAME) - joining it (nothing of yours is stopped or changed)"
+  ARGS="$(docker inspect "$TNAME" --format '{{json .Args}}')"
+  TNET="$(docker inspect "$TNAME" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | awk '{print $1}')"
+  TRES="$(echo "$ARGS" | grep -o 'certificatesresolvers\.[A-Za-z0-9_-]*' | head -1 | cut -d. -f2)"
+  TEP="$(echo "$ARGS" | grep -o 'entrypoints\.[A-Za-z0-9_-]*\.address=:443' | head -1 | cut -d. -f2)"
+  [ -n "$TNET" ] && [ -n "$TRES" ] || { echo "Could not read Traefik's network/cert resolver. Send this to support: $ARGS"; exit 1; }
+  setenv TRAEFIK_NETWORK "$TNET"; setenv TRAEFIK_RESOLVER "$TRES"; setenv TRAEFIK_ENTRYPOINT "${TEP:-websecure}"
+  PASS="$(grep '^Password:' /root/video-engine-credentials.txt | cut -d' ' -f2)"
+  setenv BASIC_APR1 "$(openssl passwd -apr1 "$PASS")"     # Traefik basic-auth hash (fast, unlike bcrypt-14)
+  docker compose -f docker-compose.prod.yml --env-file .env down --remove-orphans >/dev/null 2>&1 || true   # drop our own Caddy attempt only
+  COMPOSE=docker-compose.traefik.yml
+elif ss -ltn | grep -qE ':(80|443) '; then
+  echo "Port 80/443 is used by something that is not Traefik. Stop it or tell support: ss -ltnp | grep -E ':80 |:443 '"; exit 1
+fi
+
 say "Building and starting (first run takes 10-20 minutes)"
-docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+docker compose -f "$COMPOSE" --env-file .env up -d --build
 
 HOST="$(grep '^API_DOMAIN=' .env | cut -d= -f2)"
 say "Waiting for the server to come up"
@@ -56,7 +77,7 @@ for i in $(seq 1 60); do
 done
 
 echo
-if [ "${OK:-0}" = 1 ]; then echo "READY"; else echo "Started, but HTTPS is not answering yet (DNS / certificate can take a minute). Check: docker compose -f $DIR/video-engine/deploy/docker-compose.prod.yml logs --tail=100"; fi
+if [ "${OK:-0}" = 1 ]; then echo "READY"; else echo "Started, but HTTPS is not answering yet (DNS / certificate can take a minute). Check: docker compose -f $DIR/video-engine/deploy/$COMPOSE logs --tail=100"; fi
 echo "------------------------------------------------------------"
 cat /root/video-engine-credentials.txt
 echo "------------------------------------------------------------"
