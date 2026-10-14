@@ -1,15 +1,20 @@
-# One public address, protected by a password (HTTP basic auth). Automatic HTTPS (Let's Encrypt).
-# API_DOMAIN must resolve to this server's public IP (setup.sh uses <ip-with-dashes>.sslip.io if you have no domain).
+# One public address (automatic HTTPS). The UI + API are behind a password (basic auth).
+# /files is public: Remotion's headless browser downloads media from those URLs (paths hold unguessable UUIDs).
 {$API_DOMAIN} {
 	encode zstd gzip
-	basic_auth {
-		{$BASIC_USER} {$BASIC_HASH}
-	}
-	@backend path /api/* /files/* /health
-	handle @backend {
+	handle /files/* {
 		reverse_proxy api:4100
 	}
 	handle {
-		reverse_proxy web:3100
+		basic_auth {
+			{$BASIC_USER} {$BASIC_HASH}
+		}
+		@backend path /api/* /health
+		handle @backend {
+			reverse_proxy api:4100
+		}
+		handle {
+			reverse_proxy web:3100
+		}
 	}
 }

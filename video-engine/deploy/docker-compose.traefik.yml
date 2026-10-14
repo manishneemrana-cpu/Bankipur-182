@@ -44,13 +44,21 @@ services:
     labels:
       traefik.enable: "true"
       traefik.docker.network: "${TRAEFIK_NETWORK}"
-      traefik.http.routers.reel-api.rule: "Host(`${API_DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/files`) || Path(`/health`))"
+      traefik.http.routers.reel-api.rule: "Host(`${API_DOMAIN}`) && (PathPrefix(`/api`) || Path(`/health`))"
       traefik.http.routers.reel-api.priority: "20"
       traefik.http.routers.reel-api.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
       traefik.http.routers.reel-api.tls: "true"
       traefik.http.routers.reel-api.tls.certresolver: "${TRAEFIK_RESOLVER}"
       traefik.http.routers.reel-api.middlewares: "reel-auth"
       traefik.http.services.reel-api.loadbalancer.server.port: "4100"
+      # /files is served WITHOUT the password: Remotion's headless browser downloads media from these public URLs.
+      # Paths contain account/project UUIDs + timestamps (unguessable, but not secret-protected).
+      traefik.http.routers.reel-files.rule: "Host(`${API_DOMAIN}`) && PathPrefix(`/files`)"
+      traefik.http.routers.reel-files.priority: "30"
+      traefik.http.routers.reel-files.entrypoints: "${TRAEFIK_ENTRYPOINT:-websecure}"
+      traefik.http.routers.reel-files.tls: "true"
+      traefik.http.routers.reel-files.tls.certresolver: "${TRAEFIK_RESOLVER}"
+      traefik.http.routers.reel-files.service: "reel-api"
 
   worker:
     build: { context: .., dockerfile: apps/worker/Dockerfile }
