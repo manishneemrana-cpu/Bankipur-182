@@ -1,45 +1,38 @@
-# Deploy the backend on a Hostinger VPS
+# Deploy ReelEngine (website + backend + video renderer) on one Hostinger VPS
 
-**What runs where:** web UI → Vercel (already deployed). API + render worker + Redis + HTTPS proxy → this VPS (Docker).
+Result: **one HTTPS link + one password**. Open it, create a reel, get real 9:16 and 16:9 MP4 files.
 
-## 0. Prerequisites
-- Hostinger VPS (KVM 2 or larger recommended: ≥ 2 vCPU, ≥ 8 GB RAM — video renders use Chromium + ffmpeg), Ubuntu 22.04/24.04 or Hostinger's "Docker" template.
-- A hostname pointing at the VPS: an `A` record (e.g. `api.yourdomain.com` → VPS IP), or use `<ip-with-dashes>.sslip.io`.
-- A Supabase project with `video-engine/supabase` schema applied and a storage bucket (public API needs real auth — see `.env`).
+## What you need
+- A Hostinger **VPS, KVM 2 or bigger** (2 vCPU, 8 GB RAM), OS **Ubuntu 24.04** (or the "Ubuntu with Docker" template).
+- Nothing else. No Supabase, no domain (a free `<ip>.sslip.io` HTTPS address is created for you).
 
-## 1. Prepare the server (once)
+## Steps
+1. Buy the VPS in Hostinger and open **hPanel → VPS → Browser terminal** (or `ssh root@YOUR_VPS_IP`).
+2. Paste this single command and press Enter:
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/manishneemrana-cpu/Bankipur-182/claude/sharp-cori-socm3c/video-engine/deploy/setup.sh | sudo bash
+   ```
+   The first run takes 10–20 minutes (it builds everything). It ends by printing your **link, user and password**
+   (also saved in `/root/video-engine-credentials.txt`).
+3. Open the link, log in with the printed user/password, create a project.
+
+## Adding your API keys
+Keys live on the server, not in the web UI. On the VPS terminal:
 ```bash
-ssh root@YOUR_VPS_IP
-apt-get update && apt-get install -y ca-certificates curl git ufw
-curl -fsSL https://get.docker.com | sh          # skip if the Docker template is installed
-ufw allow OpenSSH && ufw allow 80 && ufw allow 443 && ufw --force enable   # Redis/API ports are NOT exposed
+cd /opt/video-engine-src/video-engine/deploy
+./set-key.sh ELEVENLABS_API_KEY        # asks for the key, hidden
+./set-key.sh TTS_PROVIDER elevenlabs
+./set-key.sh PAID_APIS_ENABLED true    # the master switch; false = every paid provider returns mock output
 ```
-Also create a swap file if the VPS has < 8 GB RAM (renders can spike).
-
-## 2. Get the code and configure
-```bash
-git clone -b claude/sharp-cori-socm3c https://github.com/manishneemrana-cpu/Bankipur-182.git
-cd Bankipur-182/video-engine/deploy
-cp env.production.example .env && chmod 600 .env && nano .env
-```
-
-## 3. Start
-```bash
-docker compose -f docker-compose.prod.yml --env-file .env up -d --build
-docker compose -f docker-compose.prod.yml logs -f api worker     # Ctrl-C to leave
-curl https://$API_DOMAIN/health        # expect {"ok":true,"storage":"supabase",...}
-```
-First start is slow (builds the image, downloads Remotion's browser).
-
-## 4. Point the web UI at it (Vercel → ugc-video-engine → Settings → Environment Variables)
-```
-NEXT_PUBLIC_API_URL=https://<API_DOMAIN>/api
-NEXT_PUBLIC_SUPABASE_URL=...        # same project as the API
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...   # anon key only; never the service key
-```
-Redeploy the web app afterwards (NEXT_PUBLIC_* values are baked in at build time).
+**Current limits of the code:** only **ElevenLabs** voice-over is implemented live. The map (Mapbox/Google/Cesium) and
+image-to-video (Luma/Runway/Kling) providers are still `TODO` stubs and return mock output even with keys set.
+Until then those stages produce placeholder/mock footage, but the full pipeline still renders a real reel.
 
 ## Operations
-- Update: `git pull && docker compose -f docker-compose.prod.yml --env-file .env up -d --build`
-- Logs: `docker compose -f docker-compose.prod.yml logs --tail=200 api worker`
-- Back up the `local-data` volume if you run without Supabase storage.
+- Logs: `cd /opt/video-engine-src/video-engine/deploy && docker compose -f docker-compose.prod.yml logs --tail=200 api worker`
+- Update: re-run the same one-line command (keeps your `.env`, password and data).
+- A reel takes several minutes to render; it runs in the background and the UI shows progress.
+
+## Security notes
+- The whole site (UI + API + files) is behind the HTTP basic-auth password. Redis and the API are not exposed to the internet; only ports 22, 80, 443 are open.
+- There is a single shared account (no per-user login). For multi-user logins, configure Supabase (see `../.env.example`).
