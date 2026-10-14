@@ -57,7 +57,8 @@ services:
     restart: unless-stopped
     command: ["node", "--import", "tsx", "apps/worker/src/worker.ts"]
     env_file: .env
-    environment: { REDIS_URL: "redis://redis:6379", LOCAL_DATA_DIR: /data }
+    # PUBLIC_API_URL must match the API's: the worker maps URLs under it back to files on disk instead of fetching them over HTTP.
+    environment: { REDIS_URL: "redis://redis:6379", LOCAL_DATA_DIR: /data, PUBLIC_API_URL: "https://${API_DOMAIN}" }
     shm_size: "1gb"
     depends_on: [redis]
     volumes: [local-data:/data]
