@@ -8,3 +8,5 @@ apps/api/data/db.json
 apps/api/storage/uploads
 apps/*/public/draco
 .DS_Store
+
+apps/viewer/public/demo

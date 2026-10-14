@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { fetchBundle, setAnalyticsSlug } from './api';
+import { DEMO, DEMO_SLUG, fetchBundle, setAnalyticsSlug } from './api';
 import { useStore } from './store';
 import { Splash } from './ui/Splash';
 
@@ -8,7 +8,7 @@ const loadRoot = () => import('./ViewerRoot');
 const ViewerRoot = lazy(loadRoot);
 void loadRoot();
 
-const slugFromPath = () => /^\/view\/([^/]+)/.exec(location.pathname)?.[1] ?? null;
+const slugFromPath = () => /^\/view\/([^/]+)/.exec(location.pathname)?.[1] ?? (DEMO ? DEMO_SLUG : null);
 
 export function App() {
   const slug = slugFromPath();

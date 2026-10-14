@@ -8,6 +8,7 @@
     "prebuild": "node scripts/copy-draco.mjs",
     "dev": "vite --port 5173",
     "build": "tsc --noEmit && vite build",
+    "build:demo": "node scripts/copy-demo.mjs && tsc --noEmit && vite build",
     "preview": "vite preview --port 5173",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
