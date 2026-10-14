@@ -15,7 +15,8 @@ async function req<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, { ...init, headers, cache: "no-store" });
   if (res.status === 204) return undefined as T;
   const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new ApiError(res.status, body.error ?? res.statusText, body.issues);
+  // HTTP/2 has no reason phrase, so res.statusText is "" behind TLS proxies: always keep a visible message.
+  if (!res.ok) throw new ApiError(res.status, body.error ?? (res.statusText || `Request failed (HTTP ${res.status}) – ${path}`), body.issues);
   return body as T;
 }
 

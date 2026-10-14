@@ -21,5 +21,9 @@ open('.env','w').write(s)
 PY
 else printf "%s='%s'\n" "$KEY" "$VAL" >> .env; fi
 chmod 600 .env
-docker compose -f docker-compose.prod.yml --env-file .env up -d api worker
+# Restart with the SAME compose file the stack was started with (setup.sh writes TRAEFIK_NETWORK when it joins an existing Traefik).
+# Using the wrong one would recreate api/worker without their Traefik labels/network and the site would answer 404 on /api.
+COMPOSE=docker-compose.prod.yml
+grep -q "^TRAEFIK_NETWORK=" .env && COMPOSE=docker-compose.traefik.yml
+docker compose -f "$COMPOSE" --env-file .env up -d api worker
 echo "$KEY updated; api + worker restarted."
