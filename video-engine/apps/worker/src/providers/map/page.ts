@@ -40,11 +40,11 @@ const my = (lat) => (1 - Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360))
 const ilng = (x) => x * 360 - 180;
 const ilat = (y) => (Math.atan(Math.sinh(Math.PI * (1 - 2 * y))) * 180) / Math.PI;
 
-// Route: an arc approaching the project from ~4.5° away. (Replace with a Directions API polyline if wanted.)
+// Route: a decorative arc approaching the project from ~2 km away (it is NOT a real driving route; swap in a Directions API polyline if wanted).
 const hash = (S.lat * 131 + S.lng * 71) % 1;
 const ang = (Math.abs(hash) * 360 + 200) * Math.PI / 180;
-const ORIGIN = { lng: S.lng + Math.cos(ang) * 4.5, lat: S.lat + Math.sin(ang) * 3.2 };
-const mid = { lng: (ORIGIN.lng + S.lng) / 2 - Math.sin(ang) * 0.9, lat: (ORIGIN.lat + S.lat) / 2 + Math.cos(ang) * 0.9 };
+const ORIGIN = { lng: S.lng + Math.cos(ang) * 0.02, lat: S.lat + Math.sin(ang) * 0.014 };
+const mid = { lng: (ORIGIN.lng + S.lng) / 2 - Math.sin(ang) * 0.004, lat: (ORIGIN.lat + S.lat) / 2 + Math.cos(ang) * 0.004 };
 const bez = (t) => { const a = (1 - t) * (1 - t), b = 2 * (1 - t) * t, c = t * t;
   return { lng: a * ORIGIN.lng + b * mid.lng + c * S.lng, lat: a * ORIGIN.lat + b * mid.lat + c * S.lat }; };
 const routePts = [];
@@ -54,7 +54,8 @@ const FLY_END = 0.8; // fraction of duration spent flying; the rest is a slow or
 function camera(t) {
   const u = clamp(t / (S.durationSec * FLY_END));
   const p = easeIO(u);
-  const z = lerp(5.2, 16.4, easeOut(u) * 0.55 + p * 0.45);
+  // start at neighbourhood level (z13: tiles are sharp and the route is visible), end close on the plot (z17.2)
+  const z = lerp(13, 17.2, easeOut(u) * 0.55 + p * 0.45);
   const hold = clamp((t - S.durationSec * FLY_END) / (S.durationSec * (1 - FLY_END)));
   // the camera rides along the route itself (from its midpoint to the project), so the line is always on screen
   const c = bez(lerp(0.5, 1, p));
@@ -62,9 +63,9 @@ function camera(t) {
     lng: c.lng, lat: c.lat, zoom: z,
     pitch: window.__backend.supportsPitch ? lerp(0, 58, easeIO(clamp((u - 0.35) / 0.65))) : 0,
     bearing: window.__backend.supportsPitch ? lerp(-25, 15, p) + hold * 18 : 0,
-    routeProgress: easeIO(clamp(u / 0.32)),
-    pinProgress: clamp((u - 0.62) / 0.12),
-    labelProgress: clamp((u - 0.78) / 0.14),
+    routeProgress: easeIO(clamp(u / 0.4)),
+    pinProgress: clamp((u - 0.55) / 0.15),
+    labelProgress: clamp((u - 0.72) / 0.15),
   };
 }
 

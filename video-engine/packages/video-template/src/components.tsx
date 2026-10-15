@@ -32,12 +32,34 @@ export const ClipSlot: React.FC<{ src: string | null; clipSeconds: number; slotF
 };
 
 /** Local pan/zoom on a still: the zero-cost fallback when no elevation image exists. */
-export const KenBurns: React.FC<{ src: string; durationInFrames: number }> = ({ src, durationInFrames }) => {
+export const KenBurns: React.FC<{ src: string; durationInFrames: number; flip?: boolean }> = ({ src, durationInFrames, flip }) => {
   const frame = useCurrentFrame();
   const p = interpolate(frame, [0, durationInFrames], [0, 1], { easing: Easing.inOut(Easing.cubic), extrapolateRight: "clamp" });
   return (
     <AbsoluteFill style={{ background: "#000", overflow: "hidden" }}>
-      <Img src={src} style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${1.05 + p * 0.2}) translate(${(p - 0.5) * -4}%, ${(p - 0.5) * -2.5}%)`, transformOrigin: "50% 50%" }} />
+      <Img src={src} style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${1.05 + p * 0.2}) translate(${(p - 0.5) * -4 * (flip ? -1 : 1)}%, ${(p - 0.5) * -2.5}%)`, transformOrigin: "50% 50%" }} />
+    </AbsoluteFill>
+  );
+};
+
+/** Photos one after another (each with a slow pan/zoom), optionally preceded by an AI cinematic clip. */
+export const PhotoReel: React.FC<{ clipUrl: string | null; clipSeconds: number; slides: string[]; frames: number; fallback: React.ReactNode }> = ({ clipUrl, clipSeconds, slides, frames, fallback }) => {
+  if (!clipUrl && !slides.length) return <>{fallback}</>;
+  const clipFrames = clipUrl ? (slides.length ? Math.round(frames * 0.4) : frames) : 0;
+  const per = slides.length ? Math.floor((frames - clipFrames) / slides.length) : 0;
+  return (
+    <AbsoluteFill>
+      {clipUrl && <Sequence from={0} durationInFrames={clipFrames}><ClipSlot src={clipUrl} clipSeconds={clipSeconds} slotFrames={clipFrames} /></Sequence>}
+      {slides.map((src, i) => {
+        const last = i === slides.length - 1;
+        const dur = last ? frames - clipFrames - per * i : per;
+        return (
+          <Sequence key={`${i}-${src}`} from={clipFrames + per * i} durationInFrames={dur}>
+            <KenBurns src={src} durationInFrames={dur} flip={i % 2 === 1} />
+            {(i > 0 || clipUrl) && <FadeEdges inFrames={10} />}
+          </Sequence>
+        );
+      })}
     </AbsoluteFill>
   );
 };

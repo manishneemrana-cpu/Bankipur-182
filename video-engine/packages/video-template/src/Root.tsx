@@ -17,6 +17,7 @@ export const defaultProps: VideoProps = {
   cinematicClipUrl: null,
   cinematicClipDuration: 0,
   kenBurnsImageUrl: null,
+  slideUrls: [],
   voiceoverUrl: null,
   voiceoverDuration: 20,
   logoUrl: null,

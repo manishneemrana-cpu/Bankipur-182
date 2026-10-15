@@ -161,6 +161,8 @@ export const VideoPropsSchema = z.object({
   cinematicClipUrl: z.string().nullable(),
   cinematicClipDuration: z.number().default(0),
   kenBurnsImageUrl: z.string().nullable().default(null),
+  /** Every uploaded photo, best first (elevation, site layout, amenities); shown one after another after the map flyby. */
+  slideUrls: z.array(z.string()).default([]),
   voiceoverUrl: z.string().nullable(),
   /** seconds */
   voiceoverDuration: z.number(),

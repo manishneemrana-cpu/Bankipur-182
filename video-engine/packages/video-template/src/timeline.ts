@@ -16,14 +16,20 @@ export interface Timeline {
 
 const f = (s: number) => Math.round(s * FPS);
 
+/** Length of the map flyby: short when there are photos to show afterwards, longer when the map is the only visual. */
+export function mapSecondsFor(contentSeconds: number, slideCount: number): number {
+  const c = Math.max(6, contentSeconds);
+  return slideCount > 0 ? Math.max(6, Math.min(10, c * 0.3)) : Math.max(8, Math.min(22, c * 0.6));
+}
+
 /**
  * intro (1.5s) -> content (voiceover length + tail) split into [map flyby | cinematic shot] -> outro.
- * The map takes ~60% of the content window; the building shot the rest.
+ * The map flyby is capped at ~10s when photos follow (see mapSecondsFor); the photos/cinematic shot get the rest.
  */
-export function computeTimeline(p: Pick<VideoProps, "voiceoverDuration">): Timeline {
+export function computeTimeline(p: Pick<VideoProps, "voiceoverDuration"> & { slideUrls?: string[] }): Timeline {
   const content = Math.max(6, p.voiceoverDuration + 0.8);
   const contentFrames = f(content);
-  const mapFrames = Math.round(contentFrames * 0.6);
+  const mapFrames = Math.min(contentFrames - f(2), f(mapSecondsFor(content, p.slideUrls?.length ?? 0)));
   const introFrames = f(INTRO_SECONDS);
   return {
     fps: FPS,

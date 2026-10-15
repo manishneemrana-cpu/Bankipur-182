@@ -7,6 +7,11 @@ import { repo } from "../lib/repo.js";
 import { renderReel, renderThumbnail } from "../render/remotion.js";
 import { computeTimeline } from "@ave/video-template";
 
+const ROLE_ORDER = ["elevation", "site_layout", "amenity"] as const;
+/** Every uploaded photo, hero shot first. */
+const orderedPhotos = (images: ProjectRow["input"]["images"]) =>
+  [...images].sort((a, b) => ROLE_ORDER.indexOf(a.role) - ROLE_ORDER.indexOf(b.role)).map((x) => x.url);
+
 const MUSIC = ["regal", "serene", "uplift"] as const;
 
 /** Map persisted stage outputs + brand kit onto the Remotion composition props. */
@@ -24,6 +29,7 @@ export function buildVideoProps(project: ProjectRow, assets: ProjectAssets): Vid
     cinematicClipUrl: assets.cinematicClipUrl ?? null,
     cinematicClipDuration: assets.cinematicClipDuration ?? 0,
     kenBurnsImageUrl: assets.cinematicClipUrl ? null : (assets.kenBurnsImageUrl ?? null),
+    slideUrls: orderedPhotos(i.images),
     voiceoverUrl: assets.voiceoverUrl ?? null,
     voiceoverDuration: assets.voiceoverDuration,
     logoUrl: kit.logoUrl,

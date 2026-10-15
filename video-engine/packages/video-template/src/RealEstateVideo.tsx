@@ -1,13 +1,13 @@
 import React from "react";
 import { AbsoluteFill, Audio, Sequence, staticFile } from "remotion";
 import type { VideoProps } from "@ave/shared-types";
-import { ClipSlot, FadeEdges, KenBurns, LogoIntro, Outro, TextOverlays, TitleBug, Vignette } from "./components";
+import { ClipSlot, FadeEdges, LogoIntro, Outro, PhotoReel, TextOverlays, TitleBug, Vignette } from "./components";
 import { computeTimeline, musicVolume } from "./timeline";
 import { fontCss } from "./theme";
 
 /**
  * Timeline:
- *   0 ─ intro (logo, 1.5s) ─ content [map flyby 60% | cinematic 40%] w/ synced text + voiceover ─ outro (logo + contact + CTA)
+ *   0 ─ intro (logo, 1.5s) ─ content [map flyby ~10s | photos] w/ synced text + voiceover ─ outro (logo + contact + CTA)
  * Background music ducks under the voiceover automatically (see musicVolume).
  */
 export const RealEstateVideo: React.FC<VideoProps> = (p) => {
@@ -15,12 +15,10 @@ export const RealEstateVideo: React.FC<VideoProps> = (p) => {
   const contentFrom = t.introFrames;
   const music = p.musicUrl ?? staticFile(`music/${p.musicTrack}.wav`);
 
-  const cinematic = p.cinematicClipUrl ? (
-    <ClipSlot src={p.cinematicClipUrl} clipSeconds={p.cinematicClipDuration} slotFrames={t.cinematicFrames} />
-  ) : p.kenBurnsImageUrl ? (
-    <KenBurns src={p.kenBurnsImageUrl} durationInFrames={t.cinematicFrames} />
-  ) : (
-    <AbsoluteFill style={{ background: `linear-gradient(135deg, ${p.brandColor}, #000)` }} />
+  const slides = p.slideUrls.length ? p.slideUrls : p.kenBurnsImageUrl ? [p.kenBurnsImageUrl] : [];
+  const cinematic = (
+    <PhotoReel clipUrl={p.cinematicClipUrl} clipSeconds={p.cinematicClipDuration} slides={slides} frames={t.cinematicFrames}
+      fallback={<AbsoluteFill style={{ background: `linear-gradient(135deg, ${p.brandColor}, #000)` }} />} />
   );
 
   return (
