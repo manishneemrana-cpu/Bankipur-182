@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sites N Sign – Studio Hub</title>
-  <meta name="description" content="Choose a tool: the 3D Digital Twin Viewer or the ReelEngine video studio." />
+  <title>Sites N Sign – Admin Hub</title>
+  <meta name="description" content="Admin hub: open the Digital Twin admin or the ReelEngine video studio." />
   <link rel="icon" href="data:," />
   <style>
     :root { --bg:#0b1220; --card:#121c30; --line:#24324e; --text:#eef2f8; --muted:#9fb0c8; --a1:#4f9cff; --a2:#d4a84b; color-scheme:dark; }
@@ -26,6 +26,7 @@
     .meta { display:flex; justify-content:space-between; align-items:center; gap:.5rem; font-size:.85rem; }
     .badge { padding:.15rem .6rem; border-radius:2rem; border:1px solid var(--line); color:var(--muted); }
     .open { color:var(--accent); font-weight:600; }
+    footer a { color:var(--a1); }
     footer { text-align:center; margin-top:2rem; color:var(--muted); font-size:.85rem; }
   </style>
 </head>
@@ -33,23 +34,23 @@
   <main>
     <header>
       <h1>Sites N Sign Studio</h1>
-      <p>Choose a tool to open</p>
+      <p>Admin hub &middot; one link for both admin tools</p>
     </header>
     <div class="grid">
-      <a class="card twin" href="https://digital-twin-viewer-manishneemrana-7172s-projects.vercel.app" data-link="twin">
+      <a class="card twin" href="https://twin-admin-200-141-8-86.sslip.io" data-link="twin-admin">
         <div class="icon" aria-hidden="true">🏢</div>
-        <h2>3D Digital Twin Viewer</h2>
-        <p class="desc">Walk through a real-estate project in 3D: the whole site, each tower, floor plans and unit interiors, with amenity pins and a distance tool.</p>
-        <div class="meta"><span class="badge">Live demo · sample project</span><span class="open">Open →</span></div>
+        <h2>Digital Twin Admin</h2>
+        <p class="desc">Create projects, upload photos, floor plans and 3D models, place units and amenity pins, publish and see analytics.</p>
+        <div class="meta"><span class="badge">Admin &middot; asks for the admin token</span><span class="open">Open →</span></div>
       </a>
-      <a class="card reel" href="https://ugc-video-engine-git-claud-b2a46e-manishneemrana-7172s-projects.vercel.app" data-link="reel">
+      <a class="card reel" href="https://200-141-8-86.sslip.io" data-link="reel">
         <div class="icon" aria-hidden="true">🎬</div>
         <h2>ReelEngine</h2>
-        <p class="desc">Real-estate video studio: turn project details into luxury marketing reels in 9:16 and 16:9.</p>
-        <div class="meta"><span class="badge">UI preview · backend pending</span><span class="open">Open →</span></div>
+        <p class="desc">Real-estate video studio: turn project details and photos into marketing reels in 9:16 and 16:9.</p>
+        <div class="meta"><span class="badge">Admin &middot; asks for user and password</span><span class="open">Open →</span></div>
       </a>
     </div>
-    <footer>Each tool opens as its own separate app.</footer>
+    <footer>Clients and buyers get a separate link: <a href="/viewer">Digital Twin Viewer page</a> (no admin access).</footer>
   </main>
 </body>
 </html>

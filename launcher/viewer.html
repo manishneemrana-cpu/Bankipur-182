@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Digital Twin Viewer</title>
+  <meta name="description" content="Open a public 3D tour of a Sites N Sign project." />
+  <link rel="icon" href="data:," />
+  <style>
+    :root { --bg:#0b1220; --card:#121c30; --line:#24324e; --text:#eef2f8; --muted:#9fb0c8; --a1:#4f9cff; --a2:#d4a84b; color-scheme:dark; }
+    @media (prefers-color-scheme: light) { :root { --bg:#f3f5f9; --card:#fff; --line:#dbe2ee; --text:#101a2b; --muted:#5a6b84; --a1:#1f6fe0; --a2:#a9791a; color-scheme:light; } }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; display:grid; place-items:center; padding:2rem 1rem; }
+    main { width:min(60rem,100%); }
+    header { text-align:center; margin-bottom:2rem; }
+    h1 { font-size:clamp(1.7rem,4vw,2.5rem); margin:0 0 .4rem; letter-spacing:-.01em; }
+    header p { margin:0; color:var(--muted); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr)); gap:1.25rem; }
+    a.card { display:flex; flex-direction:column; gap:.7rem; padding:1.6rem; border:1px solid var(--line); border-radius:1rem; background:var(--card); color:inherit; text-decoration:none; transition:transform .15s,border-color .15s,box-shadow .15s; min-height:15rem; }
+    a.card:hover, a.card:focus-visible { transform:translateY(-3px); border-color:var(--accent); box-shadow:0 .6rem 2rem rgba(0,0,0,.25); outline:none; }
+    a.card:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+    .twin { --accent:var(--a1); } .reel { --accent:var(--a2); }
+    .icon { width:3rem; height:3rem; display:grid; place-items:center; border-radius:.8rem; font-size:1.6rem; background:color-mix(in srgb,var(--accent) 18%,transparent); }
+    h2 { margin:.2rem 0 0; font-size:1.3rem; }
+    p.desc { margin:0; color:var(--muted); flex:1; }
+    .meta { display:flex; justify-content:space-between; align-items:center; gap:.5rem; font-size:.85rem; }
+    .badge { padding:.15rem .6rem; border-radius:2rem; border:1px solid var(--line); color:var(--muted); }
+    .open { color:var(--accent); font-weight:600; }
+    footer a { color:var(--a1); }
+    footer { text-align:center; margin-top:2rem; color:var(--muted); font-size:.85rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Digital Twin Viewer</h1>
+      <p>Public 3D tours &middot; no admin access from this page</p>
+    </header>
+    <div class="grid">
+      <a class="card twin" href="https://twin-200-141-8-86.sslip.io/view/skyline-residences" data-link="viewer-sample">
+        <div class="icon" aria-hidden="true">🏢</div>
+        <h2>Sample project</h2>
+        <p class="desc">Walk through the demo tower: the whole site, floors, unit interiors and amenity pins.</p>
+        <div class="meta"><span class="badge">Public</span><span class="open">Open →</span></div>
+      </a>
+      <form class="card reel" id="go" style="gap:.9rem">
+        <div class="icon" aria-hidden="true">🔗</div>
+        <h2>Open a project</h2>
+        <p class="desc">Type the project's slug (the last part of its share link), for example <code>shivpujan-enclave</code>.</p>
+        <input id="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="project-slug" aria-label="Project slug" style="padding:.7rem .9rem;border-radius:.6rem;border:1px solid var(--line);background:transparent;color:var(--text);font:inherit">
+        <button style="padding:.7rem;border-radius:.6rem;border:0;background:var(--a2);color:#111;font-weight:700;font:inherit;cursor:pointer">Open tour →</button>
+      </form>
+    </div>
+    <script>
+      document.getElementById('go').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var slug = document.getElementById('slug').value.trim().toLowerCase();
+        if (slug) location.href = 'https://twin-200-141-8-86.sslip.io/view/' + encodeURIComponent(slug);
+      });
+    </script>
+    <footer>Looking for the admin tools? Ask the team for the admin hub link.</footer>
+  </main>
+</body>
+</html>
